@@ -1,0 +1,1601 @@
+Published HTTP security backports for PHP 7.4.33.
+
+CVE-2025-1217: https://github.com/php/php-src/commit/d20b4c97a9f883b62b65b82d939c5af9a2028ef1
+Prerequisites where absent: 1c157d3fa2e102ccf375ec4c1ddca8770208dae7,
+51e2015af3fc4757a666736aae7899a43f76ae6d (HTTP chunked redirects and long headers).
+CVE-2025-1734: https://github.com/php/php-src/commit/0548c4c1756724a89ef8310709419b08aadb2b3b
+CVE-2025-1861: https://github.com/php/php-src/commit/ac1a054bb3eb5994a199e8b18cca28cbabf5943e
+Empty/single-character Location followups: 547566f17a12b4900efb69a7cf8cd325d00613a2,
+64664758cd8ee5928acf25b3f9ae11c7571c1b39 (CVE-2026-93682 regression protection).
+Test helpers: 95f2583743bdd758d8dbdc7e23e08a4a2d39e8da,
+b8731767d83acf5ae2be6a26eab7f6721c94eb64.
+Source: Freexian php7.3_7.3.31-1~deb10u16.debian.tar.xz,
+SHA256: 1eedbd1095e7be93d310c2cbfd13acbcf521b2433ef0ddb5e40abd2dffa633bb.
+
+Adaptations: retain native URL representation and response-header ownership,
+retain existing cross-origin credential stripping, and free the new dynamic
+redirect path on native error/recursive-call exits. PHP 7.1/7.2 use their
+native zend_string_free API. Native tests retain branch-specific diagnostics.
+PHP 7.1/7.2 HTTP test helper binds IPv4 loopback because their socket-name
+format does not bracket IPv6 literals. The OpenSSL test helper and HTTP
+advisory fixtures already use IPv4 loopback.
+
+diff --git a/ext/standard/http_fopen_wrapper.c b/ext/standard/http_fopen_wrapper.c
+index 2655deb..76c28df 100644
+--- a/ext/standard/http_fopen_wrapper.c
++++ b/ext/standard/http_fopen_wrapper.c
+@@ -69,15 +69,16 @@
+ 
+ #include "php_fopen_wrappers.h"
+ 
+-#define HTTP_HEADER_BLOCK_SIZE		1024
+-#define PHP_URL_REDIRECT_MAX		20
+-#define HTTP_HEADER_USER_AGENT		1
+-#define HTTP_HEADER_HOST			2
+-#define HTTP_HEADER_AUTH			4
+-#define HTTP_HEADER_FROM			8
+-#define HTTP_HEADER_CONTENT_LENGTH	16
+-#define HTTP_HEADER_TYPE			32
+-#define HTTP_HEADER_CONNECTION		64
++#define HTTP_HEADER_BLOCK_SIZE			1024
++#define HTTP_HEADER_MAX_LOCATION_SIZE	8182 /* 8192 - 10 (size of "Location: ") */
++#define PHP_URL_REDIRECT_MAX			20
++#define HTTP_HEADER_USER_AGENT			1
++#define HTTP_HEADER_HOST				2
++#define HTTP_HEADER_AUTH				4
++#define HTTP_HEADER_FROM				8
++#define HTTP_HEADER_CONTENT_LENGTH		16
++#define HTTP_HEADER_TYPE				32
++#define HTTP_HEADER_CONNECTION			64
+ 
+ #define HTTP_WRAPPER_HEADER_INIT    1
+ #define HTTP_WRAPPER_REDIRECTED     2
+@@ -160,6 +161,205 @@ static zend_bool check_has_header(const char *headers, const char *header) {
+ 	return 0;
+ }
+ 
++typedef struct _php_stream_http_response_header_info {
++	php_stream_filter *transfer_encoding;
++	size_t file_size;
++	zend_bool error;
++	zend_bool follow_location;
++	char *location;
++	size_t location_len;
++} php_stream_http_response_header_info;
++
++static void php_stream_http_response_header_info_init(
++		php_stream_http_response_header_info *header_info)
++{
++	memset(header_info, 0, sizeof(php_stream_http_response_header_info));
++	header_info->follow_location = 1;
++}
++
++/* Trim white spaces from response header line and update its length */
++static zend_bool php_stream_http_response_header_trim(char *http_header_line,
++		size_t *http_header_line_length)
++{
++	char *http_header_line_end = http_header_line + *http_header_line_length - 1;
++	while (http_header_line_end >= http_header_line &&
++			(*http_header_line_end == '\n' || *http_header_line_end == '\r')) {
++		http_header_line_end--;
++	}
++
++	/* The primary definition of an HTTP header in RFC 7230 states:
++	* > Each header field consists of a case-insensitive field name followed
++	* > by a colon (":"), optional leading whitespace, the field value, and
++	* > optional trailing whitespace. */
++
++	/* Strip trailing whitespace */
++	zend_bool space_trim = (*http_header_line_end == ' ' || *http_header_line_end == '\t');
++	if (space_trim) {
++		do {
++			http_header_line_end--;
++		} while (http_header_line_end >= http_header_line &&
++				(*http_header_line_end == ' ' || *http_header_line_end == '\t'));
++	}
++	http_header_line_end++;
++	*http_header_line_end = '\0';
++	*http_header_line_length = http_header_line_end - http_header_line;
++
++	return space_trim;
++}
++
++/* Process folding headers of the current line and if there are none, parse last full response
++ * header line. It returns NULL if the last header is finished, otherwise it returns updated
++ * last header line.  */
++static zend_string *php_stream_http_response_headers_parse(php_stream_wrapper *wrapper,
++		php_stream *stream, php_stream_context *context, int options,
++		zend_string *last_header_line_str, char *header_line, size_t *header_line_length,
++		int response_code, zval *response_header,
++		php_stream_http_response_header_info *header_info)
++{
++	char *last_header_line = ZSTR_VAL(last_header_line_str);
++	size_t last_header_line_length = ZSTR_LEN(last_header_line_str);
++	char *last_header_line_end = ZSTR_VAL(last_header_line_str) + ZSTR_LEN(last_header_line_str) - 1;
++
++	/* Process non empty header line. */
++	if (header_line && (*header_line != '\n' && *header_line != '\r')) {
++		/* Removing trailing white spaces. */
++		if (php_stream_http_response_header_trim(header_line, header_line_length) &&
++				*header_line_length == 0) {
++			/* Only spaces so treat as an empty folding header. */
++			return last_header_line_str;
++		}
++
++		/* Process folding headers if starting with a space or a tab. */
++		if (header_line && (*header_line == ' ' || *header_line == '\t')) {
++			char *http_folded_header_line = header_line;
++			size_t http_folded_header_line_length = *header_line_length;
++			/* Remove the leading white spaces. */
++			while (*http_folded_header_line == ' ' || *http_folded_header_line == '\t') {
++				http_folded_header_line++;
++				http_folded_header_line_length--;
++			}
++			/* It has to have some characters because it would get returned after the call
++			 * php_stream_http_response_header_trim above. */
++			ZEND_ASSERT(http_folded_header_line_length > 0);
++			/* Concatenate last header line, space and current header line. */
++			size_t len = last_header_line_length + 1 + http_folded_header_line_length;
++			zend_string *extended_header_str = zend_string_alloc(len, 0);
++			memcpy(ZSTR_VAL(extended_header_str), last_header_line, last_header_line_length);
++			ZSTR_VAL(extended_header_str)[last_header_line_length] = ' ';
++			memcpy(ZSTR_VAL(extended_header_str) + last_header_line_length + 1, http_folded_header_line, http_folded_header_line_length);
++			ZSTR_VAL(extended_header_str)[len] = '\0';
++			zend_string_efree(last_header_line_str);
++			last_header_line_str = extended_header_str;
++			/* Return new header line. */
++			return last_header_line_str;
++		}
++	}
++
++	/* Find header separator position. */
++	char *last_header_value = memchr(last_header_line, ':', last_header_line_length);
++	if (last_header_value) {
++		/* Verify there is no space in header name */
++		char *last_header_name = last_header_line + 1;
++		while (last_header_name < last_header_value) {
++			if (*last_header_name == ' ' || *last_header_name == '\t') {
++				header_info->error = 1;
++				php_stream_wrapper_log_error(wrapper, options,
++					"HTTP invalid response format (space in header name)!");
++				zend_string_efree(last_header_line_str);
++				return NULL;
++			}
++			++last_header_name;
++		}
++
++		last_header_value++; /* Skip ':'. */
++
++		/* Strip leading whitespace. */
++		while (last_header_value < last_header_line_end
++				&& (*last_header_value == ' ' || *last_header_value == '\t')) {
++			last_header_value++;
++		}
++	} else {
++		/* There is no colon which means invalid response so error. */
++		header_info->error = 1;
++		php_stream_wrapper_log_error(wrapper, options,
++				"HTTP invalid response format (no colon in header line)!");
++		zend_string_efree(last_header_line_str);
++		return NULL;
++	}
++
++	zend_bool store_header = 1;
++	zval *tmpzval = NULL;
++
++	if (!strncasecmp(last_header_line, "Location:", sizeof("Location:")-1)) {
++		/* Check if the location should be followed. */
++		if (context && (tmpzval = php_stream_context_get_option(context, "http", "follow_location")) != NULL) {
++			header_info->follow_location = zval_is_true(tmpzval);
++		} else if (!((response_code >= 300 && response_code < 304)
++				|| 307 == response_code || 308 == response_code)) {
++			/* The redirection should not be automatic if follow_location is not set and
++			 * response_code not in (300, 301, 302, 303 and 307)
++			 * see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.1
++			 * RFC 7238 defines 308: http://tools.ietf.org/html/rfc7238 */
++			header_info->follow_location = 0;
++		}
++		size_t last_header_value_len = strlen(last_header_value);
++		if (last_header_value_len > HTTP_HEADER_MAX_LOCATION_SIZE) {
++			header_info->error = 1;
++			php_stream_wrapper_log_error(wrapper, options,
++					"HTTP Location header size is over the limit of %d bytes",
++					HTTP_HEADER_MAX_LOCATION_SIZE);
++			zend_string_efree(last_header_line_str);
++			return NULL;
++		}
++		if (header_info->location_len == 0) {
++			header_info->location = emalloc(last_header_value_len + 1);
++		} else if (header_info->location_len <= last_header_value_len) {
++			header_info->location = erealloc(header_info->location, last_header_value_len + 1);
++		}
++		header_info->location_len = last_header_value_len;
++		memcpy(header_info->location, last_header_value, last_header_value_len + 1);
++	} else if (!strncasecmp(last_header_line, "Content-Type:", sizeof("Content-Type:")-1)) {
++		php_stream_notify_info(context, PHP_STREAM_NOTIFY_MIME_TYPE_IS, last_header_value, 0);
++	} else if (!strncasecmp(last_header_line, "Content-Length:", sizeof("Content-Length:")-1)) {
++		header_info->file_size = atoi(last_header_value);
++		php_stream_notify_file_size(context, header_info->file_size, last_header_line, 0);
++	} else if (
++		!strncasecmp(last_header_line, "Transfer-Encoding:", sizeof("Transfer-Encoding:")-1)
++		&& !strncasecmp(last_header_value, "Chunked", sizeof("Chunked")-1)
++	) {
++		/* Create filter to decode response body. */
++		if (!(options & STREAM_ONLY_GET_HEADERS)) {
++			zend_long decode = 1;
++
++			if (context && (tmpzval = php_stream_context_get_option(context, "http", "auto_decode")) != NULL) {
++				decode = zend_is_true(tmpzval);
++			}
++			if (decode) {
++				if (header_info->transfer_encoding != NULL) {
++					/* Prevent a memory leak in case there are more transfer-encoding headers. */
++					php_stream_filter_free(header_info->transfer_encoding);
++				}
++				header_info->transfer_encoding = php_stream_filter_create(
++						"dechunk", NULL, php_stream_is_persistent(stream));
++				if (header_info->transfer_encoding != NULL) {
++					/* Do not store transfer-encoding header. */
++					store_header = 0;
++				}
++			}
++		}
++	}
++
++	if (store_header) {
++		zval http_header;
++		ZVAL_NEW_STR(&http_header, last_header_line_str);
++		zend_hash_next_index_insert(Z_ARRVAL_P(response_header), &http_header);
++	} else {
++		zend_string_efree(last_header_line_str);
++	}
++
++	return NULL;
++}
++
+ static php_stream *php_stream_url_wrap_http_ex(php_stream_wrapper *wrapper,
+ 		const char *path, const char *mode, int options, zend_string **opened_path,
+ 		php_stream_context *context, int redirect_max, int flags,
+@@ -172,11 +372,12 @@ static php_stream *php_stream_url_wrap_http_ex(php_stream_wrapper *wrapper,
+ 	zend_string *tmp = NULL;
+ 	char *ua_str = NULL;
+ 	zval *ua_zval = NULL, *tmpzval = NULL, ssl_proxy_peer_name;
+-	char location[HTTP_HEADER_BLOCK_SIZE];
+ 	int reqok = 0;
+ 	char *http_header_line = NULL;
++	zend_string *last_header_line_str = NULL;
++	php_stream_http_response_header_info header_info;
+ 	char tmp_line[128];
+-	size_t chunk_size = 0, file_size = 0;
++	size_t chunk_size = 0;
+ 	int eol_detect = 0;
+ 	char *transport_string;
+ 	zend_string *errstr = NULL;
+@@ -188,8 +389,6 @@ static php_stream *php_stream_url_wrap_http_ex(php_stream_wrapper *wrapper,
+ 	int header_init = ((flags & HTTP_WRAPPER_HEADER_INIT) != 0);
+ 	int redirected = ((flags & HTTP_WRAPPER_REDIRECTED) != 0);
+ 	int redirect_keep_method = ((flags & HTTP_WRAPPER_KEEP_METHOD) != 0);
+-	zend_bool follow_location = 1;
+-	php_stream_filter *transfer_encoding = NULL;
+ 	int response_code;
+ 	smart_str req_buf = {0};
+ 	zend_bool custom_request_method;
+@@ -390,6 +589,8 @@ finish:
+ 		}
+ 	}
+ 
++	php_stream_http_response_header_info_init(&header_info);
++
+ 	if (stream == NULL)
+ 		goto out;
+ 
+@@ -711,8 +912,6 @@ finish:
+ 	/* send it */
+ 	php_stream_write(stream, ZSTR_VAL(req_buf.s), ZSTR_LEN(req_buf.s));
+ 
+-	location[0] = '\0';
+-
+ 	if (Z_ISUNDEF_P(response_header)) {
+ 		array_init(response_header);
+ 	}
+@@ -791,124 +990,102 @@ finish:
+ 	}
+ 
+ 	/* read past HTTP headers */
+-
+ 	while (!php_stream_eof(stream)) {
+ 		size_t http_header_line_length;
+ 
+ 		if (http_header_line != NULL) {
+ 			efree(http_header_line);
+ 		}
+-		if ((http_header_line = php_stream_get_line(stream, NULL, 0, &http_header_line_length)) && *http_header_line != '\n' && *http_header_line != '\r') {
+-			char *e = http_header_line + http_header_line_length - 1;
+-			char *http_header_value;
+-
+-			while (e >= http_header_line && (*e == '\n' || *e == '\r')) {
+-				e--;
+-			}
+-
+-			/* The primary definition of an HTTP header in RFC 7230 states:
+-			 * > Each header field consists of a case-insensitive field name followed
+-			 * > by a colon (":"), optional leading whitespace, the field value, and
+-			 * > optional trailing whitespace. */
+-
+-			/* Strip trailing whitespace */
+-			while (e >= http_header_line && (*e == ' ' || *e == '\t')) {
+-				e--;
+-			}
+-
+-			/* Terminate header line */
+-			e++;
+-			*e = '\0';
+-			http_header_line_length = e - http_header_line;
+-
+-			http_header_value = memchr(http_header_line, ':', http_header_line_length);
+-			if (http_header_value) {
+-				http_header_value++; /* Skip ':' */
+-
+-				/* Strip leading whitespace */
+-				while (http_header_value < e
+-						&& (*http_header_value == ' ' || *http_header_value == '\t')) {
+-					http_header_value++;
++		if ((http_header_line = php_stream_get_line(stream, NULL, 0, &http_header_line_length))) {
++			zend_bool last_line;
++			if (*http_header_line == '\r') {
++				if (http_header_line[1] != '\n') {
++					php_stream_close(stream);
++					stream = NULL;
++					php_stream_wrapper_log_error(wrapper, options,
++							"HTTP invalid header name (cannot start with CR character)!");
++					goto out;
+ 				}
++				last_line = 1;
++			} else if (*http_header_line == '\n') {
++				last_line = 1;
+ 			} else {
+-				/* There is no colon. Set the value to the end of the header line, which is
+-				 * effectively an empty string. */
+-				http_header_value = e;
++				last_line = 0;
+ 			}
+ 
+-			if (!strncasecmp(http_header_line, "Location:", sizeof("Location:")-1)) {
+-				if (context && (tmpzval = php_stream_context_get_option(context, "http", "follow_location")) != NULL) {
+-					follow_location = zval_is_true(tmpzval);
+-				} else if (!((response_code >= 300 && response_code < 304)
+-						|| 307 == response_code || 308 == response_code)) {
+-					/* we shouldn't redirect automatically
+-					if follow_location isn't set and response_code not in (300, 301, 302, 303 and 307)
+-					see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.1
+-					RFC 7238 defines 308: http://tools.ietf.org/html/rfc7238 */
+-					follow_location = 0;
+-				}
+-				strlcpy(location, http_header_value, sizeof(location));
+-			} else if (!strncasecmp(http_header_line, "Content-Type:", sizeof("Content-Type:")-1)) {
+-				php_stream_notify_info(context, PHP_STREAM_NOTIFY_MIME_TYPE_IS, http_header_value, 0);
+-			} else if (!strncasecmp(http_header_line, "Content-Length:", sizeof("Content-Length:")-1)) {
+-				file_size = atoi(http_header_value);
+-				php_stream_notify_file_size(context, file_size, http_header_line, 0);
+-			} else if (
+-				!strncasecmp(http_header_line, "Transfer-Encoding:", sizeof("Transfer-Encoding:")-1)
+-				&& !strncasecmp(http_header_value, "Chunked", sizeof("Chunked")-1)
+-			) {
+-
+-				/* create filter to decode response body */
+-				if (!(options & STREAM_ONLY_GET_HEADERS)) {
+-					zend_long decode = 1;
+-
+-					if (context && (tmpzval = php_stream_context_get_option(context, "http", "auto_decode")) != NULL) {
+-						decode = zend_is_true(tmpzval);
+-					}
+-					if (decode) {
+-						transfer_encoding = php_stream_filter_create("dechunk", NULL, php_stream_is_persistent(stream));
+-						if (transfer_encoding) {
+-							/* don't store transfer-encodeing header */
+-							continue;
+-						}
++			if (last_header_line_str != NULL) {
++				/* Parse last header line. */
++				last_header_line_str = php_stream_http_response_headers_parse(wrapper, stream,
++						context, options, last_header_line_str, http_header_line,
++						&http_header_line_length, response_code, response_header, &header_info);
++				if (EXPECTED(last_header_line_str == NULL)) {
++					if (UNEXPECTED(header_info.error)) {
++						php_stream_close(stream);
++						stream = NULL;
++						goto out;
+ 					}
++				} else {
++					/* Folding header present so continue. */
++					continue;
+ 				}
++			} else if (!last_line) {
++				/* The first line cannot start with spaces. */
++				if (*http_header_line == ' ' || *http_header_line == '\t') {
++					php_stream_close(stream);
++					stream = NULL;
++					php_stream_wrapper_log_error(wrapper, options,
++							"HTTP invalid response format (folding header at the start)!");
++					goto out;
++				}
++				/* Trim the first line if it is not the last line. */
++				php_stream_http_response_header_trim(http_header_line, &http_header_line_length);
+ 			}
+-
+-			{
+-				zval http_header;
+-				ZVAL_STRINGL(&http_header, http_header_line, http_header_line_length);
+-				zend_hash_next_index_insert(Z_ARRVAL_P(response_header), &http_header);
++			if (last_line) {
++				/* For the last line the last header line must be NULL. */
++				ZEND_ASSERT(last_header_line_str == NULL);
++				break;
+ 			}
++			/* Save current line as the last line so it gets parsed in the next round. */
++			last_header_line_str = zend_string_init(http_header_line, http_header_line_length, 0);
+ 		} else {
+ 			break;
+ 		}
+ 	}
+ 
+-	if (!reqok || (location[0] != '\0' && follow_location)) {
+-		if (!follow_location || (((options & STREAM_ONLY_GET_HEADERS) || ignore_errors) && redirect_max <= 1)) {
++	/* If the stream was closed early, we still want to process the last line to keep BC. */
++	if (last_header_line_str != NULL) {
++		php_stream_http_response_headers_parse(wrapper, stream, context, options,
++				last_header_line_str, NULL, NULL, response_code, response_header, &header_info);
++	}
++
++	if (!reqok || (header_info.location != NULL && header_info.follow_location)) {
++		if (!header_info.follow_location || (((options & STREAM_ONLY_GET_HEADERS) || ignore_errors) && redirect_max <= 1)) {
+ 			goto out;
+ 		}
+ 
+-		if (location[0] != '\0')
+-			php_stream_notify_info(context, PHP_STREAM_NOTIFY_REDIRECTED, location, 0);
++		if (header_info.location != NULL)
++			php_stream_notify_info(context, PHP_STREAM_NOTIFY_REDIRECTED, header_info.location, 0);
+ 
+ 		php_stream_close(stream);
+ 		stream = NULL;
+ 
+-		if (location[0] != '\0') {
++		if (header_info.transfer_encoding) {
++			php_stream_filter_free(header_info.transfer_encoding);
++			header_info.transfer_encoding = NULL;
++		}
+ 
+-			char new_path[HTTP_HEADER_BLOCK_SIZE];
+-			char loc_path[HTTP_HEADER_BLOCK_SIZE];
++		if (header_info.location != NULL) {
++			char *new_path = NULL;
+ 
+-			*new_path='\0';
+-			if (strlen(location)<8 || (strncasecmp(location, "http://", sizeof("http://")-1) &&
+-							strncasecmp(location, "https://", sizeof("https://")-1) &&
+-							strncasecmp(location, "ftp://", sizeof("ftp://")-1) &&
+-							strncasecmp(location, "ftps://", sizeof("ftps://")-1)))
++			if (header_info.location_len < 8 ||
++					(strncasecmp(header_info.location, "http://", sizeof("http://")-1) &&
++							strncasecmp(header_info.location, "https://", sizeof("https://")-1) &&
++							strncasecmp(header_info.location, "ftp://", sizeof("ftp://")-1) &&
++							strncasecmp(header_info.location, "ftps://", sizeof("ftps://")-1)))
+ 			{
+-				if (*location != '/') {
+-					if (*(location+1) != '\0' && resource->path) {
++				char *loc_path = NULL;
++				if (*header_info.location != '/') {
++					if (header_info.location_len > 1 && resource->path) {
+ 						char *s = strrchr(ZSTR_VAL(resource->path), '/');
+ 						if (!s) {
+ 							s = ZSTR_VAL(resource->path);
+@@ -924,28 +1101,34 @@ finish:
+ 						if (resource->path &&
+ 							ZSTR_VAL(resource->path)[0] == '/' &&
+ 							ZSTR_VAL(resource->path)[1] == '\0') {
+-							snprintf(loc_path, sizeof(loc_path) - 1, "%s%s", ZSTR_VAL(resource->path), location);
++							spprintf(&loc_path, 0, "%s%s", ZSTR_VAL(resource->path), header_info.location);
+ 						} else {
+-							snprintf(loc_path, sizeof(loc_path) - 1, "%s/%s", ZSTR_VAL(resource->path), location);
++							spprintf(&loc_path, 0, "%s/%s", ZSTR_VAL(resource->path), header_info.location);
+ 						}
+ 					} else {
+-						snprintf(loc_path, sizeof(loc_path) - 1, "/%s", location);
++						spprintf(&loc_path, 0, "/%s", header_info.location);
+ 					}
+ 				} else {
+-					strlcpy(loc_path, location, sizeof(loc_path));
++					loc_path = header_info.location;
++					header_info.location = NULL;
+ 				}
+ 				if ((use_ssl && resource->port != 443) || (!use_ssl && resource->port != 80)) {
+-					snprintf(new_path, sizeof(new_path) - 1, "%s://%s:%d%s", ZSTR_VAL(resource->scheme), ZSTR_VAL(resource->host), resource->port, loc_path);
++					spprintf(&new_path, 0, "%s://%s:%d%s", ZSTR_VAL(resource->scheme),
++							ZSTR_VAL(resource->host), resource->port, loc_path);
+ 				} else {
+-					snprintf(new_path, sizeof(new_path) - 1, "%s://%s%s", ZSTR_VAL(resource->scheme), ZSTR_VAL(resource->host), loc_path);
++					spprintf(&new_path, 0, "%s://%s%s", ZSTR_VAL(resource->scheme),
++							ZSTR_VAL(resource->host), loc_path);
+ 				}
++				efree(loc_path);
+ 			} else {
+-				strlcpy(new_path, location, sizeof(new_path));
++				new_path = header_info.location;
++				header_info.location = NULL;
+ 			}
+ 
+ 			php_url *new_resource = php_url_parse(new_path);
+ 			if (new_resource == NULL) {
+ 				php_stream_wrapper_log_error(wrapper, options, "Invalid redirect URL! %s", new_path);
++				efree(new_path);
+ 				goto out;
+ 			}
+ 
+@@ -966,6 +1149,7 @@ finish:
+ 		while (s < e) { \
+ 			if (iscntrl(*s)) { \
+ 				php_stream_wrapper_log_error(wrapper, options, "Invalid redirect URL! %s", new_path); \
++				efree(new_path); \
+ 				goto out; \
+ 			} \
+ 			s++; \
+@@ -991,6 +1175,7 @@ finish:
+ 			stream = php_stream_url_wrap_http_ex(
+ 				wrapper, new_path, mode, options, opened_path, context,
+ 				--redirect_max, new_flags, response_header STREAMS_CC);
++			efree(new_path);
+ 		} else {
+ 			php_stream_wrapper_log_error(wrapper, options, "HTTP request failed! %s", tmp_line);
+ 		}
+@@ -1003,6 +1188,10 @@ out:
+ 		efree(http_header_line);
+ 	}
+ 
++	if (header_info.location != NULL) {
++		efree(header_info.location);
++	}
++
+ 	if (resource) {
+ 		php_url_free(resource);
+ 	}
+@@ -1011,7 +1200,7 @@ out:
+ 		if (header_init) {
+ 			ZVAL_COPY(&stream->wrapperdata, response_header);
+ 		}
+-		php_stream_notify_progress_init(context, 0, file_size);
++		php_stream_notify_progress_init(context, 0, header_info.file_size);
+ 
+ 		/* Restore original chunk size now that we're done with headers */
+ 		if (options & STREAM_WILL_CAST)
+@@ -1027,12 +1216,8 @@ out:
+ 		/* restore mode */
+ 		strlcpy(stream->mode, mode, sizeof(stream->mode));
+ 
+-		if (transfer_encoding) {
+-			php_stream_filter_append(&stream->readfilters, transfer_encoding);
+-		}
+-	} else {
+-		if (transfer_encoding) {
+-			php_stream_filter_free(transfer_encoding);
++		if (header_info.transfer_encoding) {
++			php_stream_filter_append(&stream->readfilters, header_info.transfer_encoding);
+ 		}
+ 	}
+ 
+diff --git a/ext/standard/tests/http/bug47021.phpt b/ext/standard/tests/http/bug47021.phpt
+index f3db3e1..00108eb 100644
+--- a/ext/standard/tests/http/bug47021.phpt
++++ b/ext/standard/tests/http/bug47021.phpt
+@@ -70,23 +70,27 @@ do_test(1, true);
+ echo "\n";
+ 
+ ?>
+---EXPECT--
++--EXPECTF--
++
+ Type='text/plain'
+ Hello
+-Size=5
+-World
++
++Warning: file_get_contents(http://%s:%d/): failed to open stream: HTTP invalid response format (no colon in header line)! in %s
++
+ 
+ Type='text/plain'
+ Hello
+-Size=5
+-World
++
++Warning: file_get_contents(http://%s:%d/): failed to open stream: HTTP invalid response format (no colon in header line)! in %s
++
+ 
+ Type='text/plain'
+ Hello
+-Size=5
+-World
++
++Warning: file_get_contents(http://%s:%d/): failed to open stream: HTTP invalid response format (no colon in header line)! in %s
++
+ 
+ Type='text/plain'
+ Hello
+-Size=5
+-World
++
++Warning: file_get_contents(http://%s:%d/): failed to open stream: HTTP invalid response format (no colon in header line)! in %s
+diff --git a/ext/standard/tests/http/bug75535.phpt b/ext/standard/tests/http/bug75535.phpt
+index 9bf298c..e3757ba 100644
+--- a/ext/standard/tests/http/bug75535.phpt
++++ b/ext/standard/tests/http/bug75535.phpt
+@@ -22,10 +22,8 @@ http_server_kill($pid);
+ ==DONE==
+ --EXPECT--
+ string(0) ""
+-array(2) {
++array(1) {
+   [0]=>
+   string(15) "HTTP/1.0 200 Ok"
+-  [1]=>
+-  string(14) "Content-Length"
+ }
+ ==DONE==
+diff --git a/ext/openssl/tests/ServerClientTestCase-8.1.inc b/ext/openssl/tests/ServerClientTestCase-8.1.inc
+new file mode 100644
+--- /dev/null
++++ b/ext/openssl/tests/ServerClientTestCase-8.1.inc
+@@ -0,0 +1,199 @@
++<?php
++
++const WORKER_ARGV_VALUE = 'RUN_WORKER';
++
++const WORKER_DEFAULT_NAME = 'server';
++
++function phpt_notify(string $worker = WORKER_DEFAULT_NAME, string $message = ""): void
++{
++    ServerClientTestCase::getInstance()->notify($worker, $message);
++}
++
++function phpt_wait($worker = WORKER_DEFAULT_NAME, $timeout = null): ?string
++{
++    return ServerClientTestCase::getInstance()->wait($worker, $timeout);
++}
++
++function phpt_notify_server_start($server): void
++{
++    ServerClientTestCase::getInstance()->notify_server_start($server);
++}
++
++function phpt_has_sslv3() {
++    static $result = null;
++    if (!is_null($result)) {
++        return $result;
++    }
++    $server = @stream_socket_server('sslv3://127.0.0.1:10013');
++    if ($result = !!$server) {
++        fclose($server);
++    }
++    return $result;
++}
++
++/**
++ * This is a singleton to let the wait/notify functions work
++ * I know it's horrible, but it's a means to an end
++ */
++class ServerClientTestCase
++{
++    private $isWorker = false;
++
++    private $workerHandle = [];
++
++    private $workerStdIn = [];
++
++    private $workerStdOut = [];
++
++    private static $instance;
++
++    public static function getInstance($isWorker = false)
++    {
++        if (!isset(self::$instance)) {
++            self::$instance = new self($isWorker);
++        }
++
++        return self::$instance;
++    }
++
++    public function __construct($isWorker = false)
++    {
++        if (!isset(self::$instance)) {
++            self::$instance = $this;
++        }
++
++        $this->isWorker = $isWorker;
++    }
++
++    private function spawnWorkerProcess($worker, $code)
++    {
++        if (defined("PHP_WINDOWS_VERSION_MAJOR")) {
++            $ini = php_ini_loaded_file();
++            $cmd = sprintf(
++                '%s %s "%s" %s',
++                PHP_BINARY, $ini ? "-n -c $ini" : "",
++                __FILE__,
++                WORKER_ARGV_VALUE
++            );
++        } else {
++            $cmd = sprintf(
++                '%s "%s" %s %s',
++                PHP_BINARY,
++                __FILE__,
++                WORKER_ARGV_VALUE,
++                $worker
++            );
++        }
++        $this->workerHandle[$worker] = proc_open(
++            $cmd,
++            [['pipe', 'r'], ['pipe', 'w'], STDERR],
++            $pipes
++        );
++        $this->workerStdIn[$worker] = $pipes[0];
++        $this->workerStdOut[$worker] = $pipes[1];
++
++        fwrite($this->workerStdIn[$worker], $code . "\n---\n");
++    }
++
++    private function cleanupWorkerProcess($worker)
++    {
++        fclose($this->workerStdIn[$worker]);
++        fclose($this->workerStdOut[$worker]);
++        proc_close($this->workerHandle[$worker]);
++    }
++
++    private function stripPhpTagsFromCode($code)
++    {
++        return preg_replace('/^\s*<\?(?:php)?|\?>\s*$/i', '', $code);
++    }
++
++    public function runWorker()
++    {
++        $code = '';
++
++        while (1) {
++            $line = fgets(STDIN);
++
++            if (trim($line) === "---") {
++                break;
++            }
++
++            $code .= $line;
++        }
++
++        eval($code);
++    }
++
++    /**
++     * Run client and all workers
++     *
++     * @param string       $clientCode The client PHP code
++     * @param string|array $workerCode
++     * @param bool         $ephemeral Select whether automatic port selection and automatic awaiting is used
++     * @return void
++     * @throws Exception
++     */
++    public function run(string $clientCode, $workerCode, bool $ephemeral = true): void
++    {
++        if (!is_array($workerCode)) {
++            $workerCode = [WORKER_DEFAULT_NAME => $workerCode];
++        }
++        reset($workerCode);
++        $code = current($workerCode);
++        $worker = key($workerCode);
++        while ($worker != null) {
++            $this->spawnWorkerProcess($worker, $this->stripPhpTagsFromCode($code));
++            $code = next($workerCode);
++            if ($ephemeral) {
++                $addr = trim($this->wait($worker));
++                if (empty($addr)) {
++                    throw new \Exception("Failed server start");
++                }
++                if ($code === false) {
++                    $clientCode = preg_replace('/{{\s*ADDR\s*}}/', $addr, $clientCode);
++                } else {
++                    $code = preg_replace('/{{\s*ADDR\s*}}/', $addr, $code);
++                }
++            }
++            $worker = key($workerCode);
++        }
++
++        eval($this->stripPhpTagsFromCode($clientCode));
++        foreach ($workerCode as $worker => $code) {
++            $this->cleanupWorkerProcess($worker);
++        }
++    }
++
++    public function wait($worker, $timeout = null): ?string
++    {
++        $handle = $this->isWorker ? STDIN : $this->workerStdOut[$worker];
++        if ($timeout === null) {
++            return fgets($handle);
++        }
++
++        stream_set_blocking($handle, false);
++        $read = [$handle];
++        $result = stream_select($read, $write, $except, $timeout);
++        if (!$result) {
++            return null;
++        }
++
++        $result = fgets($handle);
++        stream_set_blocking($handle, true);
++        return $result;
++    }
++
++    public function notify(string $worker, string $message = ""): void
++    {
++        fwrite($this->isWorker ? STDOUT : $this->workerStdIn[$worker], "$message\n");
++    }
++
++    public function notify_server_start($server): void
++    {
++        echo stream_socket_get_name($server, false) . "\n";
++    }
++}
++
++if (isset($argv[1]) && $argv[1] === WORKER_ARGV_VALUE) {
++    ServerClientTestCase::getInstance(true)->runWorker();
++}
+diff --git a/ext/standard/tests/http/bug80256.phpt b/ext/standard/tests/http/bug80256.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/http/bug80256.phpt
+@@ -0,0 +1,29 @@
++--TEST--
++Bug #80256: file_get_contents strip first line with chunked encoding redirect
++--SKIPIF--
++<?php require 'server-8.0.inc'; http_server_skipif(); ?>
++--INI--
++allow_url_fopen=1
++--FILE--
++<?php
++require 'server-8.0.inc';
++
++$responses = array(
++    "data://text/plain,HTTP/1.1 302 Moved Temporarily\r\n"
++    . "Location: /try-again\r\n"
++    . "Transfer-Encoding: chunked\r\n\r\n"
++    . "0\r\n\r\n",
++    "data://text/plain,HTTP/1.1 200 Ok\r\n"
++    . "Transfer-Encoding: chunked\r\n\r\n"
++    . "4\r\n1234\r\n0\r\n\r\n",
++);
++
++['pid' => $pid, 'uri' => $uri] = http_server($responses, $output);
++
++var_dump(file_get_contents($uri));
++
++http_server_kill($pid);
++
++?>
++--EXPECT--
++string(4) "1234"
+diff --git a/ext/standard/tests/http/ghsa-52jp-hrpf-2jff-001.phpt b/ext/standard/tests/http/ghsa-52jp-hrpf-2jff-001.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/http/ghsa-52jp-hrpf-2jff-001.phpt
+@@ -0,0 +1,58 @@
++--TEST--
++GHSA-52jp-hrpf-2jff: HTTP stream wrapper truncate redirect location to 1024 bytes (success)
++--FILE--
++<?php
++$serverCode = <<<'CODE'
++$ctxt = stream_context_create([
++     "socket" => [
++         "tcp_nodelay" => true
++     ]
++ ]);
++
++ $server = stream_socket_server(
++     "tcp://127.0.0.1:0", $errno, $errstr, STREAM_SERVER_BIND | STREAM_SERVER_LISTEN, $ctxt);
++ phpt_notify_server_start($server);
++
++ $conn = stream_socket_accept($server);
++
++ phpt_notify(WORKER_DEFAULT_NAME, "server-accepted");
++
++ $loc = str_repeat("y", 8000);
++ fwrite($conn, "HTTP/1.0 301 Ok\r\nContent-Type: text/html;\r\nLocation: $loc\r\n\r\nbody\r\n");
++CODE;
++
++$clientCode = <<<'CODE'
++ function stream_notification_callback($notification_code, $severity, $message, $message_code, $bytes_transferred, $bytes_max) {
++ switch($notification_code) {
++     case STREAM_NOTIFY_MIME_TYPE_IS:
++         echo "Found the mime-type: ", $message, PHP_EOL;
++         break;
++     case STREAM_NOTIFY_REDIRECTED:
++         echo "Redirected: ";
++         var_dump($message);
++     }
++ }
++
++ $ctx = stream_context_create();
++ stream_context_set_params($ctx, array("notification" => "stream_notification_callback"));
++ var_dump(trim(file_get_contents("http://{{ ADDR }}", false, $ctx)));
++ var_dump($http_response_header);
++CODE;
++
++include sprintf("%s/../../../openssl/tests/ServerClientTestCase-8.1.inc", __DIR__);
++ServerClientTestCase::getInstance()->run($clientCode, $serverCode);
++?>
++--EXPECTF--
++Found the mime-type: text/html;
++Redirected: string(8000) "%s"
++
++Warning: file_get_contents(http://127.0.0.1:%d): failed to open stream: %s
++string(0) ""
++array(3) {
++  [0]=>
++  string(15) "HTTP/1.0 301 Ok"
++  [1]=>
++  string(24) "Content-Type: text/html;"
++  [2]=>
++  string(8010) "Location: %s"
++}
+diff --git a/ext/standard/tests/http/ghsa-52jp-hrpf-2jff-002.phpt b/ext/standard/tests/http/ghsa-52jp-hrpf-2jff-002.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/http/ghsa-52jp-hrpf-2jff-002.phpt
+@@ -0,0 +1,55 @@
++--TEST--
++GHSA-52jp-hrpf-2jff: HTTP stream wrapper truncate redirect location to 1024 bytes (over limit)
++--FILE--
++<?php
++$serverCode = <<<'CODE'
++$ctxt = stream_context_create([
++     "socket" => [
++         "tcp_nodelay" => true
++     ]
++ ]);
++
++ $server = stream_socket_server(
++     "tcp://127.0.0.1:0", $errno, $errstr, STREAM_SERVER_BIND | STREAM_SERVER_LISTEN, $ctxt);
++ phpt_notify_server_start($server);
++
++ $conn = stream_socket_accept($server);
++
++ phpt_notify(WORKER_DEFAULT_NAME, "server-accepted");
++
++ $loc = str_repeat("y", 9000);
++ fwrite($conn, "HTTP/1.0 301 Ok\r\nContent-Type: text/html;\r\nLocation: $loc\r\n\r\nbody\r\n");
++CODE;
++
++$clientCode = <<<'CODE'
++ function stream_notification_callback($notification_code, $severity, $message, $message_code, $bytes_transferred, $bytes_max) {
++ switch($notification_code) {
++     case STREAM_NOTIFY_MIME_TYPE_IS:
++         echo "Found the mime-type: ", $message, PHP_EOL;
++         break;
++     case STREAM_NOTIFY_REDIRECTED:
++         echo "Redirected: ";
++         var_dump($message);
++     }
++ }
++
++ $ctx = stream_context_create();
++ stream_context_set_params($ctx, array("notification" => "stream_notification_callback"));
++ var_dump(trim(file_get_contents("http://{{ ADDR }}", false, $ctx)));
++ var_dump($http_response_header);
++CODE;
++
++include sprintf("%s/../../../openssl/tests/ServerClientTestCase-8.1.inc", __DIR__);
++ServerClientTestCase::getInstance()->run($clientCode, $serverCode);
++?>
++--EXPECTF--
++Found the mime-type: text/html;
++
++Warning: file_get_contents(http://127.0.0.1:%d): failed to open stream: HTTP Location header size is over the limit of 8182 bytes in %s
++string(0) ""
++array(2) {
++  [0]=>
++  string(15) "HTTP/1.0 301 Ok"
++  [1]=>
++  string(24) "Content-Type: text/html;"
++}
+diff --git a/ext/standard/tests/http/ghsa-pcmh-g36c-qc44-001.phpt b/ext/standard/tests/http/ghsa-pcmh-g36c-qc44-001.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/http/ghsa-pcmh-g36c-qc44-001.phpt
+@@ -0,0 +1,51 @@
++--TEST--
++GHSA-pcmh-g36c-qc44: Header parser of http stream wrapper does not verify header name and colon (colon)
++--FILE--
++<?php
++$serverCode = <<<'CODE'
++   $ctxt = stream_context_create([
++        "socket" => [
++            "tcp_nodelay" => true
++        ]
++    ]);
++
++    $server = stream_socket_server(
++        "tcp://127.0.0.1:0", $errno, $errstr, STREAM_SERVER_BIND | STREAM_SERVER_LISTEN, $ctxt);
++    phpt_notify_server_start($server);
++
++    $conn = stream_socket_accept($server);
++
++    phpt_notify(WORKER_DEFAULT_NAME, "server-accepted");
++
++    fwrite($conn, "HTTP/1.0 200 Ok\r\nContent-Type: text/html\r\nWrong-Header\r\nGood-Header: test\r\n\r\nbody\r\n");
++CODE;
++
++$clientCode = <<<'CODE'
++    function stream_notification_callback($notification_code, $severity, $message, $message_code, $bytes_transferred, $bytes_max) {
++    switch($notification_code) {
++        case STREAM_NOTIFY_MIME_TYPE_IS:
++            echo "Found the mime-type: ", $message, PHP_EOL;
++            break;
++        }
++    }
++
++    $ctx = stream_context_create();
++    stream_context_set_params($ctx, array("notification" => "stream_notification_callback"));
++    var_dump(file_get_contents("http://{{ ADDR }}", false, $ctx));
++    var_dump($http_response_header);
++CODE;
++
++include sprintf("%s/../../../openssl/tests/ServerClientTestCase-8.1.inc", __DIR__);
++ServerClientTestCase::getInstance()->run($clientCode, $serverCode);
++?>
++--EXPECTF--
++Found the mime-type: text/html
++
++Warning: file_get_contents(http://127.0.0.1:%d): failed to open stream: HTTP invalid response format (no colon in header line)! in %s
++bool(false)
++array(2) {
++  [0]=>
++  string(15) "HTTP/1.0 200 Ok"
++  [1]=>
++  string(23) "Content-Type: text/html"
++}
+diff --git a/ext/standard/tests/http/ghsa-pcmh-g36c-qc44-002.phpt b/ext/standard/tests/http/ghsa-pcmh-g36c-qc44-002.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/http/ghsa-pcmh-g36c-qc44-002.phpt
+@@ -0,0 +1,51 @@
++--TEST--
++GHSA-pcmh-g36c-qc44: Header parser of http stream wrapper does not verify header name and colon (name)
++--FILE--
++<?php
++$serverCode = <<<'CODE'
++   $ctxt = stream_context_create([
++        "socket" => [
++            "tcp_nodelay" => true
++        ]
++    ]);
++
++    $server = stream_socket_server(
++        "tcp://127.0.0.1:0", $errno, $errstr, STREAM_SERVER_BIND | STREAM_SERVER_LISTEN, $ctxt);
++    phpt_notify_server_start($server);
++
++    $conn = stream_socket_accept($server);
++
++    phpt_notify(WORKER_DEFAULT_NAME, "server-accepted");
++
++    fwrite($conn, "HTTP/1.0 200 Ok\r\nContent-Type: text/html\r\nWrong-Header : test\r\nGood-Header: test\r\n\r\nbody\r\n");
++CODE;
++
++$clientCode = <<<'CODE'
++    function stream_notification_callback($notification_code, $severity, $message, $message_code, $bytes_transferred, $bytes_max) {
++    switch($notification_code) {
++        case STREAM_NOTIFY_MIME_TYPE_IS:
++            echo "Found the mime-type: ", $message, PHP_EOL;
++            break;
++        }
++    }
++
++    $ctx = stream_context_create();
++    stream_context_set_params($ctx, array("notification" => "stream_notification_callback"));
++    var_dump(file_get_contents("http://{{ ADDR }}", false, $ctx));
++    var_dump($http_response_header);
++CODE;
++
++include sprintf("%s/../../../openssl/tests/ServerClientTestCase-8.1.inc", __DIR__);
++ServerClientTestCase::getInstance()->run($clientCode, $serverCode);
++?>
++--EXPECTF--
++Found the mime-type: text/html
++
++Warning: file_get_contents(http://127.0.0.1:%d): failed to open stream: HTTP invalid response format (space in header name)! in %s
++bool(false)
++array(2) {
++  [0]=>
++  string(15) "HTTP/1.0 200 Ok"
++  [1]=>
++  string(23) "Content-Type: text/html"
++}
+diff --git a/ext/standard/tests/http/ghsa-v8xr-gpvj-cx9g-001.phpt b/ext/standard/tests/http/ghsa-v8xr-gpvj-cx9g-001.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/http/ghsa-v8xr-gpvj-cx9g-001.phpt
+@@ -0,0 +1,49 @@
++--TEST--
++GHSA-v8xr-gpvj-cx9g: Header parser of http stream wrapper does not handle folded headers (single)
++--FILE--
++<?php
++$serverCode = <<<'CODE'
++   $ctxt = stream_context_create([
++        "socket" => [
++            "tcp_nodelay" => true
++        ]
++    ]);
++
++    $server = stream_socket_server(
++        "tcp://127.0.0.1:0", $errno, $errstr, STREAM_SERVER_BIND | STREAM_SERVER_LISTEN, $ctxt);
++    phpt_notify_server_start($server);
++
++    $conn = stream_socket_accept($server);
++
++    phpt_notify(WORKER_DEFAULT_NAME, "server-accepted");
++
++    fwrite($conn, "HTTP/1.0 200 Ok\r\nContent-Type: text/html;\r\n    charset=utf-8\r\n\r\nbody\r\n");
++CODE;
++
++$clientCode = <<<'CODE'
++    function stream_notification_callback($notification_code, $severity, $message, $message_code, $bytes_transferred, $bytes_max) {
++    switch($notification_code) {
++        case STREAM_NOTIFY_MIME_TYPE_IS:
++            echo "Found the mime-type: ", $message, PHP_EOL;
++            break;
++        }
++    }
++
++    $ctx = stream_context_create();
++    stream_context_set_params($ctx, array("notification" => "stream_notification_callback"));
++    var_dump(trim(file_get_contents("http://{{ ADDR }}", false, $ctx)));
++    var_dump($http_response_header);
++CODE;
++
++include sprintf("%s/../../../openssl/tests/ServerClientTestCase-8.1.inc", __DIR__);
++ServerClientTestCase::getInstance()->run($clientCode, $serverCode);
++?>
++--EXPECTF--
++Found the mime-type: text/html; charset=utf-8
++string(4) "body"
++array(2) {
++  [0]=>
++  string(15) "HTTP/1.0 200 Ok"
++  [1]=>
++  string(38) "Content-Type: text/html; charset=utf-8"
++}
+diff --git a/ext/standard/tests/http/ghsa-v8xr-gpvj-cx9g-002.phpt b/ext/standard/tests/http/ghsa-v8xr-gpvj-cx9g-002.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/http/ghsa-v8xr-gpvj-cx9g-002.phpt
+@@ -0,0 +1,51 @@
++--TEST--
++GHSA-v8xr-gpvj-cx9g: Header parser of http stream wrapper does not handle folded headers (multiple)
++--FILE--
++<?php
++$serverCode = <<<'CODE'
++   $ctxt = stream_context_create([
++        "socket" => [
++            "tcp_nodelay" => true
++        ]
++    ]);
++
++    $server = stream_socket_server(
++        "tcp://127.0.0.1:0", $errno, $errstr, STREAM_SERVER_BIND | STREAM_SERVER_LISTEN, $ctxt);
++    phpt_notify_server_start($server);
++
++    $conn = stream_socket_accept($server);
++
++    phpt_notify(WORKER_DEFAULT_NAME, "server-accepted");
++
++    fwrite($conn, "HTTP/1.0 200 Ok\r\nContent-Type: text/html;\r\nCustom-Header: somevalue;\r\n  param1=value1; \r\n    param2=value2\r\n\r\nbody\r\n");
++CODE;
++
++$clientCode = <<<'CODE'
++    function stream_notification_callback($notification_code, $severity, $message, $message_code, $bytes_transferred, $bytes_max) {
++    switch($notification_code) {
++        case STREAM_NOTIFY_MIME_TYPE_IS:
++            echo "Found the mime-type: ", $message, PHP_EOL;
++            break;
++        }
++    }
++
++    $ctx = stream_context_create();
++    stream_context_set_params($ctx, array("notification" => "stream_notification_callback"));
++    var_dump(trim(file_get_contents("http://{{ ADDR }}", false, $ctx)));
++    var_dump($http_response_header);
++CODE;
++
++include sprintf("%s/../../../openssl/tests/ServerClientTestCase-8.1.inc", __DIR__);
++ServerClientTestCase::getInstance()->run($clientCode, $serverCode);
++?>
++--EXPECTF--
++Found the mime-type: text/html;
++string(4) "body"
++array(3) {
++  [0]=>
++  string(15) "HTTP/1.0 200 Ok"
++  [1]=>
++  string(24) "Content-Type: text/html;"
++  [2]=>
++  string(54) "Custom-Header: somevalue; param1=value1; param2=value2"
++}
+diff --git a/ext/standard/tests/http/ghsa-v8xr-gpvj-cx9g-003.phpt b/ext/standard/tests/http/ghsa-v8xr-gpvj-cx9g-003.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/http/ghsa-v8xr-gpvj-cx9g-003.phpt
+@@ -0,0 +1,49 @@
++--TEST--
++GHSA-v8xr-gpvj-cx9g: Header parser of http stream wrapper does not handle folded headers (empty)
++--FILE--
++<?php
++$serverCode = <<<'CODE'
++   $ctxt = stream_context_create([
++        "socket" => [
++            "tcp_nodelay" => true
++        ]
++    ]);
++
++    $server = stream_socket_server(
++        "tcp://127.0.0.1:0", $errno, $errstr, STREAM_SERVER_BIND | STREAM_SERVER_LISTEN, $ctxt);
++    phpt_notify_server_start($server);
++
++    $conn = stream_socket_accept($server);
++
++    phpt_notify(WORKER_DEFAULT_NAME, "server-accepted");
++
++    fwrite($conn, "HTTP/1.0 200 Ok\r\nContent-Type: text/html;\r\n    \r\n charset=utf-8\r\n\r\nbody\r\n");
++CODE;
++
++$clientCode = <<<'CODE'
++    function stream_notification_callback($notification_code, $severity, $message, $message_code, $bytes_transferred, $bytes_max) {
++    switch($notification_code) {
++        case STREAM_NOTIFY_MIME_TYPE_IS:
++            echo "Found the mime-type: ", $message, PHP_EOL;
++            break;
++        }
++    }
++
++    $ctx = stream_context_create();
++    stream_context_set_params($ctx, array("notification" => "stream_notification_callback"));
++    var_dump(trim(file_get_contents("http://{{ ADDR }}", false, $ctx)));
++    var_dump($http_response_header);
++CODE;
++
++include sprintf("%s/../../../openssl/tests/ServerClientTestCase-8.1.inc", __DIR__);
++ServerClientTestCase::getInstance()->run($clientCode, $serverCode);
++?>
++--EXPECTF--
++Found the mime-type: text/html; charset=utf-8
++string(4) "body"
++array(2) {
++  [0]=>
++  string(15) "HTTP/1.0 200 Ok"
++  [1]=>
++  string(38) "Content-Type: text/html; charset=utf-8"
++}
+diff --git a/ext/standard/tests/http/ghsa-v8xr-gpvj-cx9g-004.phpt b/ext/standard/tests/http/ghsa-v8xr-gpvj-cx9g-004.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/http/ghsa-v8xr-gpvj-cx9g-004.phpt
+@@ -0,0 +1,48 @@
++--TEST--
++GHSA-v8xr-gpvj-cx9g: Header parser of http stream wrapper does not handle folded headers (first line)
++--FILE--
++<?php
++$serverCode = <<<'CODE'
++   $ctxt = stream_context_create([
++        "socket" => [
++            "tcp_nodelay" => true
++        ]
++    ]);
++
++    $server = stream_socket_server(
++        "tcp://127.0.0.1:0", $errno, $errstr, STREAM_SERVER_BIND | STREAM_SERVER_LISTEN, $ctxt);
++    phpt_notify_server_start($server);
++
++    $conn = stream_socket_accept($server);
++
++    phpt_notify(WORKER_DEFAULT_NAME, "server-accepted");
++
++    fwrite($conn, "HTTP/1.0 200 Ok\r\n   Content-Type: text/html;\r\n    \r\n charset=utf-8\r\n\r\nbody\r\n");
++CODE;
++
++$clientCode = <<<'CODE'
++    function stream_notification_callback($notification_code, $severity, $message, $message_code, $bytes_transferred, $bytes_max) {
++    switch($notification_code) {
++        case STREAM_NOTIFY_MIME_TYPE_IS:
++            echo "Found the mime-type: ", $message, PHP_EOL;
++            break;
++        }
++    }
++
++    $ctx = stream_context_create();
++    stream_context_set_params($ctx, array("notification" => "stream_notification_callback"));
++    var_dump(file_get_contents("http://{{ ADDR }}", false, $ctx));
++    var_dump($http_response_header);
++CODE;
++
++include sprintf("%s/../../../openssl/tests/ServerClientTestCase-8.1.inc", __DIR__);
++ServerClientTestCase::getInstance()->run($clientCode, $serverCode);
++?>
++--EXPECTF--
++
++Warning: file_get_contents(http://127.0.0.1:%d): failed to open stream: HTTP invalid response format (folding header at the start)! in %s
++bool(false)
++array(1) {
++  [0]=>
++  string(15) "HTTP/1.0 200 Ok"
++}
+diff --git a/ext/standard/tests/http/ghsa-v8xr-gpvj-cx9g-005.phpt b/ext/standard/tests/http/ghsa-v8xr-gpvj-cx9g-005.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/http/ghsa-v8xr-gpvj-cx9g-005.phpt
+@@ -0,0 +1,48 @@
++--TEST--
++GHSA-v8xr-gpvj-cx9g: Header parser of http stream wrapper does not handle folded headers (CR before header name)
++--FILE--
++<?php
++$serverCode = <<<'CODE'
++   $ctxt = stream_context_create([
++        "socket" => [
++            "tcp_nodelay" => true
++        ]
++    ]);
++
++    $server = stream_socket_server(
++        "tcp://127.0.0.1:0", $errno, $errstr, STREAM_SERVER_BIND | STREAM_SERVER_LISTEN, $ctxt);
++    phpt_notify_server_start($server);
++
++    $conn = stream_socket_accept($server);
++
++    phpt_notify(WORKER_DEFAULT_NAME, "server-accepted");
++
++    fwrite($conn, "HTTP/1.0 200 Ok\r\n\rIgnored: ignored\r\n\r\nbody\r\n");
++CODE;
++
++$clientCode = <<<'CODE'
++    function stream_notification_callback($notification_code, $severity, $message, $message_code, $bytes_transferred, $bytes_max) {
++    switch($notification_code) {
++        case STREAM_NOTIFY_MIME_TYPE_IS:
++            echo "Found the mime-type: ", $message, PHP_EOL;
++            break;
++        }
++    }
++
++    $ctx = stream_context_create();
++    stream_context_set_params($ctx, array("notification" => "stream_notification_callback"));
++    var_dump(file_get_contents("http://{{ ADDR }}", false, $ctx));
++    var_dump($http_response_header);
++CODE;
++
++include sprintf("%s/../../../openssl/tests/ServerClientTestCase-8.1.inc", __DIR__);
++ServerClientTestCase::getInstance()->run($clientCode, $serverCode);
++?>
++--EXPECTF--
++
++Warning: file_get_contents(http://127.0.0.1:%d): failed to open stream: HTTP invalid header name (cannot start with CR character)! in %s
++bool(false)
++array(1) {
++  [0]=>
++  string(15) "HTTP/1.0 200 Ok"
++}
+diff --git a/ext/standard/tests/http/http_empty_location_redirect.phpt b/ext/standard/tests/http/http_empty_location_redirect.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/http/http_empty_location_redirect.phpt
+@@ -0,0 +1,37 @@
++--TEST--
++Empty Location header must not over-read when building the redirect target
++--FILE--
++<?php
++$serverCode = <<<'CODE'
++$server = stream_socket_server("tcp://127.0.0.1:12342", $errno, $errstr);
++phpt_notify();
++
++for ($n = 0; $n < 4; $n++) {
++    $conn = stream_socket_accept($server, 10);
++    if (!$conn) {
++        break;
++    }
++    $req = fgets($conn);
++    while (trim(fgets($conn)) !== '') {}
++    $uri = explode(' ', $req)[1];
++    if ($n < 3) {
++        fwrite($conn, "HTTP/1.1 302 Found\r\nLocation:\r\nContent-Length: 0\r\n\r\n");
++    } else {
++        $body = "uri=$uri";
++        fwrite($conn, "HTTP/1.1 200 OK\r\nContent-Length: " . strlen($body) . "\r\n\r\n$body");
++    }
++    fclose($conn);
++}
++CODE;
++
++$clientCode = <<<'CODE'
++$ctx = stream_context_create(['http' => ['follow_location' => 1]]);
++phpt_wait();
++echo @file_get_contents("http://127.0.0.1:12342/a/b", false, $ctx), "\n";
++CODE;
++
++include sprintf("%s/../../../openssl/tests/ServerClientTestCase.inc", __DIR__);
++ServerClientTestCase::getInstance()->run($clientCode, $serverCode);
++?>
++--EXPECT--
++uri=/
+diff --git a/ext/standard/tests/http/http_single_char_location_redirect.phpt b/ext/standard/tests/http/http_single_char_location_redirect.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/http/http_single_char_location_redirect.phpt
+@@ -0,0 +1,40 @@
++--TEST--
++Single-char relative Location header keeps resolving against the host root (pre-GH-23467 behavior)
++--DESCRIPTION--
++Not RFC 3986 compliant ("x" against "/a/b" gives "/a/x"), but matches
++PHP's long-standing behavior of resolving against the host root. See GH-23521.
++--FILE--
++<?php
++$serverCode = <<<'CODE'
++$server = stream_socket_server("tcp://127.0.0.1:12342", $errno, $errstr);
++phpt_notify();
++
++for ($n = 0; $n < 2; $n++) {
++    $conn = stream_socket_accept($server, 10);
++    if (!$conn) {
++        break;
++    }
++    $req = fgets($conn);
++    while (trim(fgets($conn)) !== '') {}
++    $uri = explode(' ', $req)[1];
++    if ($n < 1) {
++        fwrite($conn, "HTTP/1.1 302 Found\r\nLocation: x\r\nContent-Length: 0\r\n\r\n");
++    } else {
++        $body = "uri=$uri";
++        fwrite($conn, "HTTP/1.1 200 OK\r\nContent-Length: " . strlen($body) . "\r\n\r\n$body");
++    }
++    fclose($conn);
++}
++CODE;
++
++$clientCode = <<<'CODE'
++$ctx = stream_context_create(['http' => ['follow_location' => 1]]);
++phpt_wait();
++echo @file_get_contents("http://127.0.0.1:12342/a/b", false, $ctx), "\n";
++CODE;
++
++include sprintf("%s/../../../openssl/tests/ServerClientTestCase.inc", __DIR__);
++ServerClientTestCase::getInstance()->run($clientCode, $serverCode);
++?>
++--EXPECT--
++uri=/x
+diff --git a/ext/standard/tests/http/server-8.0.inc b/ext/standard/tests/http/server-8.0.inc
+new file mode 100644
+--- /dev/null
++++ b/ext/standard/tests/http/server-8.0.inc
+@@ -0,0 +1,124 @@
++<?php declare(strict_types=1);
++
++function http_server_skipif() {
++
++    if (!function_exists('pcntl_fork')) die('skip pcntl_fork() not available');
++    if (!function_exists('posix_kill')) die('skip posix_kill() not available');
++    if (!stream_socket_server('tcp://localhost:0')) die('skip stream_socket_server() failed');
++}
++
++function http_server_init(&$output = null) {
++    pcntl_alarm(60);
++
++    $server = stream_socket_server('tcp://localhost:0', $errno, $errstr);
++    if (!$server) {
++        return false;
++    }
++
++    if ($output === null) {
++        $output = tmpfile();
++        if ($output === false) {
++            return false;
++        }
++    }
++
++    $pid = pcntl_fork();
++    if ($pid == -1) {
++        die('could not fork');
++    } else if ($pid) {
++        return [
++            'pid' => $pid,
++            'uri' => 'http://' . stream_socket_get_name($server, false),
++        ];
++    }
++
++    return $server;
++}
++
++/* Minimal HTTP server with predefined responses.
++ *
++ * $socket_string is the socket to create and listen on (e.g. tcp://127.0.0.1:1234)
++ * $files is an iterable of files or callable generator yielding files.
++ *        containing N responses for N expected requests. Server dies after N requests.
++ * $output is a stream on which everything sent by clients is written to
++ */
++function http_server($files, &$output = null) {
++
++    if (!is_resource($server = http_server_init($output))) {
++        return $server;
++    }
++
++    if (is_callable($files)) {
++        $files = $files($server);
++    }
++
++    foreach($files as $file) {
++
++        $sock = stream_socket_accept($server);
++        if (!$sock) {
++            exit(1);
++        }
++
++        // read headers
++
++        $content_length = 0;
++
++        stream_set_blocking($sock, false);
++        while (!feof($sock)) {
++
++            list($r, $w, $e) = array(array($sock), null, null);
++            if (!stream_select($r, $w, $e, 1)) continue;
++
++            $line = stream_get_line($sock, 8192, "\r\n");
++            if ($line === '') {
++                fwrite($output, "\r\n");
++                break;
++            } else if ($line !== false) {
++                fwrite($output, "$line\r\n");
++
++                if (preg_match('#^Content-Length\s*:\s*([[:digit:]]+)\s*$#i', $line, $matches)) {
++                    $content_length = (int) $matches[1];
++                }
++            }
++        }
++        stream_set_blocking($sock, true);
++
++        // read content
++
++        if ($content_length > 0) {
++            stream_copy_to_stream($sock, $output, $content_length);
++        }
++
++        // send response
++
++        $fd = fopen($file, 'rb');
++        stream_copy_to_stream($fd, $sock);
++
++        fclose($sock);
++    }
++
++    exit(0);
++}
++
++function http_server_sleep($micro_seconds = 500000)
++{
++    if (!is_resource($server = http_server_init($output))) {
++        return $server;
++    }
++
++    $sock = stream_socket_accept($server);
++    if (!$sock) {
++        exit(1);
++    }
++
++    usleep($micro_seconds);
++
++    fclose($sock);
++
++    exit(0);
++}
++
++function http_server_kill(int $pid) {
++    posix_kill($pid, SIGTERM);
++    pcntl_waitpid($pid, $status);
++}

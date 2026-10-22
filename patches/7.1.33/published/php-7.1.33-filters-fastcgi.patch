@@ -1,0 +1,193 @@
+diff --git a/ext/standard/filters.c b/ext/standard/filters.c
+index cd92c6e..4e61d70 100644
+--- a/ext/standard/filters.c
++++ b/ext/standard/filters.c
+@@ -365,7 +365,7 @@ static php_conv_err_t php_conv_base64_encode_ctor(php_conv_base64_encode *inst,
+ 	inst->line_ccnt = line_len;
+ 	inst->line_len = line_len;
+ 	if (lbchars != NULL) {
+-		inst->lbchars = (lbchars_dup ? pestrdup(lbchars, persistent) : lbchars);
++		inst->lbchars = (lbchars_dup ? pestrndup(lbchars, lbchars_len, persistent) : lbchars);
+ 		inst->lbchars_len = lbchars_len;
+ 	} else {
+ 		inst->lbchars = NULL;
+@@ -974,7 +974,7 @@ static php_conv_err_t php_conv_qprint_encode_ctor(php_conv_qprint_encode *inst,
+ 	inst->line_ccnt = line_len;
+ 	inst->line_len = line_len;
+ 	if (lbchars != NULL) {
+-		inst->lbchars = (lbchars_dup ? pestrdup(lbchars, persistent) : lbchars);
++		inst->lbchars = (lbchars_dup ? pestrndup(lbchars, lbchars_len, persistent) : lbchars);
+ 		inst->lbchars_len = lbchars_len;
+ 	} else {
+ 		inst->lbchars = NULL;
+@@ -1187,7 +1187,7 @@ static php_conv_err_t php_conv_qprint_decode_ctor(php_conv_qprint_decode *inst,
+ 	inst->next_char = 0;
+ 	inst->lb_ptr = inst->lb_cnt = 0;
+ 	if (lbchars != NULL) {
+-		inst->lbchars = (lbchars_dup ? pestrdup(lbchars, persistent) : lbchars);
++		inst->lbchars = (lbchars_dup ? pestrndup(lbchars, lbchars_len, persistent) : lbchars);
+ 		inst->lbchars_len = lbchars_len;
+ 	} else {
+ 		inst->lbchars = NULL;
+diff --git a/ext/standard/tests/filters/ghsa-88hq-2827-7pg6.phpt b/ext/standard/tests/filters/ghsa-88hq-2827-7pg6.phpt
+new file mode 100644
+index 0000000..84a85da
+--- /dev/null
++++ b/ext/standard/tests/filters/ghsa-88hq-2827-7pg6.phpt
+@@ -0,0 +1,27 @@
++--TEST--
++GHSA-88hq-2827-7pg6: OOB read in convert stream filters when line-break-chars contains NUL
++--FILE--
++<?php
++
++// Test base64-encode: line-break-chars with embedded NUL must be preserved fully.
++// Before the fix, pestrdup() truncated at the NUL, but lbchars_len kept the
++// original length, causing a heap-buffer-overflow read during encoding.
++$opts = ["line-length" => 4, "line-break-chars" => "\0X"];
++$fp = fopen("php://temp", "r+");
++fwrite($fp, str_repeat("A", 6));
++rewind($fp);
++stream_filter_append($fp, "convert.base64-encode", STREAM_FILTER_READ, $opts);
++$out = stream_get_contents($fp);
++fclose($fp);
++
++// base64("AAAAAA") = "QUFBQUFB" (8 chars)
++// With line-length=4: "QUFB" + "\0X" + "QUFB"
++// Hex: 5155464200585155 4642
++echo bin2hex($out), "\n";
++
++echo "Done\n";
++
++?>
++--EXPECT--
++51554642005851554642
++Done
+diff --git a/main/fastcgi.c b/main/fastcgi.c
+index 3181661..1277ac9 100644
+--- a/main/fastcgi.c
++++ b/main/fastcgi.c
+@@ -1345,7 +1345,7 @@ static int fcgi_is_allowed() {
+ 	if (client_sa.sa.sa_family == AF_INET6) {
+ 		for (i = 0; allowed_clients[i].sa.sa_family ; i++) {
+ 			if (allowed_clients[i].sa.sa_family == AF_INET6
+-				&& !memcmp(&client_sa.sa_inet6.sin6_addr, &allowed_clients[i].sa_inet6.sin6_addr, 12)) {
++				&& !memcmp(&client_sa.sa_inet6.sin6_addr, &allowed_clients[i].sa_inet6.sin6_addr, sizeof(client_sa.sa_inet6.sin6_addr))) {
+ 				return 1;
+ 			}
+ #ifdef IN6_IS_ADDR_V4MAPPED
+diff --git a/sapi/fpm/tests/ghsa-62xp-839h-2637-ipv6-allowed-clients.phpt b/sapi/fpm/tests/ghsa-62xp-839h-2637-ipv6-allowed-clients.phpt
+new file mode 100644
+index 0000000..c72f9bc
+--- /dev/null
++++ b/sapi/fpm/tests/ghsa-62xp-839h-2637-ipv6-allowed-clients.phpt
+@@ -0,0 +1,52 @@
++--TEST--
++GHSA-62xp-839h-2637: IPv6 allowed client compared on all 128 bits
++--SKIPIF--
++<?php
++include "skipif.inc";
++FPM\Tester::skipIfIPv6IsNotSupported();
++?>
++--FILE--
++<?php
++
++require_once "tester.inc";
++
++$cfg = <<<EOT
++[global]
++error_log = {{FILE:LOG}}
++[exact]
++listen = {{ADDR:IPv6:ANY[exact]}}
++listen.allowed_clients = ::1
++pm = static
++pm.max_children = 1
++[prefix]
++listen = {{ADDR:IPv6:ANY[prefix]}}
++listen.allowed_clients = ::dead:beef
++pm = static
++pm.max_children = 1
++catch_workers_output = yes
++EOT;
++
++$tester = new FPM\Tester($cfg);
++$tester->start();
++$tester->expectLogStartNotices();
++$tester->checkRequest('{{ADDR:IPv6[exact]}}', 'exact: ok', 'exact: error');
++$tester->checkRequest('{{ADDR:IPv6[prefix]}}', 'prefix: ok', 'prefix: error');
++$tester->terminate();
++$tester->expectLogWarning(
++    'child %d said into stderr: "ERROR: Connection disallowed: IP address \'::1\' has been dropped."',
++    'prefix'
++);
++$tester->expectLogTerminatingNotices();
++$tester->close();
++
++?>
++Done
++--EXPECT--
++exact: ok
++prefix: error
++Done
++--CLEAN--
++<?php
++require_once "tester.inc";
++FPM\Tester::clean();
++?>
+diff --git a/sapi/fpm/tests/ghsa-62xp-839h-2637-v4mapped-allowed-clients.phpt b/sapi/fpm/tests/ghsa-62xp-839h-2637-v4mapped-allowed-clients.phpt
+new file mode 100644
+index 0000000..1bbb7c1
+--- /dev/null
++++ b/sapi/fpm/tests/ghsa-62xp-839h-2637-v4mapped-allowed-clients.phpt
+@@ -0,0 +1,52 @@
++--TEST--
++GHSA-62xp-839h-2637: IPv4-mapped allowed client compared on all 128 bits
++--SKIPIF--
++<?php
++include "skipif.inc";
++FPM\Tester::skipIfIPv6IsNotSupported();
++?>
++--FILE--
++<?php
++
++require_once "tester.inc";
++
++$cfg = <<<EOT
++[global]
++error_log = {{FILE:LOG}}
++[exact]
++listen = {{ADDR:IPv6:ANY[exact]}}
++listen.allowed_clients = ::ffff:127.0.0.1
++pm = static
++pm.max_children = 1
++[prefix]
++listen = {{ADDR:IPv6:ANY[prefix]}}
++listen.allowed_clients = ::ffff:203.0.113.1
++pm = static
++pm.max_children = 1
++catch_workers_output = yes
++EOT;
++
++$tester = new FPM\Tester($cfg);
++$tester->start();
++$tester->expectLogStartNotices();
++$tester->checkRequest('{{ADDR:IPv4[exact]}}', 'exact: ok', 'exact: error');
++$tester->checkRequest('{{ADDR:IPv4[prefix]}}', 'prefix: ok', 'prefix: error');
++$tester->terminate();
++$tester->expectLogWarning(
++    'child %d said into stderr: "ERROR: Connection disallowed: IP address \'127.0.0.1\' has been dropped."',
++    'prefix'
++);
++$tester->expectLogTerminatingNotices();
++$tester->close();
++
++?>
++Done
++--EXPECT--
++exact: ok
++prefix: error
++Done
++--CLEAN--
++<?php
++require_once "tester.inc";
++FPM\Tester::clean();
++?>

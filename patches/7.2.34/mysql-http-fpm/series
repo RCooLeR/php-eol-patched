@@ -1,0 +1,3 @@
+php-7.2.34-mysqlnd.patch
+php-7.2.34-http.patch
+php-7.2.34-fpm.patch

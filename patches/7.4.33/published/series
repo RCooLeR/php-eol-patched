@@ -1,0 +1,3 @@
+php-7.4.33-filters-fastcgi.patch
+php-7.4.33-tls-http.patch
+php-7.4.33-soap-phar.patch

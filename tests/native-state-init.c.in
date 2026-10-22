@@ -1,0 +1,39 @@
+/* Plain state structs only: no stale objects, destructors or application callbacks. */
+#include <assert.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <string.h>
+#define PHPAPI
+#define SUCCESS 0
+#define XtOffsetOf(type, member) offsetof(type, member)
+typedef struct { unsigned char request_prefix[96]; void *tags; } url_adapt_state_ex_t;
+typedef struct { unsigned level; void *data; } serialization_state;
+static struct {
+	unsigned serialize_lock;
+	serialization_state serialize, unserialize;
+	url_adapt_state_ex_t url_adapt_session_ex, url_adapt_output_ex;
+} globals;
+#define BG(name) globals.name
+
+@SCANNER_ACTIVATE@
+@SCANNER_EARLY@
+@BASIC_EARLY@
+
+int main(void)
+{
+	int session_tags, output_tags;
+	unsigned char zero[96] = {0};
+	memset(&globals, 0xa5, sizeof(globals));
+	globals.url_adapt_session_ex.tags = &session_tags;
+	globals.url_adapt_output_ex.tags = &output_tags;
+	php_basic_early_rinit();
+	assert(globals.serialize_lock == 0);
+	assert(globals.serialize.level == 0 && globals.serialize.data == NULL);
+	assert(globals.unserialize.level == 0 && globals.unserialize.data == NULL);
+	assert(!memcmp(globals.url_adapt_session_ex.request_prefix, zero, sizeof(zero)));
+	assert(!memcmp(globals.url_adapt_output_ex.request_prefix, zero, sizeof(zero)));
+	assert(globals.url_adapt_session_ex.tags == &session_tags);
+	assert(globals.url_adapt_output_ex.tags == &output_tags);
+	puts("PASS native early-state helper logic; persistent tag sentinels preserved");
+	return 0;
+}

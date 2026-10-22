@@ -1,0 +1,22 @@
+#include <assert.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stddef.h>
+#include <stdio.h>
+typedef struct { size_t FileSize; struct { size_t size, offset; } Thumbnail; } image_info_type;
+static unsigned warnings;
+#define EXIF_ERRLOG_THUMBEOF(info) ++warnings;
+@NATIVE_EXIF_BOUND@
+int main(void) {
+    image_info_type info = {100, {50, 50}};
+    assert(exif_thumbnail_in_file(&info));
+    info.Thumbnail.offset = 49; assert(exif_thumbnail_in_file(&info));
+    info.Thumbnail.offset = 51; assert(!exif_thumbnail_in_file(&info));
+    info.Thumbnail.offset = 0; info.Thumbnail.size = 101; assert(!exif_thumbnail_in_file(&info));
+    info.Thumbnail.offset = SIZE_MAX; info.Thumbnail.size = 1; assert(!exif_thumbnail_in_file(&info));
+    info.FileSize = 0; info.Thumbnail.offset = 0; info.Thumbnail.size = 0; assert(exif_thumbnail_in_file(&info));
+    info.FileSize = SIZE_MAX; info.Thumbnail.size = SIZE_MAX; assert(exif_thumbnail_in_file(&info));
+    assert(warnings == 3);
+    puts("PASS native EXIF thumbnail file bound: 7 finite arithmetic cases");
+    return 0;
+}

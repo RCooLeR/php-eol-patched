@@ -1,0 +1,66 @@
+/* A finite input feeder for the actual native fill_buffer() implementation. */
+#include <assert.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+
+typedef struct {
+	char *buffer, *buf_begin;
+	int bufsize, bytes_in_buffer;
+} multipart_buffer;
+static struct { long post_max_size; int64_t read_post_bytes; } globals;
+#define SG(name) globals.name
+static int calls, supplied;
+static size_t mock_read(char *buf, size_t size)
+{
+	static const char bytes[] = "input-payload";
+	size_t amount = sizeof(bytes) - 1;
+	calls++;
+	if (supplied) return 0;
+	if (amount > size) amount = size;
+	memcpy(buf, bytes, amount);
+	supplied = 1;
+	return amount;
+}
+static struct { size_t (*read_post)(char *, size_t); } sapi_module = { mock_read };
+
+@FILL_BUFFER@
+
+static void run(long limit, int64_t already_read, int blocked)
+{
+	char storage[128] = {0};
+	multipart_buffer buffer = {storage, storage, (int)sizeof(storage), 0};
+	int result;
+	globals.post_max_size = limit;
+	globals.read_post_bytes = already_read;
+	calls = supplied = 0;
+	result = fill_buffer(&buffer);
+	if (blocked) {
+		assert(result == 0 && calls == 0 && buffer.bytes_in_buffer == 0);
+		assert(globals.read_post_bytes == already_read);
+	} else {
+		assert(result == 13 && buffer.bytes_in_buffer == 13 && calls == 2);
+		assert(globals.read_post_bytes == already_read + 13);
+		assert(!memcmp(storage, "input-payload", 13));
+	}
+}
+
+int main(void)
+{
+	char storage[128] = "xxabc";
+	multipart_buffer buffered = {storage, storage + 2, (int)sizeof(storage), 3};
+	run(100, 101, 1);
+	run(100, 100, 0); /* Upstream deliberately uses >, not >=. */
+	run(100, 99, 0);
+	run(100, 0, 0);
+	run(0, 5000, 0);
+	run(-1, 5000, 0);
+	globals.post_max_size = 100;
+	globals.read_post_bytes = 101;
+	calls = supplied = 0;
+	assert(fill_buffer(&buffered) == 0);
+	assert(calls == 0 && buffered.bytes_in_buffer == 3 && !memcmp(storage, "abc", 3));
+	puts("PASS native multipart actual-byte bound: 7 cases");
+	return 0;
+}

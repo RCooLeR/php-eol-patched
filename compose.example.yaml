@@ -1,0 +1,29 @@
+name: php-eol-patched
+
+services:
+  php:
+    build:
+      context: .
+      target: runtime
+    image: php-eol-patched:8.1.34
+    restart: unless-stopped
+    stop_grace_period: 60s
+    read_only: true
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "127.0.0.1:9000:9000"
+    volumes:
+      - type: bind
+        source: ./app
+        target: /var/www/html
+        bind:
+          create_host_path: false
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,noexec,size=128m
+    logging:
+      driver: local
+      options:
+        max-size: "10m"
+        max-file: "3"

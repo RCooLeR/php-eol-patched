@@ -1,0 +1,11 @@
+.env
+.env.*
+compose.override.yaml
+compose.override.yml
+secrets/
+*.log
+*.tar.xz
+*.tar.gz
+__pycache__/
+*.pyc
+app/

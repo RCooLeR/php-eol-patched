@@ -1,0 +1,11 @@
+* text=auto eol=lf
+# Preserve upstream patch and license bytes, including whitespace.
+*.patch -text -whitespace
+patches/** -text -whitespace
+LICENSES/** -text -whitespace
+*.png binary
+*.jpg binary
+*.phar binary
+*.gz binary
+*.tar binary
+*.pem text eol=lf

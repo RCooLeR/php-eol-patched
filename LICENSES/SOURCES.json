@@ -1,0 +1,258 @@
+{
+  "retrieved": "2026-10-22",
+  "php_license_version_4": {
+    "source": "https://raw.githubusercontent.com/php/php-src/master/LICENSE",
+    "sha256": "76000691f0de039d3080fe8226131f5c4bb29e8996c1de96b94823fad0499fbd"
+  },
+  "versions": [
+    {
+      "version": "7.1.33",
+      "archive": "https://codeload.github.com/php/php-src/tar.gz/refs/tags/php-7.1.33",
+      "archive_sha256": "f80a795a09328a9441bae4a8a60fa0d6d43ec5adc98f5aa5f51d06f4522c07fe",
+      "notices": 256,
+      "notice_bytes": 334114,
+      "licenses": [
+        {
+          "path": "php-7.1.33/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.1.33/LICENSE",
+          "sha256": "f689b8fa63bea7950ce6a21bf52ed88ea0d77673ee76e6de12f51191174d91b8"
+        },
+        {
+          "path": "php-7.1.33/TSRM/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.1.33/TSRM/LICENSE",
+          "sha256": "fe97b8423e34199f7df3e65fd53c4df067a56ab6fe0f2296474ba7da0656460c"
+        },
+        {
+          "path": "php-7.1.33/Zend/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.1.33/Zend/LICENSE",
+          "sha256": "509aeb3be64e428d7e0004ce224620ab01bf94adaacefbb449611939df56bc5b"
+        },
+        {
+          "path": "php-7.1.33/ext/date/lib/LICENSE.rst",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.1.33/ext/date/lib/LICENSE.rst",
+          "sha256": "138d2f7193c51c599f71485281370bf492c4b45f4c294cbf45aa17cb4e652350"
+        },
+        {
+          "path": "php-7.1.33/ext/pcre/pcrelib/COPYING",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.1.33/ext/pcre/pcrelib/COPYING",
+          "sha256": "17abe1dbb92b21ab173cf9757dd57b0b15cd8d863b2ccdef635fdbef03077fb0"
+        },
+        {
+          "path": "php-7.1.33/ext/pcre/pcrelib/LICENCE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.1.33/ext/pcre/pcrelib/LICENCE",
+          "sha256": "449113f28b34ee4731e548c341a2889efbbd522c73be850279bce7e8add86b95"
+        },
+        {
+          "path": "php-7.1.33/ext/phar/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.1.33/ext/phar/LICENSE",
+          "sha256": "2d953a25bd32a888eedbd959bb6397994e13f579fe21a4d7edfb8b51e82f397c"
+        },
+        {
+          "path": "php-7.1.33/sapi/fpm/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.1.33/sapi/fpm/LICENSE",
+          "sha256": "28b9b14401f49784efd2246b32f745c2cd998f4f425be677f29e02a33e68bfed"
+        }
+      ]
+    },
+    {
+      "version": "7.2.34",
+      "archive": "https://codeload.github.com/php/php-src/tar.gz/refs/tags/php-7.2.34",
+      "archive_sha256": "4b7510a6ef920bff78f2287de7397bc6bab549669e56b4543e2194b0fb82a91c",
+      "notices": 260,
+      "notice_bytes": 339203,
+      "licenses": [
+        {
+          "path": "php-7.2.34/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.2.34/LICENSE",
+          "sha256": "f689b8fa63bea7950ce6a21bf52ed88ea0d77673ee76e6de12f51191174d91b8"
+        },
+        {
+          "path": "php-7.2.34/TSRM/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.2.34/TSRM/LICENSE",
+          "sha256": "fe97b8423e34199f7df3e65fd53c4df067a56ab6fe0f2296474ba7da0656460c"
+        },
+        {
+          "path": "php-7.2.34/Zend/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.2.34/Zend/LICENSE",
+          "sha256": "509aeb3be64e428d7e0004ce224620ab01bf94adaacefbb449611939df56bc5b"
+        },
+        {
+          "path": "php-7.2.34/ext/date/lib/LICENSE.rst",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.2.34/ext/date/lib/LICENSE.rst",
+          "sha256": "06978e8ec0a3845f921e9f84707de2bf2360f75d86541a3ee446a7ed826bb737"
+        },
+        {
+          "path": "php-7.2.34/ext/pcre/pcrelib/COPYING",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.2.34/ext/pcre/pcrelib/COPYING",
+          "sha256": "17abe1dbb92b21ab173cf9757dd57b0b15cd8d863b2ccdef635fdbef03077fb0"
+        },
+        {
+          "path": "php-7.2.34/ext/pcre/pcrelib/LICENCE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.2.34/ext/pcre/pcrelib/LICENCE",
+          "sha256": "9ac4dfc82b2645ff77b56b759f95f28aa15ab15a03670fa6d4313a6b351e60f0"
+        },
+        {
+          "path": "php-7.2.34/ext/phar/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.2.34/ext/phar/LICENSE",
+          "sha256": "2d953a25bd32a888eedbd959bb6397994e13f579fe21a4d7edfb8b51e82f397c"
+        },
+        {
+          "path": "php-7.2.34/sapi/fpm/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.2.34/sapi/fpm/LICENSE",
+          "sha256": "28b9b14401f49784efd2246b32f745c2cd998f4f425be677f29e02a33e68bfed"
+        }
+      ]
+    },
+    {
+      "version": "7.3.33",
+      "archive": "https://codeload.github.com/php/php-src/tar.gz/refs/tags/php-7.3.33",
+      "archive_sha256": "9008b50bd5089545fe2e1fb25d544ae9ebb32730cfe072f648bdf53370721c99",
+      "notices": 267,
+      "notice_bytes": 347206,
+      "licenses": [
+        {
+          "path": "php-7.3.33/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.3.33/LICENSE",
+          "sha256": "f689b8fa63bea7950ce6a21bf52ed88ea0d77673ee76e6de12f51191174d91b8"
+        },
+        {
+          "path": "php-7.3.33/TSRM/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.3.33/TSRM/LICENSE",
+          "sha256": "fe97b8423e34199f7df3e65fd53c4df067a56ab6fe0f2296474ba7da0656460c"
+        },
+        {
+          "path": "php-7.3.33/Zend/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.3.33/Zend/LICENSE",
+          "sha256": "509aeb3be64e428d7e0004ce224620ab01bf94adaacefbb449611939df56bc5b"
+        },
+        {
+          "path": "php-7.3.33/ext/date/lib/LICENSE.rst",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.3.33/ext/date/lib/LICENSE.rst",
+          "sha256": "45a3fab7d2821ff6e6c1f133ea7745c0b92a49ea86337948de933b442efd1dc3"
+        },
+        {
+          "path": "php-7.3.33/sapi/fpm/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.3.33/sapi/fpm/LICENSE",
+          "sha256": "28b9b14401f49784efd2246b32f745c2cd998f4f425be677f29e02a33e68bfed"
+        }
+      ]
+    },
+    {
+      "version": "7.4.33",
+      "archive": "https://codeload.github.com/php/php-src/tar.gz/refs/tags/php-7.4.33",
+      "archive_sha256": "dfbb2111160589054768a37086bda650a0041c89878449d078684d70d6a0e411",
+      "notices": 264,
+      "notice_bytes": 345536,
+      "licenses": [
+        {
+          "path": "php-7.4.33/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.4.33/LICENSE",
+          "sha256": "a188db807d711536f71e27b7d36879d63480f7994dc18adc08e624b3c5430fff"
+        },
+        {
+          "path": "php-7.4.33/TSRM/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.4.33/TSRM/LICENSE",
+          "sha256": "fe97b8423e34199f7df3e65fd53c4df067a56ab6fe0f2296474ba7da0656460c"
+        },
+        {
+          "path": "php-7.4.33/Zend/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.4.33/Zend/LICENSE",
+          "sha256": "509aeb3be64e428d7e0004ce224620ab01bf94adaacefbb449611939df56bc5b"
+        },
+        {
+          "path": "php-7.4.33/ext/date/lib/LICENSE.rst",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.4.33/ext/date/lib/LICENSE.rst",
+          "sha256": "45a3fab7d2821ff6e6c1f133ea7745c0b92a49ea86337948de933b442efd1dc3"
+        },
+        {
+          "path": "php-7.4.33/sapi/fpm/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.4.33/sapi/fpm/LICENSE",
+          "sha256": "28b9b14401f49784efd2246b32f745c2cd998f4f425be677f29e02a33e68bfed"
+        }
+      ]
+    },
+    {
+      "version": "8.0.30",
+      "archive": "https://codeload.github.com/php/php-src/tar.gz/refs/tags/php-8.0.30",
+      "archive_sha256": "1a8bf817d7ad1376fc93bf2e393b1861bc95ae87dab40314b29122031871b38b",
+      "notices": 266,
+      "notice_bytes": 321331,
+      "licenses": [
+        {
+          "path": "php-8.0.30/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-8.0.30/LICENSE",
+          "sha256": "a188db807d711536f71e27b7d36879d63480f7994dc18adc08e624b3c5430fff"
+        },
+        {
+          "path": "php-8.0.30/TSRM/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-8.0.30/TSRM/LICENSE",
+          "sha256": "fe97b8423e34199f7df3e65fd53c4df067a56ab6fe0f2296474ba7da0656460c"
+        },
+        {
+          "path": "php-8.0.30/Zend/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-8.0.30/Zend/LICENSE",
+          "sha256": "509aeb3be64e428d7e0004ce224620ab01bf94adaacefbb449611939df56bc5b"
+        },
+        {
+          "path": "php-8.0.30/ext/date/lib/LICENSE.rst",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-8.0.30/ext/date/lib/LICENSE.rst",
+          "sha256": "45a3fab7d2821ff6e6c1f133ea7745c0b92a49ea86337948de933b442efd1dc3"
+        },
+        {
+          "path": "php-8.0.30/sapi/fpm/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-8.0.30/sapi/fpm/LICENSE",
+          "sha256": "28b9b14401f49784efd2246b32f745c2cd998f4f425be677f29e02a33e68bfed"
+        }
+      ]
+    },
+    {
+      "version": "8.1.34",
+      "archive": "https://codeload.github.com/php/php-src/tar.gz/refs/tags/php-8.1.34",
+      "archive_sha256": "896859886cbda8d0717fcd696c7b1e93a12aac59d9ca90f69a37a2e7ae3418e3",
+      "notices": 352,
+      "notice_bytes": 418567,
+      "licenses": [
+        {
+          "path": "php-8.1.34/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-8.1.34/LICENSE",
+          "sha256": "a188db807d711536f71e27b7d36879d63480f7994dc18adc08e624b3c5430fff"
+        },
+        {
+          "path": "php-8.1.34/TSRM/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-8.1.34/TSRM/LICENSE",
+          "sha256": "fe97b8423e34199f7df3e65fd53c4df067a56ab6fe0f2296474ba7da0656460c"
+        },
+        {
+          "path": "php-8.1.34/Zend/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-8.1.34/Zend/LICENSE",
+          "sha256": "509aeb3be64e428d7e0004ce224620ab01bf94adaacefbb449611939df56bc5b"
+        },
+        {
+          "path": "php-8.1.34/Zend/asm/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-8.1.34/Zend/asm/LICENSE",
+          "sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566"
+        },
+        {
+          "path": "php-8.1.34/ext/date/lib/LICENSE.rst",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-8.1.34/ext/date/lib/LICENSE.rst",
+          "sha256": "2120d029e7c67b9d08c1f665f1c3ed581206f00970b664cccdebe1419bf566e9"
+        },
+        {
+          "path": "php-8.1.34/ext/mbstring/libmbfl/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-8.1.34/ext/mbstring/libmbfl/LICENSE",
+          "sha256": "31d9cadcc63c15b79fc59c70f043956104a34c75f23f0ac0ada53c1edfeb88ca"
+        },
+        {
+          "path": "php-8.1.34/ext/opcache/jit/libudis86/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-8.1.34/ext/opcache/jit/libudis86/LICENSE",
+          "sha256": "1070640aab24327354da44507627d1db6c67482a6facc8375a758796a05e3dff"
+        },
+        {
+          "path": "php-8.1.34/sapi/fpm/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-8.1.34/sapi/fpm/LICENSE",
+          "sha256": "28b9b14401f49784efd2246b32f745c2cd998f4f425be677f29e02a33e68bfed"
+        }
+      ]
+    }
+  ]
+}

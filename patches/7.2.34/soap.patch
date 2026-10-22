@@ -1,0 +1,20 @@
+diff --git a/ext/soap/php_encoding.c b/ext/soap/php_encoding.c
+--- a/ext/soap/php_encoding.c
++++ b/ext/soap/php_encoding.c
+@@ -369,6 +369,7 @@
+ static void soap_add_xml_ref(zval *data, xmlNodePtr node)
+ {
+ 	if (SOAP_GLOBAL(ref_map)) {
++		Z_TRY_ADDREF_P(data);
+ 		zend_hash_index_update(SOAP_GLOBAL(ref_map), (zend_ulong)node, data);
+ 	}
+ }
+@@ -3456,7 +3457,7 @@
+ 	} else {
+ 		SOAP_GLOBAL(ref_map) = emalloc(sizeof(HashTable));
+ 	}
+-	zend_hash_init(SOAP_GLOBAL(ref_map), 0, NULL, NULL, 0);
++	zend_hash_init(SOAP_GLOBAL(ref_map), 0, NULL, ZVAL_PTR_DTOR, 0);
+ }
+ 
+ void encode_finish()

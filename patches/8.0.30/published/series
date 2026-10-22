@@ -1,0 +1,3 @@
+php-8.0.30-filters-fastcgi.patch
+php-8.0.30-tls-http.patch
+php-8.0.30-soap-phar.patch
