@@ -1,0 +1,53 @@
+{
+  "php_version": "7.4.33",
+  "baseline": "After the existing core, SOAP, published, and mysql-http-fpm patch stages (or the complete legacy series).",
+  "baseline_test_image": "sha256:b847a483bb270aa7eefcc8fb90dc77508b997e6553c000bda910dd6490047237",
+  "patches": [
+    {
+      "file": "gd-CVE-2026-9672.patch",
+      "sha256": "c1abf639711f131125f9428351d7159b0a875b754998b89b1bba70a2a2f9ffdb",
+      "sources": [
+        "https://github.com/php/php-src/commit/fcd691b377d02285740744bee17c0f298be227d5"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/gd/libgd/gd_gif_in.c"
+      ]
+    },
+    {
+      "file": "openssl-CVE-2026-14355.patch",
+      "sha256": "b159cbd8c73f08bc685e5d3f9eb349278e96c308a1dec4fe8c229f4f69406858",
+      "sources": [
+        "https://github.com/php/php-src/commit/cbc0489126a7682796aad1e5fb4e51de74af162c"
+      ],
+      "adaptation": "Keep the native zend_string allocator persistent argument (0). Encryption and decryption share php_openssl_cipher_update().",
+      "paths": [
+        "ext/openssl/openssl.c",
+        "ext/openssl/tests/gh22186.phpt"
+      ]
+    },
+    {
+      "file": "phar-CVE-2026-7260.patch",
+      "sha256": "742f019836155c01514b20f41df3330ebcb34204d1072df334232c75d9d0874a",
+      "sources": [
+        "https://github.com/php/php-src/commit/2e0fa0a44441d74bf8cc4e1ce1c8af9cd4209f52",
+        "https://repo.tuxcare.com/security/errata/els_alt_php/debian12/CLSA-2026-1786517269.html",
+        "https://github.com/php/php-src/commit/b2de3cf170f81b203dfc2622f2f2dd1572ef95be"
+      ],
+      "adaptation": "Restore the temporarily overwritten filename separator as in the published native PHP 7.1 backport; retain char* ownership and existing TSRMLS APIs. The new compatibility test uses the published GH-21986 tar builder with ordinary nested links.",
+      "paths": [
+        "ext/phar/tests/tar/coverage-symlink-controls.phpt",
+        "ext/phar/tests/tar/files/circular_symlinks.tar",
+        "ext/phar/tests/tar/files/circular_symlinks_long.tar",
+        "ext/phar/tests/tar/files/circular_symlinks_rho.tar",
+        "ext/phar/tests/tar/ghsa-vc5h-9ppw-p5f3-symlink-circular.phpt",
+        "ext/phar/util.c"
+      ]
+    }
+  ],
+  "verification_limits": {
+    "gd": "The published CVE-2026-9672 commit contains no regression fixture. Existing gif.phpt is an ordinary compatibility control, not an exploit reproduction.",
+    "openssl": "Run the unchanged upstream gh22186.phpt only where its actual cipher probe succeeds; an unsupported-cipher skip is not a passing regression.",
+    "phar": "The three circular-symlink tar fixtures and their PHPT are byte-identical to upstream. The additional ordinary-link control checks the published path-separator adaptation."
+  }
+}

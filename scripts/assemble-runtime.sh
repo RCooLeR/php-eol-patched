@@ -30,6 +30,8 @@ printf '%s\n' ca-certificates > /tmp/php-runtime-packages.txt
 copy_package_file() {
   local file=$1 owner
   cp --parents --dereference "$file" "$root"
+  # This library is built from the locked upstream archive, not a Debian package.
+  case "$file" in /usr/local/lib/libpq.so*) return ;; esac
   owner=$(dpkg-query --search "$file" 2>/dev/null || dpkg-query --search "$(readlink -f "$file")")
   owner=${owner%%: /*}
   printf '%s\n' "$owner" >> /tmp/php-runtime-packages.txt
@@ -100,6 +102,8 @@ cp /build/LICENSE /build/THIRD_PARTY_NOTICES.md /build/README.md /build/PATCHES.
 cp /source/SHA256SUMS "$root/usr/share/php-eol-patched/source.sha256"
 cp /build/patches/SHA256SUMS "$root/usr/share/php-eol-patched/patches.sha256"
 cp /build/extensions/pecl.tsv "$root/usr/share/php-eol-patched/pecl.tsv"
+cp /build/extensions/libpq.tsv "$root/usr/share/php-eol-patched/libpq.tsv"
+cp /source/libpq/COPYRIGHT "$root/usr/share/licenses/php-eol-patched/PostgreSQL-COPYRIGHT"
 php-config --configure-options > "$root/usr/share/php-eol-patched/configure-options.txt"
 php -m > "$root/usr/share/php-eol-patched/modules.txt"
 printf '%s\n' "$1" > "$root/usr/share/php-eol-patched/php-version.txt"

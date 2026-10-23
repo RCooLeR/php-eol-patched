@@ -53,6 +53,7 @@ jobs:
             --set "$TARGET.tags=php-eol-patched:$PHP_RELEASE-test"
       - name: Test PHP and FPM
         run: |
+          docker pull "$(python3 -B -c "import sys; sys.path.insert(0, 'tests'); import postgresql; print(postgresql.DEFAULT_IMAGE)")"
           python3 tests/run.py \
             --image "php-eol-patched:$PHP_RELEASE" \
             --test-image "php-eol-patched:$PHP_RELEASE-test" \

@@ -12,7 +12,7 @@ source_root=${PHP_SOURCE_ROOT:-/usr/src/php}
 scratch=$(mktemp -d /tmp/php-phpt.XXXXXX)
 cp "$source_root/run-tests.php" "$scratch/"
 mkdir -p "$scratch/ext" "$scratch/sapi/cli" "$scratch/Zend"
-for extension in openssl standard soap phar mysqli pdo_mysql; do
+for extension in openssl standard soap phar mysqli pdo_mysql gd; do
     mkdir -p "$scratch/ext/$extension"
     cp -a "$source_root/ext/$extension/tests" "$scratch/ext/$extension/"
 done
@@ -41,6 +41,7 @@ mapfile -t published < "$test_dir/published-tests.list"
 mapfile -t mysql_http < "$test_dir/mysql-http-fpm-tests.list"
 run_group published "${published[@]}"
 run_group mysql-http "${mysql_http[@]}"
+source /tests/coverage-phpt.sh
 run_group soap soap-regressions/*.phpt \
     ext/soap/tests/bugs/bug30994.phpt ext/soap/tests/bugs/bug37013.phpt \
     ext/soap/tests/bugs/bug41566.phpt ext/soap/tests/soap12/T76_2.phpt \

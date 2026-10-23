@@ -91,6 +91,10 @@ extensionCheck('sqlite', function () {
     $native->close();
     return $valid;
 });
+extensionCheck('postgresql-drivers', function () {
+    return extension_loaded('pgsql') && function_exists('pg_query_params')
+        && extension_loaded('pdo_pgsql') && in_array('pgsql', PDO::getAvailableDrivers(), true);
+});
 extensionCheck('sockets', function () {
     $socket = socket_create(AF_UNIX, SOCK_STREAM, 0);
     if ($socket === false) { return false; }

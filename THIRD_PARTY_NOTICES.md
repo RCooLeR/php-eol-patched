@@ -6,7 +6,7 @@ The root MIT license covers this project's original build scripts, configuration
 
 PHP and Zend code is used under the Modified BSD License, also named PHP License version 4 and Zend Engine License version 3. [PHP's licensing page](https://www.php.net/license/) permits this choice for earlier releases under the later-version clauses of their original licenses. The applicable text is in [LICENSES/PHP-BSD-3-Clause.txt](LICENSES/PHP-BSD-3-Clause.txt).
 
-Original release licenses and copyright notices are retained for all eight versions under `LICENSES/php-VERSION/`. `SOURCE-NOTICES.txt` and, where present, `EXTENSION-SOURCE-NOTICES.txt` preserve license and copyright comments from the enabled components, including embedded notices that have no separate license file. `LICENSES/SOURCES.json` records their origins and checksums. Individual files with different licenses retain those terms.
+Original release licenses and copyright notices are retained for all eight versions under `LICENSES/php-VERSION/`. `SOURCE-NOTICES.txt` and, where present, `EXTENSION-SOURCE-NOTICES.txt` preserve license and copyright comments from the enabled components, including embedded notices that have no separate license file. Each version's `POSTGRESQL-SOURCE-NOTICES.txt` separately preserves the original notice comments from `ext/pgsql` and `ext/pdo_pgsql`. `LICENSES/SOURCES.json` records their origins and checksums. Individual files with different licenses retain those terms.
 
 This product includes PHP software, freely available from <https://www.php.net/software/>. This product includes the Zend Engine, freely available at <https://www.zend.com/>. The Zend Engine is freely available at <https://www.zend.com/>.
 
@@ -25,6 +25,8 @@ PHP 5.6 and 7.0 also use the public maintenance sources identified in [PATCHES.m
 Redis, APCu, Imagick, Memcached, igbinary and MessagePack retain their package licenses under `LICENSES/pecl/PACKAGE-VERSION/`. [extensions/pecl.tsv](extensions/pecl.tsv) records the exact release, official source URL, checksum and PHP compatibility requirements. The source-export target includes their original archives and unpacked source. Their license terms are separate from this project's MIT license.
 
 ## Other bundled and linked code
+
+libpq 16.15 is built from the PostgreSQL source under the PostgreSQL License. Its original copyright and permission notice is retained in [LICENSES/libpq-16.15/COPYRIGHT](LICENSES/libpq-16.15/COPYRIGHT). Additional BSD and ISC notices for the linked portability routines are in [LICENSES/libpq-16.15/SOURCE-NOTICES.txt](LICENSES/libpq-16.15/SOURCE-NOTICES.txt). [extensions/libpq.tsv](extensions/libpq.tsv) pins the upstream archive and checksum, also recorded in `LICENSES/SOURCES.json`. The source-export target includes the original PostgreSQL archive, its `COPYRIGHT` notice and the scripts used to build the client library.
 
 PHP includes code with additional terms, including timelib (MIT), PCRE/PCRE2 (BSD), FPM (BSD), libarchive-derived Phar routines (BSD), GD, bcmath, fileinfo and mbstring's libmbfl (LGPL 2.1). Where present, the bundled Oniguruma, libzip, Boost context assembly and OPcache disassembler notices are retained. These notices are preserved with the corresponding version under `LICENSES/`.
 

@@ -39,6 +39,8 @@ if [[ "$kind" == bundled ]]; then
       esac
       ;;
     pdo_sqlite) args+=(--with-pdo-sqlite=/usr) ;;
+    pgsql) args+=(--with-pgsql=/usr/local --with-libdir=lib) ;;
+    pdo_pgsql) args+=(--with-pdo-pgsql=/usr/local --with-libdir=lib) ;;
     sqlite3) args+=(--with-sqlite3=/usr) ;;
     curl|iconv|zlib) args+=("--with-$module") ;;
     xml)

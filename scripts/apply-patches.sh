@@ -35,6 +35,20 @@ else
     sha256sum --check "$root/$version/$stage/source-after.sha256"
   done
 fi
+for stage in postgresql coverage; do
+  [[ -f "$root/$version/$stage/series" ]] || continue
+  sha256sum --check "$root/$version/$stage/source-before.sha256"
+  while IFS= read -r filename; do
+    [[ -n "$filename" ]] || continue
+    if grep -q '^GIT binary patch$' "$root/$version/$stage/$filename"; then
+      git apply --check "$root/$version/$stage/$filename"
+      git apply --whitespace=nowarn "$root/$version/$stage/$filename"
+    else
+      patch --batch --forward --fuzz=0 -p1 < "$root/$version/$stage/$filename"
+    fi
+  done < "$root/$version/$stage/series"
+  sha256sum --check "$root/$version/$stage/source-after.sha256"
+done
 # Retain dated modification notices in the exported LGPL library source.
 case "$version" in
   5.6.40|7.0.33)

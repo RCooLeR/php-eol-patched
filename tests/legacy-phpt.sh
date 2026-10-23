@@ -38,5 +38,8 @@ php "${php_args[@]}" ./run-tests.php "${php_args[@]}" \
     -d soap.wsdl_cache_enabled=0 -q "${tests[@]}" > result.log 2>&1 || status=$?
 cat result.log
 if grep -Eq '(Tests skipped|Tests borked|Tests warned|Tests failed)[[:space:]]*:[[:space:]]*[1-9]' result.log; then status=1; fi
-if [ "$status" -ne 0 ]; then find "$scratch" -name '*.diff' -type f -exec cat {} \;; fi
-exit "$status"
+if [ "$status" -ne 0 ]; then
+    find "$scratch" -name '*.diff' -type f -exec cat {} \;
+    exit "$status"
+fi
+source /tests/coverage-phpt.sh

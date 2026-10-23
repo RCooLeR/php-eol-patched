@@ -1,0 +1,11 @@
+ext/pgsql/tests/bug81720.phpt
+ext/pgsql/tests/ghsa-hrwm-9436-5mv3.phpt
+ext/pdo_pgsql/tests/ghsa-hrwm-9436-5mv3.phpt
+ext/pgsql/tests/GHSA-7qpv-r5mr-78m4.phpt
+ext/pdo_pgsql/tests/ghsa-8xr5-qppj-gvwj.phpt
+ext/pgsql/tests/10pg_convert_9.phpt
+ext/pgsql/tests/10pg_convert_json_array.phpt
+ext/pgsql/tests/12pg_insert_9.phpt
+ext/pgsql/tests/14pg_update_9.phpt
+ext/pgsql/tests/bug64609.phpt
+ext/pgsql/tests/bug68638.phpt

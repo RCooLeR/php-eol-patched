@@ -16,6 +16,8 @@ A check mark means the extension is included. It does not mean that the extensio
 | `mysqli` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `PDO` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `pdo_mysql` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `pgsql` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `pdo_pgsql` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `openssl` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `pcre` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `Phar` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -52,6 +54,8 @@ A check mark means the extension is included. It does not mean that the extensio
 
 `ereg` is part of PHP 5.6 and was removed in PHP 7. The PHP 5.6 `apc` module supplies APCu 4's compatibility aliases; it is not a separate APC package. JSON is built into PHP 8; earlier versions load it as an extension. GD includes JPEG, PNG and FreeType support. mysqli and PDO MySQL use mysqlnd. SQLite uses the system library.
 
+pgsql and PDO PostgreSQL use libpq 16.15, built from the checksum-pinned upstream source in [extensions/libpq.tsv](extensions/libpq.tsv). The client supports SCRAM authentication and TLS through each base image's OpenSSL library. PostgreSQL server binaries and client command-line tools are not included in the runtime. The source export includes the original PostgreSQL archive; the runtime includes its license and libpq dependency manifest.
+
 ## PECL extensions
 
 Versions and download checksums are pinned in [extensions/pecl.tsv](extensions/pecl.tsv).
@@ -77,6 +81,6 @@ docker run --rm php-eol-patched:5.6.40 php -m
 docker run --rm php-eol-patched:8.1.34 php --ri redis
 ```
 
-Replace the tag with any PHP release in the tables. Each image also contains its module list and PECL pins under `/usr/share/php-eol-patched/`. Tests compare loaded modules and PECL versions with this build profile and exercise extension functions through FPM.
+Replace the tag with any PHP release in the tables. Each image also contains its module list, PECL pins and libpq manifest under `/usr/share/php-eol-patched/`. Tests compare loaded modules and dependency versions with this build profile and exercise extension functions through FPM. PostgreSQL controls connect to a disposable server using SCRAM and verified TLS, exercising both native pgsql and PDO with native and emulated prepared statements.
 
 The runtime contains PHP and the libraries/data needed by these extensions. Composer, Node.js, database servers, mail tools, a shell, a package manager and a compiler are not included. `pcntl` and `posix` are available only in the test stage.

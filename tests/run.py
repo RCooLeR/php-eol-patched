@@ -14,6 +14,7 @@ import uuid
 
 sys.dont_write_bytecode = True
 import core
+import postgresql
 
 TESTS = Path(__file__).resolve().parent
 LEGACY_VERSIONS = ("5.6.40", "7.0.33")
@@ -55,11 +56,10 @@ def fcgi_length(length):
     return bytes([length]) if length < 128 else struct.pack("!I", length | 0x80000000)
 
 
-def runtime_request(container):
-    body = b"sample=ok"
+def runtime_request(container, script="/tests/runtime-probe.php", body=b"sample=ok"):
     params = {
         "GATEWAY_INTERFACE": "CGI/1.1", "SERVER_PROTOCOL": "HTTP/1.1",
-        "REQUEST_METHOD": "POST", "SCRIPT_FILENAME": "/tests/runtime-probe.php",
+        "REQUEST_METHOD": "POST", "SCRIPT_FILENAME": script,
         "SCRIPT_NAME": "/runtime-probe.php", "REQUEST_URI": "/runtime-probe.php",
         "DOCUMENT_ROOT": "/tests", "SERVER_NAME": "localhost", "SERVER_PORT": "80",
         "REMOTE_ADDR": "127.0.0.1", "CONTENT_TYPE": "application/x-www-form-urlencoded",
@@ -144,7 +144,7 @@ def runtime_suite(report, image, version):
         required.update(("gd", "intl", "curl", "zip", "bcmath", "mbstring", "xml", "dom",
                          "simplexml", "xmlreader", "xmlwriter", "ctype", "fileinfo", "filter",
                          "iconv", "tokenizer", "zend opcache", "exif", "sockets", "json",
-                         "pdo_sqlite", "sqlite3", "zlib", "redis", "apcu", "imagick",
+                         "pdo_sqlite", "sqlite3", "pgsql", "pdo_pgsql", "zlib", "redis", "apcu", "imagick",
                          "memcached", "igbinary", "msgpack"))
         if version == "5.6.40":
             required.update(("ereg", "apc"))
@@ -162,7 +162,7 @@ def runtime_suite(report, image, version):
                     len(expected_pecl) == 6 and loaded_pecl == expected_pecl,
                     {"loaded": loaded_pecl, "expected": expected_pecl})
         smoke = {key.partition(":")[2]: value for key, value in values.items() if key.startswith("smoke:")}
-        core.record(report, "Runtime extension operations", len(smoke) == 17 and
+        core.record(report, "Runtime extension operations", len(smoke) == 18 and
                     all(value == "ok" for value in smoke.values()), smoke)
         if version.startswith("8.1."):
             repeated, errors = runtime_request(name)
@@ -340,6 +340,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--image", required=True, help="Runtime image tag or ID")
     parser.add_argument("--test-image", help="Matching Dockerfile test target tag or ID")
+    parser.add_argument("--postgres-image", default=postgresql.DEFAULT_IMAGE,
+                        help="Locally available PostgreSQL service image for database controls")
     parser.add_argument("--version", required=True, choices=VERSIONS)
     parser.add_argument("--output", type=Path, help="Optional JSON report outside the source tree")
     options = parser.parse_args()
@@ -348,9 +350,11 @@ def main():
     try:
         runtime = image_id(options.image)
         report["runtime_image"] = runtime
+        test_image = image_id(options.test_image) if options.test_image else None
         runtime_suite(report, runtime, options.version)
-        if options.test_image:
-            test_image = image_id(options.test_image)
+        postgresql.suite(report, runtime, options.postgres_image, runtime_request,
+                         container_options, test_image, options.version)
+        if test_image:
             report["test_image"] = test_image
             test_suite(report, test_image, options.version)
     except (OSError, RuntimeError, ValueError, subprocess.TimeoutExpired) as error:

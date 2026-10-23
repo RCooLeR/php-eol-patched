@@ -30,6 +30,34 @@ The table describes the patch contents. It does not claim that every affected co
 | [CVE-2025-1218](https://github.com/php/php-src/security/advisories/GHSA-r6x9-5r99-36j7) | mysqlnd packet reads | B | B | B | B | B | B | B | B | [114dbb74](https://github.com/php/php-src/commit/114dbb74368e6a6cd6e48ddb4a76dbe8728b84e2) |
 | [CVE-2021-21703](https://www.php.net/ChangeLog-7.php#7.3.31) | FPM scoreboard | B | B | B | B | U | U | U | U | [cb2021e5](https://github.com/php/php-src/commit/cb2021e5f69da5e2868130a05bb53db0f9f89e4b) |
 
+## PostgreSQL
+
+Both pgsql and PDO PostgreSQL are enabled in every image. These fixes cover selected published extension defects; they do not establish complete PostgreSQL-related CVE coverage.
+
+| CVE | Component | 5.6.40 | 7.0.33 | 7.1.33 | 7.2.34 | 7.3.33 | 7.4.33 | 8.0.30 | 8.1.34 | Published change |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| CVE-2022-31625 | pgsql parameter cleanup | B | B | B | B | B | U | U | U | [55f6895f](https://github.com/php/php-src/commit/55f6895f4b4c677272fd4ee1113acdbd99c4b5ab) |
+| [CVE-2025-1735](https://github.com/php/php-src/security/advisories/GHSA-hrwm-9436-5mv3) | pgsql and PDO PostgreSQL escaping failures | B | B | B | B | B | B | B | U | [9376aeef](https://github.com/php/php-src/commit/9376aeef9f8ff81f2705b8016237ec3e30bdee44) |
+| [CVE-2026-17543](https://github.com/php/php-src/security/advisories/GHSA-7qpv-r5mr-78m4) | pgsql string literal escaping | B | B | B | B | B | B | B | B | [ab048bd8](https://github.com/php/php-src/commit/ab048bd83b578119cf81b456526d50498421d617) |
+
+[CVE-2025-14180](https://github.com/php/php-src/security/advisories/GHSA-8xr5-qppj-gvwj) is already fixed in PHP 8.1.34. The older branches retain their integer-returning PDO quoter ABI, which already propagates quote failure; they do not need the newer zend_string-returning fix. The published invalid-byte regression is included for all eight versions.
+
+Each version's `postgresql/` patch directory records upstream commits, native maintenance sources, adaptations and before/after source hashes. Tests exercise the published failure inputs and ordinary queries through both interfaces, including SCRAM authentication and certificate-verified TLS in CLI and FPM.
+
+The extensions use [libpq 16.15](https://www.postgresql.org/docs/16/release-16-15.html), built from the pinned upstream source in [extensions/libpq.tsv](extensions/libpq.tsv). This includes the client-library repairs for [CVE-2025-1094](https://www.postgresql.org/support/security/CVE-2025-1094/) and [CVE-2026-6477](https://www.postgresql.org/support/security/CVE-2026-6477/). Substituting an older libpq can reintroduce client-library defects. Other linked libraries, including OpenSSL, retain the limits of the base image.
+
+## Additional GD, OpenSSL and Phar fixes
+
+The following fixes were already included in the PHP 5.6 and 7.0 maintenance series and are also backported to PHP 7.1–8.1:
+
+| CVE | Component | Published change | Verification scope |
+| --- | --- | --- | --- |
+| CVE-2026-9672 | GD GIF decoder | [fcd691b3](https://github.com/php/php-src/commit/fcd691b377d02285740744bee17c0f298be227d5) | Exact published changes, compilation and ordinary GIF decoding; no CVE-specific fixture was supplied upstream. |
+| CVE-2026-14355 | OpenSSL AES-WRAP-PAD allocation | [cbc04891](https://github.com/php/php-src/commit/cbc0489126a7682796aad1e5fb4e51de74af162c) | Published round-trip regression executes on PHP 8.1. The cipher is unavailable in the older builds; those skips are not passing exploit tests. |
+| CVE-2026-7260 | Phar circular symbolic links | [2e0fa0a4](https://github.com/php/php-src/commit/2e0fa0a44441d74bf8cc4e1ce1c8af9cd4209f52) | Published archive fixtures and ordinary nested symbolic links. |
+
+The Phar backports also retain the filename separator after resolving a nested link, following the [published native compatibility repair](https://repo.tuxcare.com/security/errata/els_alt_php/debian12/CLSA-2026-1786517269.html). This repair applies to all eight versions. Per-version `coverage/` directories contain the patch provenance and source hashes.
+
 ## EOL mitigations
 
 The first two rows use the published EOL approach: [PHP 7.4](https://github.com/php/php-src/commit/712e60f9edfd03f0960fc4fc3c2c375f42b90aa2), [PHP 8.0](https://github.com/php/php-src/commit/82f8f31b16a035c1b67cc253e79f7cc288f4cc20) and [PHP 8.1](https://github.com/php/php-src/commit/1d7dec178a094e6e75b229ce22754045f8c6070a). PHP 7.1–7.3 use local adaptations of the 7.4 change, not official releases for those branches.
@@ -64,7 +92,7 @@ The ordered series, source hashes and provenance are under `patches/5.6.40/` and
 
 ## Additional PHP 5.6 and 7.0 CVE inventory
 
-The selected series includes **53 additional CVE IDs for PHP 5.6.40** and **59 for PHP 7.0.33**, beyond the 19 CVEs in the main table. These counts describe included patch contents in enabled components, not the number of regression tests or complete post-EOL coverage.
+The original maintenance series includes **53 additional CVE IDs for PHP 5.6.40** and **59 for PHP 7.0.33**, beyond the 19 CVEs in the main table. The PostgreSQL additions are listed separately above. These counts describe included patch contents in enabled components, not the number of regression tests or complete post-EOL coverage.
 
 PHP 5.6 release-note evidence is in the [frozen published NEWS](https://github.com/shivammathur/php-src-backports/blob/989262e3e9dcca7642b644a75d209c5b7740e294/NEWS). Later changes use the [native PHP 5.6 maintenance archive](https://deb.freexian.com/extended-lts/pool/main/p/php5/php5_5.6.40%2Bdfsg-0%2Bdeb8u23.debian.tar.xz) and published ports. PHP 7.0 IDs follow the selected patch filenames and headers from the [PHP 7.0 maintenance archive](https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz). The [PHP 5.6 provenance](patches/5.6.40/provenance.json) and [PHP 7.0 provenance](patches/7.0.33/provenance.json) record the selected sources; patch headers retain upstream links.
 
@@ -97,7 +125,7 @@ PHP 5.6's native HTTP additions include [CVE-2025-1219](https://github.com/php/p
 Inventory limits and exclusions:
 
 - Windows-oriented CVE-2019-11044 and CVE-2021-21706 are excluded from Linux runtime counts. PHP 5.6 retains the ZIP source change for the latter, but it is not counted here.
-- Disabled components are excluded: LDAP CVE-2024-8932; CGI CVE-2024-4577, CVE-2024-8926 and CVE-2024-8927; PostgreSQL CVE-2022-31625 and CVE-2026-17543; PDO Firebird CVE-2021-21704.
+- Disabled components are excluded: LDAP CVE-2024-8932; CGI CVE-2024-4577, CVE-2024-8926 and CVE-2024-8927; PDO Firebird CVE-2021-21704.
 - PHP 5.6 receives no additional patch for the reported CVE-2025-6491 and CVE-2026-7568 vectors. Its native `str_repeat` limit and included concatenation bound reject the respective strings exceeding `INT_MAX` before SOAP or metaphone runs. This describes those published reproductions, not a broader review of those functions.
 - Older PHP 7.0 patches named only by a PHP bug number are mapped to the explicit CVE attached to the same bug number in the frozen PHP 5.6 NEWS. Test-only patches, prerequisite-only references and the contextual CVE-2012-1823 mention are not counted as additional fixes.
 - PHP 5.6's AES-WRAP-PAD NEWS entry has no CVE number. Its [published backport](https://github.com/shivammathur/php-src-backports/commit/5c2cc46b45cf286666671df14edf25fc23676cd8) cites [the same upstream change](https://github.com/php/php-src/commit/cbc0489126a7682796aad1e5fb4e51de74af162c) as the PHP 7.0 CVE-2026-14355 patch, which supplies that precise mapping.

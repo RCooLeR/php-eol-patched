@@ -1,0 +1,62 @@
+{
+  "php": "5.6.40",
+  "stage": "postgresql",
+  "series": [
+    "010-CVE-2022-31625.patch",
+    "020-CVE-2025-1735.patch",
+    "030-CVE-2026-17543.patch"
+  ],
+  "sources": [
+    {
+      "cve": "CVE-2022-31625",
+      "upstream": "https://github.com/php/php-src/commit/55f6895f4b4c677272fd4ee1113acdbd99c4b5ab",
+      "native": "https://github.com/shivammathur/php-src-backports/commit/97f8d26ba4732e7d2bc67b53c329bd70e5116639"
+    },
+    {
+      "cve": "CVE-2025-1735",
+      "upstream": "https://github.com/php/php-src/commit/9376aeef9f8ff81f2705b8016237ec3e30bdee44",
+      "maintenance_patch": "debian/patches/CVE-2025-1735.patch",
+      "maintenance_patch_sha256": "dd1b634ff34a5482a1badd24a4c4d148808ef2d921f16099ac13e2331dd04530"
+    },
+    {
+      "cve": "CVE-2026-17543",
+      "upstream": "https://github.com/php/php-src/commit/ab048bd83b578119cf81b456526d50498421d617",
+      "maintenance_patch": "debian/patches/CVE-2026-17543.patch",
+      "maintenance_patch_sha256": "0da6178ea9f3b2749a30a4eb68c731237d6e5665c21735c10e7198d4ec7b4288"
+    },
+    {
+      "cve": "CVE-2025-14180",
+      "status": "not affected: native integer-returning PDO quoter callers already check failure",
+      "test_origin": "https://github.com/php/php-src/commit/5797b94652c366521bff55f8e1a26ed6188f31b8"
+    }
+  ],
+  "maintenance_archive": {
+    "url": "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz",
+    "sha256": "3db890cadb4debb154e9fb85aea6b10389cab36d7b52a46d7be47e5e4d4a7d08"
+  },
+  "native_adaptations": [
+    "Preserve PHP 5.6 zval ownership, char pointer lengths and integer PDO quoter ABI.",
+    "Pass TSRMLS context through build_tablename and all five callers.",
+    "Read field keys in the PHP 5.6 insert value hash loop for the published error message.",
+    "Use native Exception instead of unavailable ValueError, matching the PHP 7.0 maintenance backport.",
+    "Adapt bug81720 error handling in the test override; published input and expected conversion messages remain unchanged."
+  ],
+  "libpq_dependency": {
+    "cve": "CVE-2025-1094",
+    "reference": "https://www.postgresql.org/support/security/CVE-2025-1094/",
+    "minimum_16_branch": "16.7"
+  },
+  "tests": [
+    "ext/pdo_pgsql/tests/ghsa-8xr5-qppj-gvwj.phpt",
+    "ext/pdo_pgsql/tests/ghsa-hrwm-9436-5mv3.phpt",
+    "ext/pgsql/tests/10pg_convert_9.phpt",
+    "ext/pgsql/tests/10pg_convert_json_array.phpt",
+    "ext/pgsql/tests/12pg_insert_9.phpt",
+    "ext/pgsql/tests/14pg_update_9.phpt",
+    "ext/pgsql/tests/GHSA-7qpv-r5mr-78m4.phpt",
+    "ext/pgsql/tests/bug64609.phpt",
+    "ext/pgsql/tests/bug68638.phpt",
+    "ext/pgsql/tests/bug81720.phpt",
+    "ext/pgsql/tests/ghsa-hrwm-9436-5mv3.phpt"
+  ]
+}

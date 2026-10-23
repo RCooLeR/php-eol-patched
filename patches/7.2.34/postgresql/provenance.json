@@ -1,0 +1,34 @@
+{
+  "php_version": "7.2.34",
+  "cves": {
+    "CVE-2022-31625": "backported",
+    "CVE-2025-1735": "backported",
+    "CVE-2026-17543": "backported",
+    "CVE-2025-14180": "native integer-returning quoter ABI already checks failure"
+  },
+  "upstream_commits": [
+    "55f6895f4b4c677272fd4ee1113acdbd99c4b5ab",
+    "9376aeef9f8ff81f2705b8016237ec3e30bdee44",
+    "ab048bd83b578119cf81b456526d50498421d617",
+    "727a4ddc39ca9b78131e06b5537fe8b6c3dd6fe7"
+  ],
+  "adaptations": [
+    "Keep native resource and zval APIs, error semantics and quoter failure return values.",
+    "Propagate all table-builder failures through existing cleanup labels.",
+    "Native conversion buffer ownership releases failed strings before returning failure.",
+    "Regression tests use published maintenance fixtures with branch-native expectations."
+  ],
+  "libpq_requirement": "Built and tested with upstream libpq16.15; do not substitute an unpatched older libpq.",
+  "maintenance_archives": {
+    "7.0": {
+      "url": "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz",
+      "sha256": "3db890cadb4debb154e9fb85aea6b10389cab36d7b52a46d7be47e5e4d4a7d08"
+    },
+    "7.3": {
+      "url": "https://deb.freexian.com/extended-lts/pool/main/p/php7.3/php7.3_7.3.31-1~deb10u16.debian.tar.xz",
+      "sha256": "1eedbd1095e7be93d310c2cbfd13acbcf521b2433ef0ddb5e40abd2dffa633bb"
+    }
+  },
+  "native_parameter_cleanup": "https://github.com/shivammathur/php-src-backports/commit/310b17f5c8938389b1dbd7d8ff5a8144bfb9a351",
+  "maintenance_use": "PHP 7.0 and 7.3 maintenance patches supply native escaping changes and test fixtures. Other branches adapt these changes to their own table builder, buffer ownership and error APIs. PHP 8.1 only requires the string-literal fix; earlier escaping and parameter-cleanup fixes are native."
+}

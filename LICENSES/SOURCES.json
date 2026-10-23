@@ -96,7 +96,17 @@
         "sha256": "03476ed9b64e9fce93289b428a015a3fa39f1476166c4e0e3b71c4ace4601eef",
         "source_files": 1088
       },
-      "notice_source_archives_verified": "2026-10-23"
+      "notice_source_archives_verified": "2026-10-23",
+      "postgresql_source_notices": {
+        "path": "php-5.6.40/POSTGRESQL-SOURCE-NOTICES.txt",
+        "notices": 4,
+        "notice_bytes": 5556,
+        "sha256": "7f5988f98423aef30cbed1b252551c830db9f91fa8f60f7da67749930ad1ee82",
+        "source_files": 7,
+        "archive": "https://codeload.github.com/php/php-src/tar.gz/refs/tags/php-5.6.40",
+        "archive_sha256": "c38f1fbe990973aa8ce3fb77e07f2c5f623e72165c609a14629f2bdadfcd271f",
+        "retrieved": "2026-10-23"
+      }
     },
     {
       "version": "7.0.33",
@@ -184,7 +194,17 @@
         "sha256": "01aa82ad3d6b7a8fb108d371bb0f4ca05f9f414f111ce650ee40c918fad0f035",
         "source_files": 1129
       },
-      "notice_source_archives_verified": "2026-10-23"
+      "notice_source_archives_verified": "2026-10-23",
+      "postgresql_source_notices": {
+        "path": "php-7.0.33/POSTGRESQL-SOURCE-NOTICES.txt",
+        "notices": 4,
+        "notice_bytes": 5556,
+        "sha256": "a621018f49892737dbf41b95198c70139efd28e6c7a2069d1c493414aa7e1117",
+        "source_files": 7,
+        "archive": "https://codeload.github.com/php/php-src/tar.gz/refs/tags/php-7.0.33",
+        "archive_sha256": "d89bfb1dd0c13aab33b81f4dd278cbea3274299fc49acd600ef42b8bee7b3612",
+        "retrieved": "2026-10-23"
+      }
     },
     {
       "version": "7.1.33",
@@ -271,7 +291,17 @@
         "sha256": "d78cb98dccff3547d0cd2df70197a9b618ee790d407061a6f5887d7b870e5aa9",
         "source_files": 593
       },
-      "notice_source_archives_verified": "2026-10-23"
+      "notice_source_archives_verified": "2026-10-23",
+      "postgresql_source_notices": {
+        "path": "php-7.1.33/POSTGRESQL-SOURCE-NOTICES.txt",
+        "notices": 4,
+        "notice_bytes": 5556,
+        "sha256": "5c39c7c207233b169d00646ebab052c23e1a15417183e79e0e0daf377f64b4f6",
+        "source_files": 7,
+        "archive": "https://codeload.github.com/php/php-src/tar.gz/refs/tags/php-7.1.33",
+        "archive_sha256": "f80a795a09328a9441bae4a8a60fa0d6d43ec5adc98f5aa5f51d06f4522c07fe",
+        "retrieved": "2026-10-23"
+      }
     },
     {
       "version": "7.2.34",
@@ -358,7 +388,17 @@
         "sha256": "b5d04f8312e2b251eff06b9ed61972a3bd9bcc7ec22723bd5e2b9e7120e70ccd",
         "source_files": 595
       },
-      "notice_source_archives_verified": "2026-10-23"
+      "notice_source_archives_verified": "2026-10-23",
+      "postgresql_source_notices": {
+        "path": "php-7.2.34/POSTGRESQL-SOURCE-NOTICES.txt",
+        "notices": 4,
+        "notice_bytes": 5556,
+        "sha256": "b64b9589b603ef396bf7ce9072bdffb4f1485efa30971ac91dfb984f6b809496",
+        "source_files": 7,
+        "archive": "https://codeload.github.com/php/php-src/tar.gz/refs/tags/php-7.2.34",
+        "archive_sha256": "4b7510a6ef920bff78f2287de7397bc6bab549669e56b4543e2194b0fb82a91c",
+        "retrieved": "2026-10-23"
+      }
     },
     {
       "version": "7.3.33",
@@ -430,7 +470,17 @@
         "sha256": "e6cb28c8663eacfbd6aab9dce951cfcc819d3dbe7a45f8d9d0b9b50d1694b695",
         "source_files": 597
       },
-      "notice_source_archives_verified": "2026-10-23"
+      "notice_source_archives_verified": "2026-10-23",
+      "postgresql_source_notices": {
+        "path": "php-7.3.33/POSTGRESQL-SOURCE-NOTICES.txt",
+        "notices": 4,
+        "notice_bytes": 5556,
+        "sha256": "e02372ee996edc719ec5094c300bb1a8da4f8e4828f491ecf437c857a3a5e670",
+        "source_files": 7,
+        "archive": "https://codeload.github.com/php/php-src/tar.gz/refs/tags/php-7.3.33",
+        "archive_sha256": "9008b50bd5089545fe2e1fb25d544ae9ebb32730cfe072f648bdf53370721c99",
+        "retrieved": "2026-10-23"
+      }
     },
     {
       "version": "7.4.33",
@@ -487,7 +537,17 @@
         "sha256": "33310880b2c3d0c2df10fb213fc66217fa8869a6df0c1ecd4959abab1050f326",
         "source_files": 428
       },
-      "notice_source_archives_verified": "2026-10-23"
+      "notice_source_archives_verified": "2026-10-23",
+      "postgresql_source_notices": {
+        "path": "php-7.4.33/POSTGRESQL-SOURCE-NOTICES.txt",
+        "notices": 4,
+        "notice_bytes": 5556,
+        "sha256": "eb32c2ae182a2c8844d905432ff7121b81a839d0dec02ce7d2a622111fa08139",
+        "source_files": 7,
+        "archive": "https://codeload.github.com/php/php-src/tar.gz/refs/tags/php-7.4.33",
+        "archive_sha256": "dfbb2111160589054768a37086bda650a0041c89878449d078684d70d6a0e411",
+        "retrieved": "2026-10-23"
+      }
     },
     {
       "version": "8.0.30",
@@ -549,7 +609,17 @@
         "sha256": "860b2ead28b8d9fb8bd56bc14f7d8c6ef48f5af8ead237f672bce539afda7106",
         "source_files": 457
       },
-      "notice_source_archives_verified": "2026-10-23"
+      "notice_source_archives_verified": "2026-10-23",
+      "postgresql_source_notices": {
+        "path": "php-8.0.30/POSTGRESQL-SOURCE-NOTICES.txt",
+        "notices": 4,
+        "notice_bytes": 4952,
+        "sha256": "e774027ce40adf8bb73bec3ee8b20800bf0337dcf474ecdd1e387b0ff15d60b6",
+        "source_files": 7,
+        "archive": "https://codeload.github.com/php/php-src/tar.gz/refs/tags/php-8.0.30",
+        "archive_sha256": "1a8bf817d7ad1376fc93bf2e393b1861bc95ae87dab40314b29122031871b38b",
+        "retrieved": "2026-10-23"
+      }
     },
     {
       "version": "8.1.34",
@@ -616,7 +686,17 @@
         "sha256": "9dc8fb77fd4edc0ec68ce3d87fdc6deb3022c93154707004cc25354960b166a5",
         "source_files": 175
       },
-      "notice_source_archives_verified": "2026-10-23"
+      "notice_source_archives_verified": "2026-10-23",
+      "postgresql_source_notices": {
+        "path": "php-8.1.34/POSTGRESQL-SOURCE-NOTICES.txt",
+        "notices": 4,
+        "notice_bytes": 4952,
+        "sha256": "0689804f7afa7f2de4e0ba17cf6a8c284863d17da03c3bf6b828713de28c595e",
+        "source_files": 7,
+        "archive": "https://codeload.github.com/php/php-src/tar.gz/refs/tags/php-8.1.34",
+        "archive_sha256": "896859886cbda8d0717fcd696c7b1e93a12aac59d9ca90f69a37a2e7ae3418e3",
+        "retrieved": "2026-10-23"
+      }
     }
   ],
   "expanded_extensions_retrieved": "2026-10-23",
@@ -673,5 +753,78 @@
     ],
     "libzip": "Bundled source notices are retained where present in the PHP source archive; the build may use external libzip.",
     "existing_notice_files": "Existing SOURCE-NOTICES.txt and original license files are unchanged; additional notices are in EXTENSION-SOURCE-NOTICES.txt."
+  },
+  "libpq": {
+    "version": "16.15",
+    "archive": "https://ftp.postgresql.org/pub/source/v16.15/postgresql-16.15.tar.bz2",
+    "archive_sha256": "c1575341fa7bd40f5274ea465b34390f4dc64cdd0770af327005caaeb9f6b7ed",
+    "retrieved": "2026-10-23",
+    "licenses": [
+      {
+        "path": "libpq-16.15/COPYRIGHT",
+        "archive_path": "postgresql-16.15/COPYRIGHT",
+        "sha256": "3d6af92ff8a4c2cdf69afb1cf44edea727922f5cd0cf8b5f72b11cdecac8fdfd"
+      }
+    ],
+    "source_notices": {
+      "path": "libpq-16.15/SOURCE-NOTICES.txt",
+      "notices": 4,
+      "notice_bytes": 4212,
+      "sha256": "df91e7047296148ba9981ecfb967e70f15ecb4eea91a9a4a7c4583ca81f73ffd",
+      "source_files": 5,
+      "scope": "Additional notices in PostgreSQL sources linked into libpq and pg_config by the Linux build configured with OpenSSL, without readline, ICU, or zlib.",
+      "comment_bytes": "Original source comment bytes are preserved without newline normalization; byte ranges use zero-based offsets and exclude the end position.",
+      "origins": [
+        {
+          "archive_path": "postgresql-16.15/src/port/inet_net_ntop.c",
+          "source_sha256": "569eef5ae11268c07f2c68ece4d78b36c68890c0931c99b146bb84833652c521",
+          "comment_start_byte": 0,
+          "comment_end_byte": 882,
+          "comment_sha256": "2517dc351dc4ef074015686b0d4fb5f6ffb706089b48f1fa812d1c124f428883"
+        },
+        {
+          "archive_path": "postgresql-16.15/src/port/snprintf.c",
+          "source_sha256": "ad730143eb21ec35c3ee2b8a09ea48d87f03454ae31b09d3687f0c540b7dfacf",
+          "comment_start_byte": 0,
+          "comment_end_byte": 1736,
+          "comment_sha256": "c1c3f2a48d48df11f01ac083bcabef7cafe9934acfce734d45292addd217fa00"
+        },
+        {
+          "archive_path": "postgresql-16.15/src/port/strlcat.c",
+          "source_sha256": "29ae605634e37f4b2ee7d3d09bfb6cc009e21123f32b7e1c548bd3c9e11baaaa",
+          "comment_start_byte": 94,
+          "comment_end_byte": 894,
+          "comment_sha256": "313320a8f56b3ee205620fa7a3bd79d228ee103f2c464dc8b0dc37769dc3fda5"
+        },
+        {
+          "archive_path": "postgresql-16.15/src/port/strlcpy.c",
+          "source_sha256": "ba9374ab61285148fd42d6ccc9b5a7006ce95f33def527a5aa6e160992caa762",
+          "comment_start_byte": 523,
+          "comment_end_byte": 1323,
+          "comment_sha256": "313320a8f56b3ee205620fa7a3bd79d228ee103f2c464dc8b0dc37769dc3fda5"
+        },
+        {
+          "archive_path": "postgresql-16.15/src/port/timingsafe_bcmp.c",
+          "source_sha256": "299ea1f4dd46314c14fcaf5108a4b2dd29b12f8ced677c966d0d4768b88555df",
+          "comment_start_byte": 113,
+          "comment_end_byte": 907,
+          "comment_sha256": "eb67849a3a5a1b20b2b6dfbb8d0e5b1a8f132b70c8c1f2946d588a16a7ab90c1"
+        }
+      ]
+    }
+  },
+  "postgresql_notice_scope": {
+    "source_roots": [
+      "ext/pgsql/",
+      "ext/pdo_pgsql/"
+    ],
+    "excluded_path_components": [
+      "docs",
+      "examples",
+      "test",
+      "tests"
+    ],
+    "comment_bytes": "Original source comment bytes are preserved without newline normalization.",
+    "existing_notice_files": "Existing notices and licenses remain unchanged; PostgreSQL notices are in separate POSTGRESQL-SOURCE-NOTICES.txt files."
   }
 }

@@ -1,0 +1,88 @@
+Copyright and license notices from PHP 7.4.33 PostgreSQL extensions.
+Runtime source components: ext/pgsql and ext/pdo_pgsql.
+Original comment bytes are retained.
+Full source: https://codeload.github.com/php/php-src/tar.gz/refs/tags/php-7.4.33
+
+Files: ext/pdo_pgsql/pdo_pgsql.c, ext/pdo_pgsql/php_pdo_pgsql.h
+/*
+  +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
+  | Copyright (c) The PHP Group                                          |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | http://www.php.net/license/3_01.txt                                  |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Author: Edin Kadribasic <edink@emini.dk>                             |
+  +----------------------------------------------------------------------+
+*/
+
+Files: ext/pdo_pgsql/pgsql_driver.c, ext/pdo_pgsql/pgsql_statement.c, ext/pdo_pgsql/php_pdo_pgsql_int.h
+/*
+  +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
+  | Copyright (c) The PHP Group                                          |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | http://www.php.net/license/3_01.txt                                  |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Authors: Edin Kadribasic <edink@emini.dk>                            |
+  |          Ilia Alshanestsky <ilia@prohost.org>                        |
+  |          Wez Furlong <wez@php.net>                                   |
+  +----------------------------------------------------------------------+
+*/
+
+Files: ext/pgsql/pgsql.c
+/*
+   +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | http://www.php.net/license/3_01.txt                                  |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Authors: Zeev Suraski <zeev@php.net>                                 |
+   |          Jouni Ahto <jouni.ahto@exdec.fi>                            |
+   |          Yasuo Ohgaki <yohgaki@php.net>                              |
+   |          Youichi Iwakiri <yiwakiri@st.rim.or.jp> (pg_copy_*)         |
+   |          Chris Kings-Lynne <chriskl@php.net> (v3 protocol)           |
+   +----------------------------------------------------------------------+
+ */
+
+Files: ext/pgsql/php_pgsql.h
+/*
+   +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | http://www.php.net/license/3_01.txt                                  |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Authors: Zeev Suraski <zeev@php.net>                                 |
+   |          Jouni Ahto <jouni.ahto@exdec.fi>                            |
+   +----------------------------------------------------------------------+
+ */
+

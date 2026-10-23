@@ -36,7 +36,9 @@ RUN /bin/bash /build/scripts/build-php.sh "${PHP_RELEASE}"
 # Build serializer extensions before Redis and Memcached.
 FROM build AS application-extensions
 COPY scripts/build-extension.sh /build/scripts/build-extension.sh
+COPY scripts/build-libpq.sh /build/scripts/build-libpq.sh
 COPY extensions/ /build/extensions/
+RUN /bin/bash /build/scripts/build-libpq.sh
 
 # Start extension json installation
 RUN /bin/bash /build/scripts/build-extension.sh "${PHP_RELEASE}" bundled json
@@ -125,6 +127,14 @@ RUN /bin/bash /build/scripts/build-extension.sh "${PHP_RELEASE}" bundled sqlite3
 # Start extension pdo_sqlite installation
 RUN /bin/bash /build/scripts/build-extension.sh "${PHP_RELEASE}" bundled pdo_sqlite
 # End extension pdo_sqlite installation
+
+# Start extension pgsql installation
+RUN /bin/bash /build/scripts/build-extension.sh "${PHP_RELEASE}" bundled pgsql
+# End extension pgsql installation
+
+# Start extension pdo_pgsql installation
+RUN /bin/bash /build/scripts/build-extension.sh "${PHP_RELEASE}" bundled pdo_pgsql
+# End extension pdo_pgsql installation
 
 # Start extension zlib installation
 RUN /bin/bash /build/scripts/build-extension.sh "${PHP_RELEASE}" bundled zlib

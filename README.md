@@ -21,11 +21,11 @@ This is an independent project, not an official PHP distribution. [PATCHES.md](P
 
 Only Linux amd64 is supported. Builds start from pinned official PHP images, apply the patches once, and compile the selected modules. The runtime starts from `scratch` and contains PHP, its required shared libraries, CA certificates, configuration and license notices.
 
-All eight targets use the shared Dockerfile. They include OpenSSL, Phar, session, SOAP and mysqlnd, plus mysqli and PDO MySQL. Application extensions such as GD, intl, curl, ZIP, bcmath, mbstring, XML, OPcache and the pinned PECL packages are enabled in every image. [EXTENSIONS.md](EXTENSIONS.md) gives the complete per-version map.
+All eight targets use the shared Dockerfile. They include OpenSSL, Phar, session, SOAP and mysqlnd, plus mysqli and PDO MySQL. PostgreSQL is available through pgsql and PDO PostgreSQL, linked to source-built libpq 16.15. Application extensions such as GD, intl, curl, ZIP, bcmath, mbstring, XML, OPcache and the pinned PECL packages are enabled in every image. [EXTENSIONS.md](EXTENSIONS.md) gives the complete per-version map.
 
 The optional extension installation sections are clearly marked after the core build. They are enabled by default. Removing a shared extension's section may require adjusting extensions that depend on it. Extensions already built into the patched core remain enabled, including mbstring, EXIF and zlib on PHP 8.1. Optional extensions and linked system libraries need their own security maintenance; the patch table describes only the included PHP fixes.
 
-Composer, Node.js, mail tools, shells, package managers and compilers are not in the runtime. Test-only modules and tools remain in the test stage.
+Composer, Node.js, mail tools, database servers, shells, package managers and compilers are not in the runtime. Test-only modules and tools remain in the test stage.
 
 ## Build and run
 
@@ -55,11 +55,12 @@ The image uses PHP's `php.ini-production`, with UTC as the timezone and session 
 
 ## Test
 
-The test stage contains the same PHP build plus the compiler, matching source and test-only modules. It uses local fake servers; no database or credentials are needed.
+The test stage contains the same PHP build plus the compiler, matching source and test-only modules. Tests use local fake servers and a disposable PostgreSQL server on an isolated Docker network. Database credentials are generated for each run; no existing database is used.
 
 ```sh
 docker buildx bake --load php71
 docker buildx bake --load --set php71.target=test --set php71.tags=php-eol-patched:7.1.33-test php71
+docker pull "$(python3 -B -c "import sys; sys.path.insert(0, 'tests'); import postgresql; print(postgresql.DEFAULT_IMAGE)")"
 python3 tests/run.py --image php-eol-patched:7.1.33 --test-image php-eol-patched:7.1.33-test --version 7.1.33
 ```
 
@@ -67,7 +68,7 @@ See [tests/README.md](tests/README.md) for the selected regressions and resource
 
 ## Source and modified builds
 
-Export the complete patched PHP source, PECL source archives and build inputs:
+Export the complete patched PHP source, PECL and libpq source archives, and build inputs:
 
 ```sh
 docker buildx bake --allow fs.write=/tmp/php-eol-source \

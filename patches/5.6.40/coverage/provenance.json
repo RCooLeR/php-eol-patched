@@ -1,0 +1,26 @@
+{
+  "php_version": "5.6.40",
+  "baseline": "After the existing core, SOAP, published, and mysql-http-fpm patch stages (or the complete legacy series).",
+  "baseline_test_image": "sha256:a4a107e9a6ec886125c745432ad1cac6c48eaf3516bc0ad31b9c528bd35b1440",
+  "patches": [
+    {
+      "file": "phar-CVE-2026-7260.patch",
+      "sha256": "d90f920663f7e1b645b6cc657952e368e29c4977643ad89753530218c5cae2b4",
+      "sources": [
+        "https://github.com/php/php-src/commit/2e0fa0a44441d74bf8cc4e1ce1c8af9cd4209f52",
+        "https://repo.tuxcare.com/security/errata/els_alt_php/debian12/CLSA-2026-1786517269.html",
+        "https://github.com/php/php-src/commit/b2de3cf170f81b203dfc2622f2f2dd1572ef95be"
+      ],
+      "adaptation": "Restore the temporarily overwritten filename separator as in the published native PHP 7.1 backport; retain char* ownership and existing TSRMLS APIs. The new compatibility test uses the published GH-21986 tar builder with ordinary nested links.",
+      "paths": [
+        "ext/phar/tests/tar/coverage-symlink-controls.phpt",
+        "ext/phar/util.c"
+      ]
+    }
+  ],
+  "verification_limits": {
+    "gd": "The published CVE-2026-9672 commit contains no regression fixture. Existing gif.phpt is an ordinary compatibility control, not an exploit reproduction.",
+    "openssl": "Run the unchanged upstream gh22186.phpt only where its actual cipher probe succeeds; an unsupported-cipher skip is not a passing regression.",
+    "phar": "The three circular-symlink tar fixtures and their PHPT are byte-identical to upstream. The additional ordinary-link control checks the published path-separator adaptation."
+  }
+}
