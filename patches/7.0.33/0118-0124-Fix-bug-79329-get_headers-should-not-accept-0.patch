@@ -1,0 +1,26 @@
+Published-source: https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz
+Published-patch: 0124-Fix-bug-79329-get_headers-should-not-accept-0.patch
+Scope: selected PHP runtime components and their tests; packaging and unrelated extensions omitted.
+
+From: Remi Collet <remi@remirepo.net>
+Date: Tue, 17 Mar 2020 07:25:12 +0100
+Subject: Fix bug #79329 - get_headers should not accept \0
+
+From 0d139c5b94a5f485a66901919e51faddb0371c43
+
+(cherry picked from commit b7b9302660a23a67285e204bc3d7fcf6ba7f6533)
+---
+ ext/standard/url.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/ext/standard/url.c
++++ b/ext/standard/url.c
+@@ -659,7 +659,7 @@ PHP_FUNCTION(get_headers)
+ 	HashTable *hashT;
+ 	zend_long format = 0;
+ 
+-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s|l", &url, &url_len, &format) == FAILURE) {
++	if (zend_parse_parameters(ZEND_NUM_ARGS(), "p|l", &url, &url_len, &format) == FAILURE) {
+ 		return;
+ 	}
+ 	context = FG(default_context) ? FG(default_context) : (FG(default_context) = php_stream_context_alloc());

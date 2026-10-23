@@ -1,0 +1,46 @@
+Published-source: https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz
+Published-patch: 0114-Fix-77569-Write-Acess-Violation-in-DomImplementation.patch
+Scope: selected PHP runtime components and their tests; packaging and unrelated extensions omitted.
+
+From: "Christoph M. Becker" <cmbecker69@gmx.de>
+Date: Thu, 13 Feb 2020 15:13:26 +0100
+Subject: Fix #77569: Write Acess Violation in DomImplementation
+
+We must not assume that the zval IS_STRING.
+
+(cherry picked from commit cec8b24c848bab8562c82422f3692c193f0afcdb)
+---
+ NEWS                        |  6 ++++++
+ ext/dom/document.c          |  2 +-
+ ext/dom/tests/bug77569.phpt | 14 ++++++++++++++
+ 3 files changed, 21 insertions(+), 1 deletion(-)
+ create mode 100644 ext/dom/tests/bug77569.phpt
+
+--- a/ext/dom/document.c
++++ b/ext/dom/document.c
+@@ -341,7 +341,7 @@ int dom_document_encoding_write(dom_object *obj, zval *newval)
+ 
+ 	str = zval_get_string(newval);
+ 
+-	handler = xmlFindCharEncodingHandler(Z_STRVAL_P(newval));
++	handler = xmlFindCharEncodingHandler(ZSTR_VAL(str));
+ 
+     if (handler != NULL) {
+ 		xmlCharEncCloseFunc(handler);
+--- /dev/null
++++ b/ext/dom/tests/bug77569.phpt
+@@ -0,0 +1,14 @@
++--TEST--
++Bug #77569 (Write Acess Violation in DomImplementation)
++--SKIPIF--
++<?php
++if (!extension_loaded('dom')) die('skip dom extension not available');
++?>
++--FILE--
++<?php
++$imp = new DOMImplementation;
++$dom = $imp->createDocument("", "");
++$dom->encoding = null;
++?>
++--EXPECTF--
++Warning: main(): Invalid Document Encoding in %s on line %d

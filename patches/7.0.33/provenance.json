@@ -1,0 +1,1712 @@
+{
+  "php_version": "7.0.33",
+  "source_archive": {
+    "url": "https://museum.php.net/php7/php-7.0.33.tar.xz",
+    "sha256": "ab8c5be6e32b1f8d032909dedaaaa4bbb1a209e519abb01a52ce3914f9a13d96"
+  },
+  "maintenance_archive": {
+    "url": "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz",
+    "sha256": "3db890cadb4debb154e9fb85aea6b10389cab36d7b52a46d7be47e5e4d4a7d08"
+  },
+  "scope": "Published fixes and prerequisite maintenance for built PHP components and their tests. Debian packaging and unrelated extensions are omitted. Selected omitted paths are recorded per patch. CVE-2026-109618 and CVE-2026-109619 have the published EOL mitigation, not a complete fix.",
+  "patches": [
+    {
+      "file": "0051-0051-CVE-2019-9021.patch",
+      "published_patch": "0051-CVE-2019-9021.patch",
+      "published_sha256": "8b0822b4b1f2899a594266de7d770779c4945302db83815f3105856973fc87d0",
+      "paths": [
+        "ext/phar/phar.c",
+        "ext/phar/tests/bug77247.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0052-0052-CVE-2019-9022-caa.patch",
+      "published_patch": "0052-CVE-2019-9022-caa.patch",
+      "published_sha256": "7a8e1cffd1ebc85d3d925c0910d515cb97955ec8dc576fd52027e9cd1bc2d42f",
+      "paths": [
+        "ext/standard/dns.c",
+        "ext/standard/tests/network/dns_get_record_caa.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0053-0053-CVE-2019-9022.patch",
+      "published_patch": "0053-CVE-2019-9022.patch",
+      "published_sha256": "3eeea0f1fe2cc985e135768ccaf6170bb20f3b247b4a4199f78c7b329939d86b",
+      "paths": [
+        "ext/standard/dns.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0054-0054-CVE-2019-9023-1.patch",
+      "published_patch": "0054-CVE-2019-9023-1.patch",
+      "published_sha256": "453fbdfa57f38d7a3c410f7608e346b246047c047b72ca5e71846672731a83da",
+      "paths": [
+        "ext/mbstring/oniguruma/regparse.c",
+        "ext/mbstring/tests/bug77370.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0055-0055-CVE-2019-9023-2.patch",
+      "published_patch": "0055-CVE-2019-9023-2.patch",
+      "published_sha256": "00ec62ac05a90b8c6d6a609f3aade7c830c57809bd71011a902e83c04a20cc6e",
+      "paths": [
+        "ext/mbstring/oniguruma/regcomp.c",
+        "ext/mbstring/tests/bug77371.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0056-0056-CVE-2019-9023-3.patch",
+      "published_patch": "0056-CVE-2019-9023-3.patch",
+      "published_sha256": "eac1cd05cba9700dbd3229a3ee357edada6b4efefab18c83c7c0e9041ef87122",
+      "paths": [
+        "ext/mbstring/oniguruma/enc/unicode.c",
+        "ext/mbstring/oniguruma/regcomp.c",
+        "ext/mbstring/oniguruma/regparse.c",
+        "ext/mbstring/oniguruma/regparse.h",
+        "ext/mbstring/tests/bug77371.phpt",
+        "ext/mbstring/tests/bug77381.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0057-0057-CVE-2019-9023-4.patch",
+      "published_patch": "0057-CVE-2019-9023-4.patch",
+      "published_sha256": "ebcc5cc5f1ea6406de794e9ed95dc4250fd3fa13b52e07d9ed805fca155a55ac",
+      "paths": [
+        "ext/mbstring/oniguruma/enc/utf16_be.c",
+        "ext/mbstring/oniguruma/enc/utf16_le.c",
+        "ext/mbstring/oniguruma/enc/utf32_be.c",
+        "ext/mbstring/oniguruma/enc/utf32_le.c",
+        "ext/mbstring/tests/bug77418.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0059-0059-Fix-bug-77396-Null-Pointer-Dereference-in-phar_creat.patch",
+      "published_patch": "0059-Fix-bug-77396-Null-Pointer-Dereference-in-phar_creat.patch",
+      "published_sha256": "da388507257b2be8575331c935896c59583929405e9e3c572f7bdaeb2836e1a5",
+      "paths": [
+        "ext/phar/phar.c",
+        "ext/phar/tests/bug77396.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0060-0060-Fix-77431-SplFileInfo-__construct-accepts-NUL-bytes.patch",
+      "published_patch": "0060-Fix-77431-SplFileInfo-__construct-accepts-NUL-bytes.patch",
+      "published_sha256": "6d69b2edec10ad391b85901b36e5ebd43c525cce703b2009f81777c8078c89a3",
+      "paths": [
+        "ext/spl/spl_directory.c",
+        "ext/spl/tests/bug77431.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0061-0061-Fix-integer-overflows-on-32-bits.patch",
+      "published_patch": "0061-Fix-integer-overflows-on-32-bits.patch",
+      "published_sha256": "75e0396170868851d12959568fcc503c2707a593ddcac0b75886101685ca293d",
+      "paths": [
+        "ext/exif/exif.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0062-0062-Fix-bug-77540-Invalid-Read-on-exif_process_SOFn.patch",
+      "published_patch": "0062-Fix-bug-77540-Invalid-Read-on-exif_process_SOFn.patch",
+      "published_sha256": "d35ceb50b2debf754ace50d3602caf8e597e7e030c62f38cc81fd37e07093970",
+      "paths": [
+        "ext/exif/exif.c",
+        "ext/exif/tests/bug77540.jpg",
+        "ext/exif/tests/bug77540.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0063-0063-Fix-bug-77563-Uninitialized-read-in-exif_process_IFD.patch",
+      "published_patch": "0063-Fix-bug-77563-Uninitialized-read-in-exif_process_IFD.patch",
+      "published_sha256": "6cd0db4ce96283b78be9f7e621e73e98a1f54a0c7d1a741fb329f114a0593770",
+      "paths": [
+        "ext/exif/exif.c",
+        "ext/exif/tests/bug77563.jpg",
+        "ext/exif/tests/bug77563.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0064-0064-Fix-test-error-message.patch",
+      "published_patch": "0064-Fix-test-error-message.patch",
+      "published_sha256": "5f1a50a3f8c5249957928759710ab744460b20150927d3548723be03146562e7",
+      "paths": [
+        "ext/exif/tests/bug77563.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0065-0065-Fix-bug-77586-phar_tar_writeheaders_int-buffer-overf.patch",
+      "published_patch": "0065-Fix-bug-77586-phar_tar_writeheaders_int-buffer-overf.patch",
+      "published_sha256": "98039420779d4cf79562f90eba4cbb749e732eab47cbe1361a3a0f1186d63d53",
+      "paths": [
+        "ext/phar/tar.c",
+        "ext/phar/tests/bug71488.phpt",
+        "ext/phar/tests/bug77586.phpt",
+        "ext/phar/tests/bug77586/files/link-nktarAMLdJBv7BGYnpzg-ZDycSpWN3Ne3kacltOSE-EqfhStJ1EoBpGuoua6VE-dne29hvpNWXiVbepwIf8-NRHWM9LITLo3nXZnKVNC"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0066-0066-Fix-bug-77630-safer-rename-procedure.patch",
+      "published_patch": "0066-Fix-bug-77630-safer-rename-procedure.patch",
+      "published_sha256": "c9a648544b9dcfbbd34216bec19dc2c414b98c8a600bfb3e27fb335d0ddfcf03",
+      "paths": [
+        "main/streams/plain_wrapper.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0067-0067-Fix-test-portability.patch",
+      "published_patch": "0067-Fix-test-portability.patch",
+      "published_sha256": "632c0f9273c3ab6d8cced130784208fadb93504b93a90643bdafd4d3b9d0c702",
+      "paths": [
+        "ext/exif/tests/bug77563.phpt",
+        "ext/phar/tests/bug77396.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0069-0069-SQLite3-add-DEFENSIVE-config-for-SQLite-3.26.0-as-a-.patch",
+      "published_patch": "0069-SQLite3-add-DEFENSIVE-config-for-SQLite-3.26.0-as-a-.patch",
+      "published_sha256": "40b61cdbada71ffa111d60c8523c61c080e57b2d263401789494e4b5d12db7d3",
+      "paths": [
+        "ext/sqlite3/php_sqlite3.h",
+        "ext/sqlite3/sqlite3.c",
+        "ext/sqlite3/tests/sqlite3_defensive.phpt"
+      ],
+      "omitted_paths": [
+        "NEWS",
+        "php.ini-development",
+        "php.ini-production"
+      ]
+    },
+    {
+      "file": "0070-0070-Fix-bug-77753-Heap-buffer-overflow-in-php_ifd_get32s.patch",
+      "published_patch": "0070-Fix-bug-77753-Heap-buffer-overflow-in-php_ifd_get32s.patch",
+      "published_sha256": "127d7362f9473432563ef867c6480c60f0b70341b166a2f7149c6f5858d9ca2f",
+      "paths": [
+        "ext/exif/exif.c",
+        "ext/exif/tests/bug77753.phpt",
+        "ext/exif/tests/bug77753.tiff"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0071-0071-Fixed-bug-77831-Heap-buffer-overflow-in-exif_iif_add.patch",
+      "published_patch": "0071-Fixed-bug-77831-Heap-buffer-overflow-in-exif_iif_add.patch",
+      "published_sha256": "838e5ad441d442bd40b16ea7b0215bb41761f9bb3c5cec0fe9dd5c2e060233d3",
+      "paths": [
+        "ext/exif/exif.c",
+        "ext/exif/tests/bug77831.phpt",
+        "ext/exif/tests/bug77831.tiff"
+      ],
+      "omitted_paths": [
+        "NEWS"
+      ]
+    },
+    {
+      "file": "0072-0072-Pointer-arithmetic-on-void-pointers-is-illegal.patch",
+      "published_patch": "0072-Pointer-arithmetic-on-void-pointers-is-illegal.patch",
+      "published_sha256": "74570ee9fb39976a9f03bd233add429611c8afb69514331bbbbb4edd62de4883",
+      "paths": [
+        "ext/exif/exif.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0074-0074-Fix-bug-77950-Heap-buffer-overflow-in-_estrndup-via-.patch",
+      "published_patch": "0074-Fix-bug-77950-Heap-buffer-overflow-in-_estrndup-via-.patch",
+      "published_sha256": "bfb9ba2055af904a4e0beb41458074264a13008dacb1fe279af23bb9f2bb72b5",
+      "paths": [
+        "ext/exif/exif.c",
+        "ext/exif/tests/bug77950.phpt",
+        "ext/exif/tests/bug77950.tiff"
+      ],
+      "omitted_paths": [
+        "NEWS"
+      ]
+    },
+    {
+      "file": "0076-0076-Fix-77973-Uninitialized-read-in-gdImageCreateFromXbm.patch",
+      "published_patch": "0076-Fix-77973-Uninitialized-read-in-gdImageCreateFromXbm.patch",
+      "published_sha256": "58273c86fd24ca7e6f5fede3d5bb350fe89773a6330e06e0c6fe33abfd994cae",
+      "paths": [
+        "ext/gd/libgd/xbm.c",
+        "ext/gd/tests/bug77973.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0077-0077-Fix-bug-78069-Out-of-bounds-read-in-iconv.c-_php_ico.patch",
+      "published_patch": "0077-Fix-bug-78069-Out-of-bounds-read-in-iconv.c-_php_ico.patch",
+      "published_sha256": "4fe6a75d6ef163305f53748b7728283030b0a9fa8021b56a5f3d3d0c4466ac54",
+      "paths": [
+        "ext/iconv/iconv.c",
+        "ext/iconv/tests/bug78069.data",
+        "ext/iconv/tests/bug78069.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0078-0078-fix-test-output.patch",
+      "published_patch": "0078-fix-test-output.patch",
+      "published_sha256": "3f50f5fa432c76da4ed4b1e778d2140acca1b49a35e2a750fceee8a6a8870836",
+      "paths": [
+        "ext/iconv/tests/bug78069.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0079-0079-Fix-bug-77988-heap-buffer-overflow-on-php_jpg_get16.patch",
+      "published_patch": "0079-Fix-bug-77988-heap-buffer-overflow-on-php_jpg_get16.patch",
+      "published_sha256": "bb59ca6c41f0f6c1a0ca564eef89775555f69e9f859d9f1639918f7fc42350f0",
+      "paths": [
+        "ext/exif/exif.c",
+        "ext/exif/tests/bug77988.jpg",
+        "ext/exif/tests/bug77988.phpt"
+      ],
+      "omitted_paths": [
+        "NEWS"
+      ]
+    },
+    {
+      "file": "0080-0080-Fix-bug-77967-Bypassing-open_basedir-restrictions-vi.patch",
+      "published_patch": "0080-Fix-bug-77967-Bypassing-open_basedir-restrictions-vi.patch",
+      "published_sha256": "07d95de579e93d5bb78440a433574ff4ad087286546ec1cd6ed788ccf8520212",
+      "paths": [
+        "ext/sqlite3/sqlite3.c"
+      ],
+      "omitted_paths": [
+        "NEWS"
+      ]
+    },
+    {
+      "file": "0081-0086-Fixes-3-Updated-tests-to-have-less-fails-due-to-the-.patch",
+      "published_patch": "0086-Fixes-3-Updated-tests-to-have-less-fails-due-to-the-.patch",
+      "published_sha256": "6788da05b3e4d5cfa39ae8d32ce0892ad4079035914904ea96f03dcfd838a268",
+      "paths": [
+        "ext/curl/tests/curl_basic_009.phpt",
+        "ext/pdo_mysql/tests/pdo_mysql_exec.phpt",
+        "ext/pdo_mysql/tests/pdo_mysql_stmt_getcolumnmeta.phpt",
+        "ext/standard/tests/streams/stream_socket_sendto.phpt",
+        "ext/standard/tests/strings/bug65769.phpt",
+        "sapi/cli/tests/php_cli_server.inc"
+      ],
+      "omitted_paths": [
+        "ext/curl/tests/check_win_config.phpt"
+      ]
+    },
+    {
+      "file": "0082-0087-Upgrade-to-SQLite-3.28.0.patch",
+      "published_patch": "0087-Upgrade-to-SQLite-3.28.0.patch",
+      "published_sha256": "46b81ab3cff62e97660b72da056c0355d8cf4a8c340d3d7c6b284ab7441d7ba2",
+      "paths": [
+        "ext/sqlite3/libsqlite/sqlite3.c",
+        "ext/sqlite3/libsqlite/sqlite3.h",
+        "ext/sqlite3/libsqlite/sqlite3ext.h"
+      ],
+      "omitted_paths": [
+        "NEWS"
+      ]
+    },
+    {
+      "file": "0083-0088-Fix-bug-78222-heap-buffer-overflow-on-exif_scan_thum.patch",
+      "published_patch": "0088-Fix-bug-78222-heap-buffer-overflow-on-exif_scan_thum.patch",
+      "published_sha256": "b91ba7d03a79a66b1c745cd980ded9f966f52035203c7130743919e59dc5feb8",
+      "paths": [
+        "ext/exif/exif.c",
+        "ext/exif/tests/bug78222.jpg",
+        "ext/exif/tests/bug78222.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0084-0089-Fix-bug-78256-heap-buffer-overflow-on-exif_process_u.patch",
+      "published_patch": "0089-Fix-bug-78256-heap-buffer-overflow-on-exif_process_u.patch",
+      "published_sha256": "75f892729f8ad1f070cce9e319af4333e80d1ab5eb2f47a4749cf6f7bd27fd2c",
+      "paths": [
+        "ext/exif/exif.c",
+        "ext/exif/tests/bug78256.jpg",
+        "ext/exif/tests/bug78256.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0085-0090-Fix-77919-Potential-UAF-in-Phar-RSHUTDOWN.patch",
+      "published_patch": "0090-Fix-77919-Potential-UAF-in-Phar-RSHUTDOWN.patch",
+      "published_sha256": "fea60e19d8eae0295a43c6c73054cd72ab89eabc1e8f453738e45715499dbb55",
+      "paths": [
+        "ext/phar/phar_object.c",
+        "ext/phar/tests/bug71488.phpt"
+      ],
+      "omitted_paths": [
+        "NEWS"
+      ]
+    },
+    {
+      "file": "0087-0092-Fix-CVE-2019-13224-don-t-allow-different-encodings-f.patch",
+      "published_patch": "0092-Fix-CVE-2019-13224-don-t-allow-different-encodings-f.patch",
+      "published_sha256": "a52075f7acb8daf156599f799436a907bc5b0aee5e4eca3406af7349d58d87b7",
+      "paths": [
+        "ext/mbstring/oniguruma/regext.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0088-0093-Fix-75457-heap-use-after-free-in-php7.0.25.patch",
+      "published_patch": "0093-Fix-75457-heap-use-after-free-in-php7.0.25.patch",
+      "published_sha256": "950b2116af4e896f21eb4d1b0c3be86a037e1d2d2a4e214741a2715356e6c692",
+      "paths": [
+        "ext/pcre/pcrelib/pcre_compile.c",
+        "ext/pcre/tests/bug75457.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0090-0095-relax-test-offset-may-be-different-on-various-system.patch",
+      "published_patch": "0095-relax-test-offset-may-be-different-on-various-system.patch",
+      "published_sha256": "4e40590f14e775ced22f2232b521060dfefa7c47ec5468d7a4ccb4f713692bbe",
+      "paths": [
+        "ext/pcre/tests/bug75457.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0091-0096-Fix-Opcache-test-fails-regarding-to-AppVeyor-image-u.patch",
+      "published_patch": "0096-Fix-Opcache-test-fails-regarding-to-AppVeyor-image-u.patch",
+      "published_sha256": "24ac7de0917ba7aee00843d569087676aec3d8d68073d8420f6f3bf6bb36ec32",
+      "paths": [
+        "ext/opcache/tests/php_cli_server.inc"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0092-0097-Fixed-test-on-32-bit-systems.patch",
+      "published_patch": "0097-Fixed-test-on-32-bit-systems.patch",
+      "published_sha256": "57308cc93138a73d7dccb35479560029ec6788d7628a98400b681f82befaa8aa",
+      "paths": [
+        "ext/opcache/tests/bug71127.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0093-0098-Remove-unstable-dns-tests.patch",
+      "published_patch": "0098-Remove-unstable-dns-tests.patch",
+      "published_sha256": "b8363d24befeca0ae4c110e61f12af6ee02a9540a736226b1565229636e7d8b5",
+      "paths": [
+        "ext/standard/tests/dns_get_record.phpt",
+        "ext/standard/tests/network/dns_get_record_caa.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0094-0099-Prevent-test-case-failure.patch",
+      "published_patch": "0099-Prevent-test-case-failure.patch",
+      "published_sha256": "13aec4ed973a55eb96eac89c616fece4ec6c49c998d1ac1873e6889a951dfee0",
+      "paths": [
+        "ext/opcache/tests/bug66461.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0095-0100-Fix-module-name-in-test-cases.patch",
+      "published_patch": "0100-Fix-module-name-in-test-cases.patch",
+      "published_sha256": "7ffb91d71ec8c6b5974aae4728370cb54c8e546b779469857fef16bc57a45c98",
+      "paths": [
+        "ext/opcache/tests/issue0115.phpt",
+        "ext/opcache/tests/issue0149.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0096-0101-Fix-test-expectations-to-match-the-implementation.patch",
+      "published_patch": "0101-Fix-test-expectations-to-match-the-implementation.patch",
+      "published_sha256": "c412de6132edba96ce3a4fbde97aac8ae313af4fe1c3ec16758cef617f6f9f61",
+      "paths": [
+        "ext/pdo_mysql/tests/pdo_mysql_stmt_getcolumnmeta.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0097-0102-Fix-bug-78599-env_path_info-underflow-can-lead-to-RC.patch",
+      "published_patch": "0102-Fix-bug-78599-env_path_info-underflow-can-lead-to-RC.patch",
+      "published_sha256": "f3755ad314333ccfa3527b2502459a3d98933331840d5c79642633a19beda683",
+      "paths": [
+        "sapi/fpm/fpm/fpm_main.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0099-0104-Fix-78878-Buffer-underflow-in-bc_shift_addsub.patch",
+      "published_patch": "0104-Fix-78878-Buffer-underflow-in-bc_shift_addsub.patch",
+      "published_sha256": "4e00fd6188751e4cf98c75afe8e236934f8de76d3df4853c1e7cc96f619f5793",
+      "paths": [
+        "ext/bcmath/libbcmath/src/str2num.c",
+        "ext/bcmath/tests/bug78878.phpt"
+      ],
+      "omitted_paths": [
+        "NEWS"
+      ]
+    },
+    {
+      "file": "0100-0105-Fix-78862-link-silently-truncates-after-a-null-byte-.patch",
+      "published_patch": "0105-Fix-78862-link-silently-truncates-after-a-null-byte-.patch",
+      "published_sha256": "5914cfb9e66e248009fdcb27becee932fff6bab28d633b0d9e0300f87cde1936",
+      "paths": [
+        "ext/standard/tests/file/windows_links/bug78862.phpt"
+      ],
+      "omitted_paths": [
+        "NEWS",
+        "ext/standard/link_win32.c"
+      ]
+    },
+    {
+      "file": "0101-0106-Fix-78863-DirectoryIterator-class-silently-truncates.patch",
+      "published_patch": "0106-Fix-78863-DirectoryIterator-class-silently-truncates.patch",
+      "published_sha256": "b1fa4e1170ba45b24c641878dee56b38bf09e4f517cbb7344c7fa7fb9bf1b239",
+      "paths": [
+        "ext/spl/spl_directory.c",
+        "ext/spl/tests/bug78863.phpt"
+      ],
+      "omitted_paths": [
+        "NEWS"
+      ]
+    },
+    {
+      "file": "0102-0107-Fix-bug-78793.patch",
+      "published_patch": "0107-Fix-bug-78793.patch",
+      "published_sha256": "de7778addfa89bd1ee6e3fde584f3eb6e437f5a3ddca022056891aa866eab811",
+      "paths": [
+        "ext/exif/exif.c",
+        "ext/exif/tests/bug78793.phpt"
+      ],
+      "omitted_paths": [
+        "NEWS"
+      ]
+    },
+    {
+      "file": "0103-0108-Fixed-bug-78910.patch",
+      "published_patch": "0108-Fixed-bug-78910.patch",
+      "published_sha256": "13c01613f83c7dc21aea0d0efced45a82c22eb14eb62f39265e6d48d0cd7aa3f",
+      "paths": [
+        "ext/exif/exif.c",
+        "ext/exif/tests/bug78910.phpt"
+      ],
+      "omitted_paths": [
+        "NEWS"
+      ]
+    },
+    {
+      "file": "0104-0109-Fix-tests.patch",
+      "published_patch": "0109-Fix-tests.patch",
+      "published_sha256": "14dad1d0c0ff11ad60ee31307a3d41e0bed75e918d1673add76d455dea15a126",
+      "paths": [
+        "ext/bcmath/tests/bug72093-win32.phpt",
+        "ext/bcmath/tests/bug75178-win32.phpt",
+        "ext/exif/tests/bug76557.phpt",
+        "ext/exif/tests/bug78910.phpt",
+        "ext/spl/tests/bug54291.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0105-0110-Fix-79099-OOB-read-in-php_strip_tags_ex.patch",
+      "published_patch": "0110-Fix-79099-OOB-read-in-php_strip_tags_ex.patch",
+      "published_sha256": "379e69a356f3f9ab3eaa2f0b3f7ace28e027db348b35dbd660e11f3d857b8829",
+      "paths": [
+        "ext/standard/string.c",
+        "ext/standard/tests/file/bug79099.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0106-0111-Fix-bug-79037-global-buffer-overflow-in-mbfl_filt_co.patch",
+      "published_patch": "0111-Fix-bug-79037-global-buffer-overflow-in-mbfl_filt_co.patch",
+      "published_sha256": "62b0c3a2472ced33a6ebdc12d1f87e3f8d0e726900b9ec168dcf0b74e60d9b39",
+      "paths": [
+        "ext/mbstring/libmbfl/filters/mbfilter_big5.c",
+        "ext/mbstring/tests/bug79037.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0108-0113-More-checks-for-php_strip_tags_ex.patch",
+      "published_patch": "0113-More-checks-for-php_strip_tags_ex.patch",
+      "published_sha256": "29601f646750011225b709ccfd9bb431629fdc44ee38ca3b64106b94f3b55774",
+      "paths": [
+        "ext/standard/string.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0109-0114-Fix-77569-Write-Acess-Violation-in-DomImplementation.patch",
+      "published_patch": "0114-Fix-77569-Write-Acess-Violation-in-DomImplementation.patch",
+      "published_sha256": "94d476c921fd63ae78660e68629f46856c3b44d8b88000abfdbb2a09b5c96d19",
+      "paths": [
+        "ext/dom/document.c",
+        "ext/dom/tests/bug77569.phpt"
+      ],
+      "omitted_paths": [
+        "NEWS"
+      ]
+    },
+    {
+      "file": "0110-0115-Fix-typo-in-recent-bugfix.patch",
+      "published_patch": "0115-Fix-typo-in-recent-bugfix.patch",
+      "published_sha256": "ffbb09c3f7f126386793aa85bc12e1d23db6dd40f74e47f1ab26c8fc1f8f74b4",
+      "paths": [
+        "ext/dom/tests/bug77569.phpt"
+      ],
+      "omitted_paths": [
+        "NEWS"
+      ]
+    },
+    {
+      "file": "0111-0116-Fix-bug-79221-Null-Pointer-Dereference-in-PHP-Sessio.patch",
+      "published_patch": "0116-Fix-bug-79221-Null-Pointer-Dereference-in-PHP-Sessio.patch",
+      "published_sha256": "7b8c0ecd7dccc8415047ecebef7cea5beaed3df34859f88a9fac39f7911a126c",
+      "paths": [
+        "ext/session/session.c",
+        "ext/session/tests/bug79221.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0112-0117-Fix-bug-79082-Files-added-to-tar-with-Phar-buildFrom.patch",
+      "published_patch": "0117-Fix-bug-79082-Files-added-to-tar-with-Phar-buildFrom.patch",
+      "published_sha256": "fb495aa1e90ba1a732bfa7dceb801d6b5d1d4a3f4019b4d91af7854242b7bf01",
+      "paths": [
+        "ext/phar/phar_object.c",
+        "ext/phar/tests/bug79082.phpt",
+        "ext/phar/tests/test79082/test79082-testfile",
+        "ext/phar/tests/test79082/test79082-testfile2"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0114-0119-renew-certs-for-openssl-tests.patch",
+      "published_patch": "0119-renew-certs-for-openssl-tests.patch",
+      "published_sha256": "63a45c2da5373a50cce44dd92f5fd9647daf9b4573d9a51222c42da9b6066138",
+      "paths": [
+        "ext/openssl/tests/bug54992-ca.pem",
+        "ext/openssl/tests/bug54992.pem",
+        "ext/openssl/tests/bug65538.phar",
+        "ext/openssl/tests/openssl_peer_fingerprint_basic.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0115-0121-Fixed-bug-79282.patch",
+      "published_patch": "0121-Fixed-bug-79282.patch",
+      "published_sha256": "7e542721e18dbe982cf58366c51643ebf7a21d7c54caec7a7ca71982b1b06757",
+      "paths": [
+        "ext/exif/exif.c",
+        "ext/exif/tests/bug79282.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0116-0122-Fix-test.patch",
+      "published_patch": "0122-Fix-test.patch",
+      "published_sha256": "00af9229981d87ab6f41c98cc68d67c519b487b581e05e6c2b4b4b61a87d0c96",
+      "paths": [
+        "ext/exif/tests/bug79282.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0117-0123-fix-test.patch",
+      "published_patch": "0123-fix-test.patch",
+      "published_sha256": "a54a385f09ee702d17e1f412095fff1597f5ced41b8d20e21ad73702f5482963",
+      "paths": [
+        "ext/exif/tests/bug79282.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0118-0124-Fix-bug-79329-get_headers-should-not-accept-0.patch",
+      "published_patch": "0124-Fix-bug-79329-get_headers-should-not-accept-0.patch",
+      "published_sha256": "0b9338bb4d05150513f5a76f61d080bab840462c53285048f8d973524a087633",
+      "paths": [
+        "ext/standard/url.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0120-0126-Fix-bug-79330-make-all-execution-modes-consistent-in.patch",
+      "published_patch": "0126-Fix-bug-79330-make-all-execution-modes-consistent-in.patch",
+      "published_sha256": "8d5d0227c0d4897c008fd69986897e204cddf1da959bf9113f54d4347e0989ac",
+      "paths": [
+        "ext/standard/exec.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0121-0127-Fix-bug-79465-use-unsigneds-as-indexes.patch",
+      "published_patch": "0127-Fix-bug-79465-use-unsigneds-as-indexes.patch",
+      "published_sha256": "975f145c5af6d198d610724715cc3dfea9b5512abbf881e37166a0939cc29bac",
+      "paths": [
+        "ext/standard/url.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0123-0129-Fix-bug-76895.patch",
+      "published_patch": "0129-Fix-bug-76895.patch",
+      "published_sha256": "c2a4abc325a64bf0461dceb87c86d6ce6c4e278ef32e28277b831bc70830f86b",
+      "paths": [
+        "Zend/zend_signal.c",
+        "ext/opcache/ZendAccelerator.c",
+        "main/main.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0124-0131-Fix-78875-Long-filenames-cause-OOM-and-temp-files-ar.patch",
+      "published_patch": "0131-Fix-78875-Long-filenames-cause-OOM-and-temp-files-ar.patch",
+      "published_sha256": "8e24565772425ff42d8295d57f2382217fb2f15964e76a421af82b9966be80a9",
+      "paths": [
+        "main/rfc1867.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0125-0132-Fix-78876-Long-variables-cause-OOM-and-temp-files-ar.patch",
+      "published_patch": "0132-Fix-78876-Long-variables-cause-OOM-and-temp-files-ar.patch",
+      "published_sha256": "4ef362254262a803063aea46494e865c874beb975ecc5a9fc3a0bf61d5ec4b69",
+      "paths": [
+        "main/rfc1867.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0127-CVE-2020-7068.patch",
+      "published_patch": "CVE-2020-7068.patch",
+      "published_sha256": "0cade49719b281cdbe2f8a3273c356fda0edebd47880d59f492ff82d620ed43b",
+      "paths": [
+        "ext/phar/zip.c",
+        "ext/phar/tests/bug79797.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0128-CVE-2020-7070.patch",
+      "published_patch": "CVE-2020-7070.patch",
+      "published_sha256": "9d086644280ddad0f8ca0611d97ef8d3aa5dcf4bbb129fc1e1b5ac4315113bd8",
+      "paths": [
+        "main/php_variables.c",
+        "tests/basic/022.phpt",
+        "tests/basic/023.phpt",
+        "tests/basic/bug79699.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0129-CVE-2019-18218.patch",
+      "published_patch": "CVE-2019-18218.patch",
+      "published_sha256": "0bcd2d1fc5ec4306700d0fdf790767bd1f5a13672860ecb8fcdf9341f7c69e08",
+      "paths": [
+        "ext/fileinfo/libmagic/cdf.c",
+        "ext/fileinfo/libmagic/cdf.h"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0130-CVE-2020-7071.patch",
+      "published_patch": "CVE-2020-7071.patch",
+      "published_sha256": "ed4c2151a82aa5716ba62ff77857b0a1ae62f58cd599afa4b9af1161a4eac2dc",
+      "paths": [
+        "ext/filter/logical_filters.c",
+        "ext/filter/tests/bug77423.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0131-CVE-2021-21702.patch",
+      "published_patch": "CVE-2021-21702.patch",
+      "published_sha256": "2b28e95c3fca7eb77d5491c96c17f2a082d4e7cfd3cce9a8d635998fa6e88a97",
+      "paths": [
+        "ext/soap/php_sdl.c",
+        "ext/soap/php_xml.c",
+        "ext/soap/tests/bug80672.phpt",
+        "ext/soap/tests/bug80672.xml"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0134-CVE-2021-21705.patch",
+      "published_patch": "CVE-2021-21705.patch",
+      "published_sha256": "02b3b089b415251ce8107c1246bb57814b263b314a14edfb7a0f9dec7e80096c",
+      "paths": [
+        "ext/filter/logical_filters.c",
+        "ext/filter/tests/bug81122.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0135-CVE-2021-21703.patch",
+      "published_patch": "CVE-2021-21703.patch",
+      "published_sha256": "5cad1de4522e11a34098c077be697bad4057e0630baa63e4d7e2a09798813f22",
+      "paths": [
+        "sapi/fpm/fpm/fpm_children.c",
+        "sapi/fpm/fpm/fpm_request.c",
+        "sapi/fpm/fpm/fpm_scoreboard.c",
+        "sapi/fpm/fpm/fpm_scoreboard.h",
+        "sapi/fpm/fpm/fpm_status.c",
+        "sapi/fpm/fpm/fpm_worker_pool.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0136-CVE-2021-21707.patch",
+      "published_patch": "CVE-2021-21707.patch",
+      "published_sha256": "2f37029ef48013faf43c1f642a60780adeabf0fc0f7cc017ac5952c5c9e840cd",
+      "paths": [
+        "ext/dom/domimplementation.c",
+        "ext/dom/tests/bug79971_2.phpt",
+        "ext/libxml/libxml.c",
+        "ext/simplexml/tests/bug79971_1.phpt",
+        "ext/simplexml/tests/bug79971_1.xml"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0138-CVE-2022-31626.patch",
+      "published_patch": "CVE-2022-31626.patch",
+      "published_sha256": "82c6a58fd5ecc5be3fb4bc35bc78978dc5a3e39eb7e7fe1dcd4ac691355cc884",
+      "paths": [
+        "ext/mysqlnd/mysqlnd_wireprotocol.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0139-CVE-2022-31628-1.patch",
+      "published_patch": "CVE-2022-31628-1.patch",
+      "published_sha256": "217c040a637540c89ff2860032eec733ec2c9692e3f0b29772d31982795954f5",
+      "paths": [
+        "ext/phar/phar.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0140-CVE-2022-31628-2.patch",
+      "published_patch": "CVE-2022-31628-2.patch",
+      "published_sha256": "9f610db858ad3762eab15f1c7cb60fdd4742989e8072f2f3ccf7a561d4a2f8f6",
+      "paths": [
+        "ext/phar/phar.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0141-CVE-2022-31629.patch",
+      "published_patch": "CVE-2022-31629.patch",
+      "published_sha256": "0413c90a673c6993a471b7e7245e482cea5bbd7eceb4969c6b1d3330e33fe78c",
+      "paths": [
+        "ext/standard/tests/bug81727.phpt",
+        "main/php_variables.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0142-CVE-2023-0567.patch",
+      "published_patch": "CVE-2023-0567.patch",
+      "published_sha256": "41f8d659aea174ec16563affbfcc1d7c157e89f029dde7a32d32804199fd61c7",
+      "paths": [
+        "ext/standard/crypt.c",
+        "ext/standard/crypt_blowfish.c",
+        "ext/standard/tests/crypt/bcrypt_salt_dollar.phpt",
+        "ext/standard/tests/password/password_bcrypt_short.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0143-CVE-2023-0568.patch",
+      "published_patch": "CVE-2023-0568.patch",
+      "published_sha256": "5b7f1b9ed68938f346938706dc0b2925a11544b53bac0ef0a7fea49a4149fa70",
+      "paths": [
+        "ext/dom/document.c",
+        "ext/xmlreader/php_xmlreader.c",
+        "main/fopen_wrappers.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0144-CVE-2023-0662.patch",
+      "published_patch": "CVE-2023-0662.patch",
+      "published_sha256": "cc10a36960e1cc9f27b88b9b9a5d42f7f4cf18469737b01c71bed99df8efcd3a",
+      "paths": [
+        "main/main.c",
+        "main/rfc1867.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0145-CVE-2022-31631.patch",
+      "published_patch": "CVE-2022-31631.patch",
+      "published_sha256": "a9a0ff06ec0930b331705d7fb57d3056c8578382e79d4f6e2e9d05b1996be672",
+      "paths": [
+        "ext/pdo_sqlite/sqlite_driver.c",
+        "ext/pdo_sqlite/tests/bug81740.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0146-CVE-2023-3247_part1.patch",
+      "published_patch": "CVE-2023-3247_part1.patch",
+      "published_sha256": "0763404128f4768bf9aac68cfc3ebb3cba4c55c872014638d9307394703dfe3e",
+      "paths": [
+        "ext/soap/php_http.c",
+        "ext/standard/crypt.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0147-CVE-2023-3247_part2.patch",
+      "published_patch": "CVE-2023-3247_part2.patch",
+      "published_sha256": "ad00fda441f9c19ca5bb3ce652b74847a2a46bbd5e1ea19a79b70ae6ebe59bbd",
+      "paths": [
+        "ext/soap/php_http.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0148-CVE-2023-3247_part3.patch",
+      "published_patch": "CVE-2023-3247_part3.patch",
+      "published_sha256": "8e9f047762f6b50194cc412fea1a03e10714804dbc56de4d69ec5fe84429a38a",
+      "paths": [
+        "ext/soap/php_http.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0149-CVE-2023-3823.patch",
+      "published_patch": "CVE-2023-3823.patch",
+      "published_sha256": "309564c0e29c1726c869da9e1f69576795a6f0195e6fe33ff0212dc4461edec3",
+      "paths": [
+        "ext/dom/document.c",
+        "ext/dom/documentfragment.c",
+        "ext/libxml/php_libxml.h",
+        "ext/simplexml/simplexml.c",
+        "ext/soap/php_xml.c",
+        "ext/xml/compat.c",
+        "ext/xmlreader/php_xmlreader.c"
+      ],
+      "omitted_paths": [
+        "ext/xsl/xsltprocessor.c"
+      ]
+    },
+    {
+      "file": "0150-CVE-2023-3824.patch",
+      "published_patch": "CVE-2023-3824.patch",
+      "published_sha256": "d5af7384b84ee2cca9a10a9e4ba57429e913b75ed1bb761a72e14ad3808ede2c",
+      "paths": [
+        "ext/phar/dirstream.c",
+        "ext/phar/tests/GHSA-jqcx-ccgc-xwhv.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0151-CVE-2024-2756.patch",
+      "published_patch": "CVE-2024-2756.patch",
+      "published_sha256": "75099ff6bcd419e85bccd6bf55bbc9063d48d21ff63e49da2cf1fd3fb52c5410",
+      "paths": [
+        "ext/standard/tests/ghsa-wpj3-hf5j-x4v4.phpt",
+        "main/php_variables.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0152-CVE-2024-3096.patch",
+      "published_patch": "CVE-2024-3096.patch",
+      "published_sha256": "65e34853bdd13562b82aed1bf808b6036bd96293a796c04ae8d717aa4c7ec9d4",
+      "paths": [
+        "ext/standard/password.c",
+        "ext/standard/tests/password/password_bcrypt_errors.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0153-CVE-2024-5458.patch",
+      "published_patch": "CVE-2024-5458.patch",
+      "published_sha256": "ef31ce5280719ee206a4b231ee55b561e0bd04be6e1c2ea9794fe1e75051180d",
+      "paths": [
+        "ext/filter/logical_filters.c",
+        "ext/filter/tests/ghsa-w8qr-v226-r27w.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0154-CVE-2024-8925.patch",
+      "published_patch": "CVE-2024-8925.patch",
+      "published_sha256": "652d86d7ed5d3a60b641cd7ec8fc4a26f4a729ba92498174ca59b16aeb2d5ded",
+      "paths": [
+        "main/rfc1867.c",
+        "tests/basic/GHSA-9pqp-7h25-4f32.inc",
+        "tests/basic/GHSA-9pqp-7h25-4f32.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0156-0156-Define-ZSTR_MAX_LEN-Zend-zend_string.h.patch",
+      "published_patch": "0156-Define-ZSTR_MAX_LEN-Zend-zend_string.h.patch",
+      "published_sha256": "17ee0bb4390cc22317580237b9b1b8670cbe2bd02872a3d60946e2b8dd6f4c01",
+      "paths": [
+        "Zend/zend_string.h"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0158-CVE-2024-11233.patch",
+      "published_patch": "CVE-2024-11233.patch",
+      "published_sha256": "0fb14e58b0adf332591fc2ce937db2845baee061494d2ddabfb84989ddaab2b7",
+      "paths": [
+        "ext/standard/filters.c",
+        "ext/standard/tests/filters/ghsa-r977-prxv-hc43.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0159-CVE-2024-11234.patch",
+      "published_patch": "CVE-2024-11234.patch",
+      "published_sha256": "b7fa0a48f12cd20c80c22a382afad91fa674ac8ae0e3de4743933215bcc2fd8b",
+      "paths": [
+        "ext/standard/http_fopen_wrapper.c",
+        "ext/standard/tests/http/ghsa-c5f2-jwm7-mmq2.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0162-GHSA-4w77-75f9-2c8w.patch",
+      "published_patch": "GHSA-4w77-75f9-2c8w.patch",
+      "published_sha256": "6ba3fbafb79b2b45bb30686dc7ccc425789ed86b67f6e55dd676e5e719821c94",
+      "paths": [
+        "sapi/cli/php_cli_server.c",
+        "sapi/cli/tests/ghsa-4w77-75f9-2c8w.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0163-0163-Fix-74267-segfault-with-streams-and-invalid-data.patch",
+      "published_patch": "0163-Fix-74267-segfault-with-streams-and-invalid-data.patch",
+      "published_sha256": "0f4adabad8d5700415a3c975aa029de9820b3bfaadd269b6dab9a594c945fd39",
+      "paths": [
+        "ext/standard/filters.c",
+        "ext/standard/tests/filters/bug74267.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0164-CVE-2024-8929-01-2f5aa9f.patch",
+      "published_patch": "CVE-2024-8929/01-2f5aa9f.patch",
+      "published_sha256": "798d8f55f3f57021dd0018b64b57dc1817ccf1f73f5035d7240800a56046ac43",
+      "paths": [
+        "ext/mysqli/tests/fake_server.inc",
+        "ext/mysqli/tests/ghsa-h35g-vwh6-m678-auth-message.phpt",
+        "ext/mysqli/tests/ghsa-h35g-vwh6-m678-def.phpt",
+        "ext/mysqli/tests/ghsa-h35g-vwh6-m678-filename.phpt",
+        "ext/mysqli/tests/ghsa-h35g-vwh6-m678-query-len-overflow.phpt",
+        "ext/mysqli/tests/ghsa-h35g-vwh6-m678-stmt-row-bit.phpt",
+        "ext/mysqli/tests/ghsa-h35g-vwh6-m678-stmt-row-date.phpt",
+        "ext/mysqli/tests/ghsa-h35g-vwh6-m678-stmt-row-datetime.phpt",
+        "ext/mysqli/tests/ghsa-h35g-vwh6-m678-stmt-row-double.phpt",
+        "ext/mysqli/tests/ghsa-h35g-vwh6-m678-stmt-row-float.phpt",
+        "ext/mysqli/tests/ghsa-h35g-vwh6-m678-stmt-row-int.phpt",
+        "ext/mysqli/tests/ghsa-h35g-vwh6-m678-stmt-row-no-space.phpt",
+        "ext/mysqli/tests/ghsa-h35g-vwh6-m678-stmt-row-string.phpt",
+        "ext/mysqli/tests/ghsa-h35g-vwh6-m678-stmt-row-time.phpt",
+        "ext/mysqli/tests/protocol_query_row_fetch_data.phpt",
+        "ext/mysqli/tests/protocol_stmt_row_fetch_data.phpt",
+        "ext/mysqlnd/mysqlnd_ps_codec.c",
+        "ext/mysqlnd/mysqlnd_result.c",
+        "ext/mysqlnd/mysqlnd_wireprotocol.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0165-CVE-2024-8929-02-32f905f.patch",
+      "published_patch": "CVE-2024-8929/02-32f905f.patch",
+      "published_sha256": "f15e821ce35c0cd0601aa887f7ee02f06a858a708ac1cb130a1db266492e8c4b",
+      "paths": [
+        "ext/mysqlnd/mysqlnd_wireprotocol.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0166-CVE-2024-8929-03-c70b97d.patch",
+      "published_patch": "CVE-2024-8929/03-c70b97d.patch",
+      "published_sha256": "9c23aeacb77a55d13c824833fadd3c38a04725dc87f750b9a6c7dfc6862694f5",
+      "paths": [
+        "ext/mysqli/tests/protocol_stmt_row_fetch_data.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0167-CVE-2024-8929-04-51f5539.patch",
+      "published_patch": "CVE-2024-8929/04-51f5539.patch",
+      "published_sha256": "8bccbf8e0940575ff9de9bc66f0765494332703b88856e957f2866ff4e1a172d",
+      "paths": [
+        "ext/mysqli/tests/ghsa-h35g-vwh6-m678-auth-message.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0168-CVE-2024-8929-05-eb951b3.patch",
+      "published_patch": "CVE-2024-8929/05-eb951b3.patch",
+      "published_sha256": "c20d5cdd8bb5a486f6762ac0ae67bd68d57ca77d00bff741b8ee4409f14b0a01",
+      "paths": [
+        "ext/mysqli/tests/fake_server.inc"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0169-http-server-8.0.patch",
+      "published_patch": "http-server-8.0.patch",
+      "published_sha256": "4c8845b7053f59410e2f88fe2c5f1a2fae200d62cbcc3a688b3df92e9b1b8468",
+      "paths": [
+        "ext/standard/tests/http/server-8.0.inc"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0170-openssl-server-8.1.patch",
+      "published_patch": "openssl-server-8.1.patch",
+      "published_sha256": "a5aea9b3b6b82b94fde830b6edcc9ff7af2fa868e1cda74fc066665d9b854655",
+      "paths": [
+        "ext/openssl/tests/ServerClientTestCase-8.1.inc"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0171-CVE-2025-1217-01-1c157d3fa2e.patch",
+      "published_patch": "CVE-2025-1217/01-1c157d3fa2e.patch",
+      "published_sha256": "469a106fe89f9a19aeee945b20fca4286b9d4705410627f34f68ede174945e31",
+      "paths": [
+        "ext/standard/http_fopen_wrapper.c",
+        "ext/standard/tests/http/bug80256.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0172-CVE-2025-1217-02-51e2015af3f.patch",
+      "published_patch": "CVE-2025-1217/02-51e2015af3f.patch",
+      "published_sha256": "5e611623a46818a94b9ff05c7a0dcf7efd286216f50a49e2acac1f5606ce87f2",
+      "paths": [
+        "ext/standard/http_fopen_wrapper.c",
+        "ext/standard/tests/http/bug78719.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0173-CVE-2025-1217-03-d20b4c97a9f.patch",
+      "published_patch": "CVE-2025-1217/03-d20b4c97a9f.patch",
+      "published_sha256": "6b331575d764a3269bc11eff8d9f2fe06541ff134386c6e8d3d3161c5ba3fdbf",
+      "paths": [
+        "ext/standard/http_fopen_wrapper.c",
+        "ext/standard/tests/http/ghsa-v8xr-gpvj-cx9g-001.phpt",
+        "ext/standard/tests/http/ghsa-v8xr-gpvj-cx9g-002.phpt",
+        "ext/standard/tests/http/ghsa-v8xr-gpvj-cx9g-003.phpt",
+        "ext/standard/tests/http/ghsa-v8xr-gpvj-cx9g-004.phpt",
+        "ext/standard/tests/http/ghsa-v8xr-gpvj-cx9g-005.phpt",
+        "ext/standard/tests/http/http_response_header_05.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0174-CVE-2025-1219-01-f901bec494a.patch",
+      "published_patch": "CVE-2025-1219/01-f901bec494a.patch",
+      "published_sha256": "7ea864bb051edea97c2db0db0b3e388573a823d5b4d47d0406093608287c3d98",
+      "paths": [
+        "ext/libxml/libxml.c",
+        "ext/libxml/tests/bug51903.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0175-CVE-2025-1219-02-b6004a043c1.patch",
+      "published_patch": "CVE-2025-1219/02-b6004a043c1.patch",
+      "published_sha256": "d7e7641c890fe40cfc6ccd2217f0f93f288b0eee5f67422d2b63d45820f77f08",
+      "paths": [
+        "ext/dom/tests/ghsa-p3x9-6h7p-cgfc_001.phpt",
+        "ext/dom/tests/ghsa-p3x9-6h7p-cgfc_002.phpt",
+        "ext/dom/tests/ghsa-p3x9-6h7p-cgfc_003.phpt",
+        "ext/libxml/libxml.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0176-CVE-2025-1734.patch",
+      "published_patch": "CVE-2025-1734.patch",
+      "published_sha256": "37b2f473d8a4cb9a2d8062838b9b635964c8eb25ace7c7d0cd17da07129c1c11",
+      "paths": [
+        "ext/standard/http_fopen_wrapper.c",
+        "ext/standard/tests/http/bug47021.phpt",
+        "ext/standard/tests/http/bug75535.phpt",
+        "ext/standard/tests/http/ghsa-pcmh-g36c-qc44-001.phpt",
+        "ext/standard/tests/http/ghsa-pcmh-g36c-qc44-002.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0177-CVE-2025-1736-01-d0d60503b54.patch",
+      "published_patch": "CVE-2025-1736/01-d0d60503b54.patch",
+      "published_sha256": "4c3349fd6d417c5dee19b8e939d130f4c04982b768cdedc70f27a3b5583a8b97",
+      "paths": [
+        "ext/standard/http_fopen_wrapper.c",
+        "ext/standard/tests/http/bug79265.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0178-CVE-2025-1736-02-3d9c02364db.patch",
+      "published_patch": "CVE-2025-1736/02-3d9c02364db.patch",
+      "published_sha256": "1e28fd523e712360a9aa3ed1675c1fadd952aebac544f7fa127728173ec7771a",
+      "paths": [
+        "ext/standard/http_fopen_wrapper.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0179-CVE-2025-1736-03-56cdbe63c24.patch",
+      "published_patch": "CVE-2025-1736/03-56cdbe63c24.patch",
+      "published_sha256": "c45a5a978f4e3fc667296127116464e9e0de711d965b9e99b4830eb3f211e884",
+      "paths": [
+        "ext/standard/http_fopen_wrapper.c",
+        "ext/standard/tests/http/bug79265_2.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0180-CVE-2025-1736-04-41d49abbd99.patch",
+      "published_patch": "CVE-2025-1736/04-41d49abbd99.patch",
+      "published_sha256": "38ae1291521b3a0505f167efcf1016e2e84d01ee64f00e30967f4ba65051ebb2",
+      "paths": [
+        "ext/standard/http_fopen_wrapper.c",
+        "ext/standard/tests/http/ghsa-hgf5-96fm-v528-001.phpt",
+        "ext/standard/tests/http/ghsa-hgf5-96fm-v528-002.phpt",
+        "ext/standard/tests/http/ghsa-hgf5-96fm-v528-003.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0181-CVE-2025-1861.patch",
+      "published_patch": "CVE-2025-1861.patch",
+      "published_sha256": "1cd757eb7666199ccd68ce038512d8ba0553101d005ba685d5ed6b85076c312c",
+      "paths": [
+        "ext/standard/http_fopen_wrapper.c",
+        "ext/standard/tests/http/ghsa-52jp-hrpf-2jff-001.phpt",
+        "ext/standard/tests/http/ghsa-52jp-hrpf-2jff-002.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0182-GHSA-wg4p-4hqh-c3g9.patch",
+      "published_patch": "GHSA-wg4p-4hqh-c3g9.patch",
+      "published_sha256": "caa73ee2ac206fd1b21b161900b7aaea182bb7a7069602f6c4c54397381f54ee",
+      "paths": [
+        "ext/xml/tests/toffset_bounds.phpt",
+        "ext/xml/xml.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0183-CVE-2025-1220.patch",
+      "published_patch": "CVE-2025-1220.patch",
+      "published_sha256": "85422343140b19b001aa114928db6799a4ca094af154370574411303ff24a0a5",
+      "paths": [
+        "ext/standard/fsock.c",
+        "ext/standard/tests/network/ghsa-3cr5-j632-f35r.phpt",
+        "ext/standard/tests/streams/ghsa-3cr5-j632-f35r.phpt",
+        "main/streams/xp_socket.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0185-CVE-2025-6491.patch",
+      "published_patch": "CVE-2025-6491.patch",
+      "published_sha256": "1bc999954245dad8fb53c0514ff65490fe70a52f06c3c03f6e73e1d47ec86b92",
+      "paths": [
+        "ext/soap/soap.c",
+        "ext/soap/tests/soap_qname_crash.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0186-CVE-2026-6722.patch",
+      "published_patch": "CVE-2026-6722.patch",
+      "published_sha256": "e0e8f9ceeedf0448b8e4674c269449ee8d544a09a3651e6fb577be87f156feca",
+      "paths": [
+        "ext/soap/php_encoding.c",
+        "ext/soap/tests/GHSA-85c2-q967-79q5.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0187-CVE-2026-7261.patch",
+      "published_patch": "CVE-2026-7261.patch",
+      "published_sha256": "23a7c40ad4243cf2fc6b61cbf8a03b0c129028c1a020c1090ba216ff3cccf0e7",
+      "paths": [
+        "ext/soap/soap.c",
+        "ext/soap/tests/GHSA-m33r-qmcv-p97q.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0188-CVE-2026-7262.patch",
+      "published_patch": "CVE-2026-7262.patch",
+      "published_sha256": "f7e4e4410c8f6d94e363fe379d9236f2482bbebe2ea98b61173bc72db03de948",
+      "paths": [
+        "ext/soap/php_encoding.c",
+        "ext/soap/tests/GHSA-hmxp-6pc4-f3vv.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0189-CVE-2026-6735.patch",
+      "published_patch": "CVE-2026-6735.patch",
+      "published_sha256": "a29ab18af397873cefa4a11c49d587e8bf4406627044d7d14bcd4fcf5e26eb93",
+      "paths": [
+        "sapi/fpm/fpm/fpm_status.c",
+        "sapi/fpm/tests/ghsa-7qg2-v9fj-4mwv-status-xss.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0190-0190-Backport-sapi-fpm-tests-.inc-from-buster.patch",
+      "published_patch": "0190-Backport-sapi-fpm-tests-.inc-from-buster.patch",
+      "published_sha256": "565943aa7c84ce714e3c72c8bd1c2f3fcbf925d52aad97d6279cbe6515c78693",
+      "paths": [
+        "sapi/fpm/tests/fcgi.inc",
+        "sapi/fpm/tests/logtool.inc",
+        "sapi/fpm/tests/response.inc",
+        "sapi/fpm/tests/tester.inc"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0191-CVE-2026-7568.patch",
+      "published_patch": "CVE-2026-7568.patch",
+      "published_sha256": "4e12b510d09f921a560f76c95163aa78d8e1ef42cdd123e0c787d3ea1caa9181",
+      "paths": [
+        "ext/standard/metaphone.c",
+        "ext/standard/tests/GHSA-96wq-48vp-hh57.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0192-CVE-2026-7258.patch",
+      "published_patch": "CVE-2026-7258.patch",
+      "published_sha256": "81ca958b51ba97236c8462cc2d544ec7e24aefd38ee458ca0d494b1a216fd46e",
+      "paths": [
+        "Zend/zend_compile.c",
+        "Zend/zend_operators.c",
+        "Zend/zend_virtual_cwd.c",
+        "Zend/zend_virtual_cwd.h",
+        "ext/date/lib/parse_date.c",
+        "ext/date/lib/parse_date.re",
+        "ext/date/lib/parse_iso_intervals.c",
+        "ext/date/lib/parse_iso_intervals.re",
+        "ext/date/lib/timelib.c",
+        "ext/filter/logical_filters.c",
+        "ext/gd/libgd/xbm.c",
+        "ext/intl/locale/locale_methods.c",
+        "ext/mbstring/mbstring.c",
+        "ext/pcre/php_pcre.c",
+        "ext/pdo/pdo.c",
+        "ext/pdo/pdo_sql_parser.re",
+        "ext/pdo/pdo_stmt.c",
+        "ext/standard/file.c",
+        "ext/standard/filters.c",
+        "ext/standard/formatted_print.c",
+        "ext/standard/ftp_fopen_wrapper.c",
+        "ext/standard/html.c",
+        "ext/standard/math.c",
+        "ext/standard/metaphone.c",
+        "ext/standard/quot_print.c",
+        "ext/standard/scanf.c",
+        "ext/standard/soundex.c",
+        "ext/standard/string.c",
+        "ext/standard/strnatcmp.c",
+        "ext/standard/url.c",
+        "ext/standard/url_scanner_ex.re",
+        "ext/standard/versioning.c",
+        "main/SAPI.c",
+        "main/fopen_wrappers.c",
+        "main/php_ini.c",
+        "main/php_variables.c",
+        "main/rfc1867.c",
+        "main/snprintf.c",
+        "main/spprintf.c",
+        "main/streams/streams.c",
+        "main/streams/transports.c",
+        "sapi/cli/php_cli_server.c",
+        "sapi/fpm/fpm/fpm_conf.c"
+      ],
+      "omitted_paths": [
+        "ext/com_dotnet/com_extension.c",
+        "ext/ftp/ftp.c",
+        "ext/imap/php_imap.c",
+        "sapi/litespeed/lsapi_main.c",
+        "sapi/litespeed/lsapilib.c",
+        "sapi/phpdbg/phpdbg_cmd.c",
+        "sapi/phpdbg/phpdbg_prompt.c",
+        "sapi/phpdbg/phpdbg_utils.c",
+        "win32/sendmail.c"
+      ]
+    },
+    {
+      "file": "0193-CVE-2026-9672.patch",
+      "published_patch": "CVE-2026-9672.patch",
+      "published_sha256": "0a301bf9dd7617cbd1c1011875615a1c71f71d92ab7c157d60911e7e143b8e34",
+      "paths": [
+        "ext/gd/libgd/gd_gif_in.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0195-CVE-2026-7260.patch",
+      "published_patch": "CVE-2026-7260.patch",
+      "published_sha256": "f2a33e067b09e6da1ef28dda4184a1c403ed2d9c5be27001fee4d8e64c943725",
+      "paths": [
+        "ext/phar/tests/tar/files/circular_symlinks.tar",
+        "ext/phar/tests/tar/files/circular_symlinks_long.tar",
+        "ext/phar/tests/tar/files/circular_symlinks_rho.tar",
+        "ext/phar/tests/tar/ghsa-vc5h-9ppw-p5f3-symlink-circular.phpt",
+        "ext/phar/util.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0196-CVE-2026-14355.patch",
+      "published_patch": "CVE-2026-14355.patch",
+      "published_sha256": "086382f5f415510c91d1b63a160203bd479cef0feef1c7aa382ab818fe12b2a3",
+      "paths": [
+        "ext/openssl/openssl.c",
+        "ext/openssl/tests/gh22186.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0197-CVE-2026-92842.patch",
+      "published_patch": "CVE-2026-92842.patch",
+      "published_sha256": "f3122ff2c50902f51e915e684ee9a0f2de1c1e83844d4ee0707cb2dc61efc0ea",
+      "paths": [
+        "ext/standard/filters.c",
+        "ext/standard/tests/filters/ghsa-88hq-2827-7pg6.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0198-0198-Backport-sapi-fpm-tests-logtool.inc-from-8.2.patch",
+      "published_patch": "0198-Backport-sapi-fpm-tests-logtool.inc-from-8.2.patch",
+      "published_sha256": "5a9d674575028c8672e0e52301dad690e754b974c5acc75b0480b4b4fe5b62de",
+      "paths": [
+        "sapi/fpm/tests/logtool.inc"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0199-CVE-2026-91768.patch",
+      "published_patch": "CVE-2026-91768.patch",
+      "published_sha256": "d6318a3f1e02d4e55bd1bb3c890fd4b044c05a5cb868c7fb20ce406270e126c0",
+      "paths": [
+        "main/fastcgi.c",
+        "sapi/fpm/tests/ghsa-62xp-839h-2637-ipv6-allowed-clients.phpt",
+        "sapi/fpm/tests/ghsa-62xp-839h-2637-v4mapped-allowed-clients.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0200-0200-Generate-certs-for-openssl-tests-on-the-fly.patch",
+      "published_patch": "0200-Generate-certs-for-openssl-tests-on-the-fly.patch",
+      "published_sha256": "8e10af7a24cd36e8a275c81eec86fd40f57df8f00939b74d1649137cf621d27f",
+      "paths": [
+        "ext/openssl/tests/CertificateGenerator.inc",
+        "ext/openssl/tests/bug46127.pem",
+        "ext/openssl/tests/bug46127.phpt",
+        "ext/openssl/tests/bug48182.phpt",
+        "ext/openssl/tests/bug54992-ca.pem",
+        "ext/openssl/tests/bug54992.pem",
+        "ext/openssl/tests/bug54992.phpt",
+        "ext/openssl/tests/bug65538.phar",
+        "ext/openssl/tests/bug65538_001.phpt",
+        "ext/openssl/tests/bug65538_003.phpt",
+        "ext/openssl/tests/bug72333.phpt",
+        "ext/openssl/tests/bug74159.phpt",
+        "ext/openssl/tests/capture_peer_cert_001.phpt",
+        "ext/openssl/tests/openssl_peer_fingerprint_basic.phpt",
+        "ext/openssl/tests/peer_verification.phpt",
+        "ext/openssl/tests/session_meta_capture.phpt",
+        "ext/openssl/tests/stream_crypto_flags_001.phpt",
+        "ext/openssl/tests/stream_crypto_flags_002.phpt",
+        "ext/openssl/tests/stream_crypto_flags_003.phpt",
+        "ext/openssl/tests/stream_crypto_flags_004.phpt",
+        "ext/openssl/tests/stream_server_reneg_limit.phpt",
+        "ext/openssl/tests/stream_verify_peer_name_001.phpt",
+        "ext/openssl/tests/stream_verify_peer_name_002.phpt",
+        "ext/openssl/tests/stream_verify_peer_name_003.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0201-0201-Add-SubjectAltName-support-to-certificate-generator.patch",
+      "published_patch": "0201-Add-SubjectAltName-support-to-certificate-generator.patch",
+      "published_sha256": "a9ce5dbc84aa3425ddbda803a0cbe41de1114c746881ed5bc51189932f931079",
+      "paths": [
+        "ext/openssl/tests/CertificateGenerator.inc",
+        "ext/openssl/tests/bug68265.pem",
+        "ext/openssl/tests/bug68265.phpt",
+        "ext/openssl/tests/bug68879.pem",
+        "ext/openssl/tests/bug68879.phpt",
+        "ext/openssl/tests/san.cnf",
+        "ext/openssl/tests/san_peer_matching.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0202-CVE-2026-91769.patch",
+      "published_patch": "CVE-2026-91769.patch",
+      "published_sha256": "0043b8968930d0e0cdd716a8df8d831c56a1d4b9241a8711b3d20b52a2c44358",
+      "paths": [
+        "ext/openssl/tests/san_absent_cn_fallback.phpt",
+        "ext/openssl/tests/san_no_cn_fallback.phpt",
+        "ext/openssl/tests/san_peer_matching.phpt",
+        "ext/openssl/tests/san_srv_no_cn_fallback.phpt",
+        "ext/openssl/tests/san_uri_no_cn_fallback.phpt",
+        "ext/openssl/xp_ssl.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0203-CVE-2026-91767.patch",
+      "published_patch": "CVE-2026-91767.patch",
+      "published_sha256": "5dd332f5582775db5dace25a0cc19301cf8ff32b76306fb8c8d1fd7edd21c7db",
+      "paths": [
+        "ext/openssl/tests/GHSA-xr7j-rvgx-xq5p.phpt",
+        "ext/openssl/xp_ssl.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0204-CVE-2026-91766_CVE-2026-93682-01-518c651c663.patch",
+      "published_patch": "CVE-2026-91766_CVE-2026-93682/01-518c651c663.patch",
+      "published_sha256": "d06527af21a63f80835dd51869fb65f0ab3656dc8004dbaa6dbfd057d75245a4",
+      "paths": [
+        "ext/standard/http_fopen_wrapper.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0205-CVE-2026-91766_CVE-2026-93682-02-1ce830a4aaa.patch",
+      "published_patch": "CVE-2026-91766_CVE-2026-93682/02-1ce830a4aaa.patch",
+      "published_sha256": "c293d152d511a3b5d0078e0722b3090c7398e850ae0aefcdde6d567fa7605025",
+      "paths": [
+        "ext/standard/http_fopen_wrapper.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0206-CVE-2026-91766_CVE-2026-93682-03-1ede3137c9a.patch",
+      "published_patch": "CVE-2026-91766_CVE-2026-93682/03-1ede3137c9a.patch",
+      "published_sha256": "47990acf0c21dbd9c0ba9577740b43df76d0a82bf7d017f932a615fa50a02212",
+      "paths": [
+        "ext/standard/http_fopen_wrapper.c",
+        "ext/standard/tests/http/bug67430.phpt",
+        "ext/standard/tests/http/gh11274.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0207-CVE-2026-91766_CVE-2026-93682-04-5af9465ca89.patch",
+      "published_patch": "CVE-2026-91766_CVE-2026-93682/04-5af9465ca89.patch",
+      "published_sha256": "76728a3c0d7005bc4f4d41e481527369ae56c4da31b012143f0d7728b0b36756",
+      "paths": [
+        "ext/standard/http_fopen_wrapper.c",
+        "ext/standard/tests/http/bug61548.phpt",
+        "ext/standard/tests/http/ghsa-fpwc-w8rq-cr92.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0208-CVE-2026-91765.patch",
+      "published_patch": "CVE-2026-91765.patch",
+      "published_sha256": "d2a272773103befdf8e2a00cc6763ad22b8cdda80fbbac2d0a587f5e43378f44",
+      "paths": [
+        "ext/soap/php_encoding.c",
+        "ext/soap/php_soap.h",
+        "ext/soap/php_xml.c",
+        "ext/soap/soap.c",
+        "ext/soap/tests/GHSA-rgrp-mwpx-f6rm-href-chain.phpt",
+        "ext/soap/tests/GHSA-rgrp-mwpx-f6rm-href-cycle.phpt",
+        "ext/soap/tests/GHSA-rgrp-mwpx-f6rm.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0209-CVE-2025-14181-01-f7c43b8c728.patch",
+      "published_patch": "CVE-2025-14181/01-f7c43b8c728.patch",
+      "published_sha256": "4137972dd68378bd2bb557336014136b2d43818ab0f2c741d4f85cf05b53ced5",
+      "paths": [
+        "ext/soap/php_http.c",
+        "ext/soap/tests/bug47021.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0210-CVE-2025-14181-02-b11bd1d9390.patch",
+      "published_patch": "CVE-2025-14181/02-b11bd1d9390.patch",
+      "published_sha256": "5bb179d433a8fc8a3bb3e6c748c5f3ef73a0ff3ae24a11e621923d0136827357",
+      "paths": [
+        "ext/soap/php_http.c",
+        "ext/soap/tests/bugs/GHSA-cj93-vc83-wgqv.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0211-CVE-2025-14181-03-3aedde06bc3.patch",
+      "published_patch": "CVE-2025-14181/03-3aedde06bc3.patch",
+      "published_sha256": "446112e53d7a893adae5a95321e9036ad983a7b1df1c77987bdac6d76ebc275c",
+      "paths": [
+        "ext/soap/tests/bugs/GHSA-cj93-vc83-wgqv.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0212-CVE-2026-6103.patch",
+      "published_patch": "CVE-2026-6103.patch",
+      "published_sha256": "76856936fa6f5145ad3459596b060815ed0e5e6a181819e18456b8c4c446b650",
+      "paths": [
+        "ext/phar/phar_internal.h",
+        "ext/phar/tar.c",
+        "ext/phar/tests/tar/GHSA-j3wh-g957-2m85-longlink.phpt",
+        "ext/phar/tests/tar/GHSA-j3wh-g957-2m85-size.phpt",
+        "ext/phar/tests/tar/GHSA-j3wh-g957-2m85-typeflag.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0213-GHSA-ch8v-r6jh-4vvr.patch",
+      "published_patch": "GHSA-ch8v-r6jh-4vvr.patch",
+      "published_sha256": "d49cabfab126f0a6702c6eb70279c037fac4a24f389a35de8bfc6ef14443985a",
+      "paths": [
+        "ext/filter/sanitizing_filters.c",
+        "ext/filter/tests/filter_sanitize_encoded_0xff.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0214-0214-http-Fix-out-of-bounds-read-on-empty-Location-header.patch",
+      "published_patch": "0214-http-Fix-out-of-bounds-read-on-empty-Location-header.patch",
+      "published_sha256": "6800d95151f3ddd4c71828bfe8563675e15eef9e7441230cf10ca769fea3ee3e",
+      "paths": [
+        "ext/standard/http_fopen_wrapper.c",
+        "ext/standard/tests/http/http_empty_location_redirect.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0215-0215-ext-standard-Fix-1-char-relative-Location-redirects-.patch",
+      "published_patch": "0215-ext-standard-Fix-1-char-relative-Location-redirects-.patch",
+      "published_sha256": "662aec43ce2f49b3964363222d8674997025c9d71389ead1ecafa631d3858b26",
+      "paths": [
+        "ext/standard/http_fopen_wrapper.c",
+        "ext/standard/tests/http/http_single_char_location_redirect.phpt"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0216-CVE-2026-109618_CVE-2026-109619.patch",
+      "published_patch": "CVE-2026-109618_CVE-2026-109619.patch",
+      "published_sha256": "e58925e317cc2cbd86b8978a03590df2b774a117337442da479e59c82d591133",
+      "paths": [
+        "Zend/zend_API.c",
+        "Zend/zend_API.h",
+        "Zend/zend_alloc.c",
+        "Zend/zend_alloc.h",
+        "Zend/zend_execute_API.c",
+        "Zend/zend_hash.c",
+        "Zend/zend_llist.c",
+        "Zend/zend_multiply.h",
+        "Zend/zend_strtod.c",
+        "Zend/zend_vm_def.h",
+        "Zend/zend_vm_execute.h",
+        "ext/session/session.c",
+        "main/SAPI.c",
+        "main/main.c",
+        "main/php_variables.c",
+        "main/rfc1867.c"
+      ],
+      "omitted_paths": []
+    },
+    {
+      "file": "0217-CVE-2025-1218-native.patch",
+      "origin": "https://github.com/php/php-src/commit/114dbb74368e6a6cd6e48ddb4a76dbe8728b84e2",
+      "advisory": "https://github.com/php/php-src/security/advisories/GHSA-r6x9-5r99-36j7",
+      "upstream_patch_sha256": "fc61846d6765ac060f447a35a504d73609437f0acabc67952de2a5adf6bf3f2b",
+      "paths": [
+        "ext/mysqli/tests/fake_server.inc",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-auth-packet-affected-rows-2-bytes.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-auth-packet-affected-rows-8-bytes.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-auth-packet-affected-rows-null-length.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-auth-packet-affected-rows.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-auth-packet-last-insert-id-no-space.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-auth-packet-last-insert-id.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-auth-packet-warning-count.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-auth-switch-unterminated.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-chg-user-empty.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-chg-user-len.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-chg-user-switch-unterminated.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-eof-warning-count.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-greet-packet-string.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-greet-packet.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-greet-scramble-len.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-ok-packet-affected-rows.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-ok-packet-last-insert-id.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-ok-packet-message-len.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-ok-packet-warning-count.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-query-row-eof-short.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-query-row-field-len-2-bytes.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-query-row-field-len.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-query-row-field-null.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-rset-header-field-len.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-rset-header-upsert-affected-rows.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-rset-header-upsert-len.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-sha256-pk-empty.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-sha256-pk-len.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-stmt-response-field-len-faulty.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-stmt-response-field-len-premature.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-stmt-response-row-status.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-stmt-row-short-length-date.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-stmt-row-short-length-datetime.phpt",
+        "ext/mysqli/tests/ghsa-r6x9-5r99-36j7-stmt-row-short-length-time.phpt",
+        "ext/mysqli/tests/protocol_query_row_fetch_data.phpt",
+        "ext/mysqli/tests/protocol_stmt_row_fetch_data.phpt",
+        "ext/mysqlnd/mysqlnd_ps.c",
+        "ext/mysqlnd/mysqlnd_ps_codec.c",
+        "ext/mysqlnd/mysqlnd_wireprotocol.c",
+        "ext/mysqlnd/mysqlnd_wireprotocol.h"
+      ],
+      "adaptation": "Preserve PHP7.0 MYSQLND_NET, packet and mutable-pointer APIs; keep bounded COM_FIELD_LIST support; adapt upstream tests to PHP7.0 syntax. caching_sha2 tests are not applicable."
+    },
+    {
+      "file": "0218-mysqlnd-result-ownership.patch",
+      "origin": "https://github.com/php/php-src/commit/f365d0e00ed93b1c33e984ff3b4cc8677cbca193",
+      "paths": [
+        "ext/mysqlnd/mysqlnd_ps.c",
+        "ext/mysqlnd/mysqlnd_result.c"
+      ],
+      "adaptation": "Use native persistent allocation release in the published result-ownership prerequisite."
+    }
+  ]
+}

@@ -79,6 +79,9 @@ try {
     }
     fclose($socket);
     echo json_encode(array('stdout' => $stdout, 'stderr' => $stderr, 'end' => $end)) . "\n";
+} catch (Exception $error) {
+    fwrite(STDERR, $error->getMessage() . "\n");
+    exit(2);
 } catch (Throwable $error) {
     fwrite(STDERR, $error->getMessage() . "\n");
     exit(2);

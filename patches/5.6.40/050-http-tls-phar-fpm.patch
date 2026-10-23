@@ -1,0 +1,1711 @@
+Published-source: https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz
+Published-fixes: CVE-2026-92842, CVE-2026-6103, CVE-2026-91767, CVE-2026-91769, CVE-2026-91768, CVE-2026-91766, CVE-2026-93682
+Origin: https://github.com/php/php-src/commit/b4e3397ec8f4f647e6e019dbf79870fc2f14ba78
+Origin: https://github.com/php/php-src/commit/0994e2e887cd993866b5e4d7dba2fade5caeefec
+Origin: https://github.com/php/php-src/commit/78cc82b37a340840c6fbff676f513eb4e3d96533
+Origin: https://github.com/php/php-src/commit/0bb308eb4cf699e707efbcf97ffb70e46a176be7
+Origin: https://github.com/php/php-src/commit/dcdfcf86fcf7f42fa98dd3d000f310ebdad41965
+Origin: https://github.com/php/php-src/commit/5af9465ca890be679033d5fb0dc89b6ea071326b
+Prerequisites: 518c651c663a2f09fb05ecea407ea0ab64f9bb51, 1ce830a4aaa626a6c33835297273249eefb8e643, 1ede3137c9abe19da1fafef66d8e4038c63516b4
+Follow-ups: 547566f17a12b4900efb69a7cf8cd325d00613a2, 64664758cd8ee5928acf25b3f9ae11c7571c1b39
+Adaptation: PHP 5.6 native zval/context APIs, TSRMLS arguments, FPM FastCGI source path and PHP 5-compatible test syntax. Certificate generator from the same published maintenance series.
+
+--- /dev/null
++++ b/ext/openssl/tests/CertificateGenerator.inc
+@@ -0,0 +1,131 @@
++<?php
++
++class CertificateGenerator
++{
++    const CONFIG = __DIR__. DIRECTORY_SEPARATOR . 'openssl.cnf';
++    const SAN_CONFIG = __DIR__ . DIRECTORY_SEPARATOR . 'san.cnf';
++
++    /** @var resource */
++    private $ca;
++
++    /** @var resource */
++    private $caKey;
++
++    /** @var resource|null */
++    private $lastCert;
++
++    /** @var resource|null */
++    private $lastKey;
++
++    public function __construct()
++    {
++        if (!extension_loaded('openssl')) {
++            throw new RuntimeException(
++                'openssl extension must be loaded to generate certificates'
++            );
++        }
++        $this->generateCa();
++    }
++
++    /**
++     * @param int|null $keyLength
++     * @return resource
++     */
++    private static function generateKey($keyLength = null)
++    {
++        if (null === $keyLength) {
++            $keyLength = 2048;
++        }
++
++        return openssl_pkey_new([
++            'private_key_bits' => $keyLength,
++            'private_key_type' => OPENSSL_KEYTYPE_RSA,
++            'encrypt_key' => false,
++        ]);
++    }
++
++    private function generateCa()
++    {
++        $this->caKey = self::generateKey();
++        $dn = [
++            'countryName' => 'GB',
++            'stateOrProvinceName' => 'Berkshire',
++            'localityName' => 'Newbury',
++            'organizationName' => 'Example Certificate Authority',
++            'commonName' => 'CA for PHP Tests'
++        ];
++
++        $this->ca = openssl_csr_sign(
++            openssl_csr_new(
++                $dn,
++                $this->caKey,
++                [
++                    'x509_extensions' => 'v3_ca',
++                    'config' => self::CONFIG,
++                ]
++            ),
++            null,
++            $this->caKey,
++            2
++        );
++    }
++
++    public function getCaCert()
++    {
++        $output = '';
++        openssl_x509_export($this->ca, $output);
++
++        return $output;
++    }
++
++    public function saveCaCert($file)
++    {
++        openssl_x509_export_to_file($this->ca, $file);
++    }
++
++    public function saveNewCertAsFileWithKey(
++        $commonNameForCert, $file, $keyLength = null, $subjectAltName = null
++    ) {
++        $dn = [
++            'countryName' => 'BY',
++            'stateOrProvinceName' => 'Minsk',
++            'localityName' => 'Minsk',
++            'organizationName' => 'Example Org',
++        ];
++        if ($commonNameForCert !== null) {
++            $dn['commonName'] = $commonNameForCert;
++        }
++
++        $config = [
++            'digest_alg' => 'sha256',
++            'req_extensions' => 'v3_req',
++            'x509_extensions' => 'usr_cert',
++        ];
++        if ($subjectAltName !== null) {
++            putenv("PHP_SUBJECTALTNAME=$subjectAltName");
++            $config['config'] = self::SAN_CONFIG;
++        }
++
++        $this->lastKey = self::generateKey($keyLength);
++        $this->lastCert = openssl_csr_sign(
++            openssl_csr_new($dn, $this->lastKey, $config),
++            $this->ca,
++            $this->caKey,
++            /* days */ 2,
++            $config
++        );
++
++        $certText = '';
++        openssl_x509_export($this->lastCert, $certText);
++
++        $keyText = '';
++        openssl_pkey_export($this->lastKey, $keyText);
++
++        file_put_contents($file, $certText . PHP_EOL . $keyText);
++    }
++
++    public function getCertDigest($algo)
++    {
++        return openssl_x509_fingerprint($this->lastCert, $algo);
++    }
++}
+--- /dev/null
++++ b/ext/openssl/tests/GHSA-xr7j-rvgx-xq5p.phpt
+@@ -0,0 +1,68 @@
++--TEST--
++GHSA-xr7j-rvgx-xq5p: OOB read in php_openssl_matches_wildcard_name() with overlapping wildcard prefix and suffix
++--SKIPIF--
++<?php
++if (!extension_loaded("openssl")) die("skip openssl not loaded");
++if (!function_exists("proc_open")) die("skip no proc_open");
++?>
++--FILE--
++<?php
++$certFile = __DIR__ . DIRECTORY_SEPARATOR . 'GHSA-xr7j-rvgx-xq5p.pem.tmp';
++$san = 'DNS:a*aaaa, DNS:w*www.example.org';
++
++$serverCode = <<<'CODE'
++    $serverUri = "ssl://127.0.0.1:64321";
++    $serverFlags = STREAM_SERVER_BIND | STREAM_SERVER_LISTEN;
++    $serverCtx = stream_context_create(['ssl' => [
++        'local_cert' => '%s',
++    ]]);
++
++    $server = stream_socket_server($serverUri, $errno, $errstr, $serverFlags, $serverCtx);
++    phpt_notify();
++
++    @stream_socket_accept($server, 1);
++    @stream_socket_accept($server, 1);
++CODE;
++$serverCode = sprintf($serverCode, $certFile);
++
++$clientCode = <<<'CODE'
++    $serverUri = "ssl://127.0.0.1:64321";
++    $clientFlags = STREAM_CLIENT_CONNECT;
++    $clientCtx = stream_context_create(['ssl' => [
++        'verify_peer' => false,
++    ]]);
++
++    phpt_wait();
++
++    stream_context_set_option($clientCtx, 'ssl', 'peer_name', 'aaaa');
++    var_dump(stream_socket_client($serverUri, $errno, $errstr, 1, $clientFlags, $clientCtx));
++
++    stream_context_set_option($clientCtx, 'ssl', 'peer_name', 'www.example.org');
++    var_dump(stream_socket_client($serverUri, $errno, $errstr, 1, $clientFlags, $clientCtx));
++CODE;
++
++include 'CertificateGenerator.inc';
++$certificateGenerator = new CertificateGenerator();
++$certificateGenerator->saveNewCertAsFileWithKey('a*aaaa', $certFile, null, $san);
++
++include 'ServerClientTestCase.inc';
++ServerClientTestCase::getInstance()->run($clientCode, $serverCode);
++?>
++--CLEAN--
++<?php
++@unlink(__DIR__ . DIRECTORY_SEPARATOR . 'GHSA-xr7j-rvgx-xq5p.pem.tmp');
++?>
++--EXPECTF--
++Warning: stream_socket_client(): Peer certificate subjectAltName did not match expected name `aaaa' in %s on line %d
++
++Warning: stream_socket_client(): Failed to enable crypto in %s on line %d
++
++Warning: stream_socket_client(): unable to connect to ssl://127.0.0.1:%d (Unknown error) in %s on line %d
++bool(false)
++
++Warning: stream_socket_client(): Peer certificate subjectAltName did not match expected name `www.example.org' in %s on line %d
++
++Warning: stream_socket_client(): Failed to enable crypto in %s on line %d
++
++Warning: stream_socket_client(): unable to connect to ssl://127.0.0.1:%d (Unknown error) in %s on line %d
++bool(false)
+--- a/ext/openssl/tests/openssl.cnf
++++ b/ext/openssl/tests/openssl.cnf
+@@ -1,3 +1,10 @@
++oid_section             = new_oids
++
++[ new_oids ]
++# Example policies to test their
++tsa_policy1 = 1.2.3.4.1
++tsa_policy2 = 1.2.3.4.5.6
++
+ [ req ]
+ default_bits		= 1024
+ default_keyfile 	= privkey.pem
+--- /dev/null
++++ b/ext/openssl/tests/san.cnf
+@@ -0,0 +1,13 @@
++[ req ]
++distinguished_name = req_distinguished_name
++
++[ req_distinguished_name ]
++
++[ v3_req ]
++basicConstraints = CA:FALSE
++keyUsage = nonRepudiation, digitalSignature, keyEncipherment
++subjectAltName = ${ENV::PHP_SUBJECTALTNAME}
++
++[ usr_cert ]
++basicConstraints = CA:FALSE
++subjectAltName = ${ENV::PHP_SUBJECTALTNAME}
+--- /dev/null
++++ b/ext/openssl/tests/san_absent_cn_fallback.phpt
+@@ -0,0 +1,62 @@
++--TEST--
++Peer verification falls back to CN when the certificate has no SAN
++--SKIPIF--
++<?php
++if (!extension_loaded("openssl")) die("skip openssl not loaded");
++if (!function_exists("proc_open")) die("skip no proc_open");
++?>
++--FILE--
++<?php
++$certFile = __DIR__ . DIRECTORY_SEPARATOR . 'san_absent_cn_fallback.pem.tmp';
++
++$serverCode = <<<'CODE'
++    $serverUri = "ssl://127.0.0.1:64321";
++    $serverFlags = STREAM_SERVER_BIND | STREAM_SERVER_LISTEN;
++    $serverCtx = stream_context_create(['ssl' => [
++        'local_cert' => '%s',
++    ]]);
++
++    $server = stream_socket_server($serverUri, $errno, $errstr, $serverFlags, $serverCtx);
++    phpt_notify();
++
++    @stream_socket_accept($server, 1);
++    @stream_socket_accept($server, 1);
++CODE;
++$serverCode = sprintf($serverCode, $certFile);
++
++$clientCode = <<<'CODE'
++    $serverUri = "ssl://127.0.0.1:64321";
++    $clientFlags = STREAM_CLIENT_CONNECT;
++    $clientCtx = stream_context_create(['ssl' => [
++        'verify_peer' => false,
++    ]]);
++
++    phpt_wait();
++
++    stream_context_set_option($clientCtx, 'ssl', 'peer_name', 'cn.example.org');
++    var_dump(stream_socket_client($serverUri, $errno, $errstr, 1, $clientFlags, $clientCtx));
++
++    stream_context_set_option($clientCtx, 'ssl', 'peer_name', 'other.example.org');
++    var_dump(stream_socket_client($serverUri, $errno, $errstr, 1, $clientFlags, $clientCtx));
++CODE;
++
++include 'CertificateGenerator.inc';
++$certificateGenerator = new CertificateGenerator();
++$certificateGenerator->saveNewCertAsFileWithKey('cn.example.org', $certFile);
++
++include 'ServerClientTestCase.inc';
++ServerClientTestCase::getInstance()->run($clientCode, $serverCode);
++?>
++--CLEAN--
++<?php
++@unlink(__DIR__ . DIRECTORY_SEPARATOR . 'san_absent_cn_fallback.pem.tmp');
++?>
++--EXPECTF--
++resource(%d) of type (stream)
++
++Warning: stream_socket_client(): Peer certificate CN=`cn.example.org' did not match expected CN=`other.example.org' in %s on line %d
++
++Warning: stream_socket_client(): Failed to enable crypto in %s on line %d
++
++Warning: stream_socket_client(): unable to connect to ssl://127.0.0.1:%d (Unknown error) in %s on line %d
++bool(false)
+--- /dev/null
++++ b/ext/openssl/tests/san_no_cn_fallback.phpt
+@@ -0,0 +1,65 @@
++--TEST--
++Peer verification does not fall back to CN when the certificate has a SAN
++--SKIPIF--
++<?php
++if (!extension_loaded("openssl")) die("skip openssl not loaded");
++if (!function_exists("proc_open")) die("skip no proc_open");
++?>
++--FILE--
++<?php
++$certFile = __DIR__ . DIRECTORY_SEPARATOR . 'san_no_cn_fallback.pem.tmp';
++
++$serverCode = <<<'CODE'
++    $serverUri = "ssl://127.0.0.1:64321";
++    $serverFlags = STREAM_SERVER_BIND | STREAM_SERVER_LISTEN;
++    $serverCtx = stream_context_create(['ssl' => [
++        'local_cert' => '%s',
++    ]]);
++
++    $server = stream_socket_server($serverUri, $errno, $errstr, $serverFlags, $serverCtx);
++    phpt_notify();
++
++    @stream_socket_accept($server, 1);
++    @stream_socket_accept($server, 1);
++CODE;
++$serverCode = sprintf($serverCode, $certFile);
++
++$clientCode = <<<'CODE'
++    $serverUri = "ssl://127.0.0.1:64321";
++    $clientFlags = STREAM_CLIENT_CONNECT;
++    $clientCtx = stream_context_create(['ssl' => [
++        'verify_peer' => false,
++    ]]);
++
++    phpt_wait();
++
++    // The SAN entry is matched as usual.
++    stream_context_set_option($clientCtx, 'ssl', 'peer_name', 'san.example.org');
++    var_dump(stream_socket_client($serverUri, $errno, $errstr, 1, $clientFlags, $clientCtx));
++
++    // The CN must not be considered because the certificate presents a SAN.
++    stream_context_set_option($clientCtx, 'ssl', 'peer_name', 'cn.example.org');
++    var_dump(stream_socket_client($serverUri, $errno, $errstr, 1, $clientFlags, $clientCtx));
++CODE;
++
++include 'CertificateGenerator.inc';
++$certificateGenerator = new CertificateGenerator();
++$certificateGenerator->saveNewCertAsFileWithKey(
++    'cn.example.org', $certFile, null, 'DNS:san.example.org');
++
++include 'ServerClientTestCase.inc';
++ServerClientTestCase::getInstance()->run($clientCode, $serverCode);
++?>
++--CLEAN--
++<?php
++@unlink(__DIR__ . DIRECTORY_SEPARATOR . 'san_no_cn_fallback.pem.tmp');
++?>
++--EXPECTF--
++resource(%d) of type (stream)
++
++Warning: stream_socket_client(): Peer certificate subjectAltName did not match expected name `cn.example.org' in %s on line %d
++
++Warning: stream_socket_client(): Failed to enable crypto in %s on line %d
++
++Warning: stream_socket_client(): unable to connect to ssl://127.0.0.1:%d (Unknown error) in %s on line %d
++bool(false)
+--- a/ext/openssl/tests/san_peer_matching.phpt
++++ b/ext/openssl/tests/san_peer_matching.phpt
+@@ -42,7 +42,7 @@
+ --EXPECTF--
+ resource(%d) of type (stream)
+ 
+-Warning: stream_socket_client(): Unable to locate peer certificate CN in %s on line %d
++Warning: stream_socket_client(): Peer certificate subjectAltName did not match expected name `moar.example.org' in %s on line %d
+ 
+ Warning: stream_socket_client(): Failed to enable crypto in %s on line %d
+ 
+--- /dev/null
++++ b/ext/openssl/tests/san_srv_no_cn_fallback.phpt
+@@ -0,0 +1,58 @@
++--TEST--
++Peer verification does not fall back to CN when the certificate has an SRV-ID
++--SKIPIF--
++<?php
++if (!extension_loaded("openssl")) die("skip openssl not loaded");
++if (!function_exists("proc_open")) die("skip no proc_open");
++?>
++--FILE--
++<?php
++$certFile = __DIR__ . DIRECTORY_SEPARATOR . 'san_srv_no_cn_fallback.pem.tmp';
++
++$serverCode = <<<'CODE'
++    $serverUri = "ssl://127.0.0.1:64321";
++    $serverFlags = STREAM_SERVER_BIND | STREAM_SERVER_LISTEN;
++    $serverCtx = stream_context_create(['ssl' => [
++        'local_cert' => '%s',
++    ]]);
++
++    $server = stream_socket_server($serverUri, $errno, $errstr, $serverFlags, $serverCtx);
++    phpt_notify();
++
++    @stream_socket_accept($server, 1);
++CODE;
++$serverCode = sprintf($serverCode, $certFile);
++
++$clientCode = <<<'CODE'
++    $serverUri = "ssl://127.0.0.1:64321";
++    $clientFlags = STREAM_CLIENT_CONNECT;
++    $clientCtx = stream_context_create(['ssl' => [
++        'verify_peer' => false,
++    ]]);
++
++    phpt_wait();
++
++    // The CN must not be considered because the certificate presents an SRV-ID.
++    stream_context_set_option($clientCtx, 'ssl', 'peer_name', 'cn.example.org');
++    var_dump(stream_socket_client($serverUri, $errno, $errstr, 1, $clientFlags, $clientCtx));
++CODE;
++
++include 'CertificateGenerator.inc';
++$certificateGenerator = new CertificateGenerator();
++$certificateGenerator->saveNewCertAsFileWithKey(
++    'cn.example.org', $certFile, null, 'otherName:1.3.6.1.5.5.7.8.7;IA5STRING:_https.san.example.org');
++
++include 'ServerClientTestCase.inc';
++ServerClientTestCase::getInstance()->run($clientCode, $serverCode);
++?>
++--CLEAN--
++<?php
++@unlink(__DIR__ . DIRECTORY_SEPARATOR . 'san_srv_no_cn_fallback.pem.tmp');
++?>
++--EXPECTF--
++Warning: stream_socket_client(): Peer certificate subjectAltName did not match expected name `cn.example.org' in %s on line %d
++
++Warning: stream_socket_client(): Failed to enable crypto in %s on line %d
++
++Warning: stream_socket_client(): unable to connect to ssl://127.0.0.1:%d (Unknown error) in %s on line %d
++bool(false)
+--- /dev/null
++++ b/ext/openssl/tests/san_uri_no_cn_fallback.phpt
+@@ -0,0 +1,58 @@
++--TEST--
++Peer verification does not fall back to CN when the certificate has a URI-ID
++--SKIPIF--
++<?php
++if (!extension_loaded("openssl")) die("skip openssl not loaded");
++if (!function_exists("proc_open")) die("skip no proc_open");
++?>
++--FILE--
++<?php
++$certFile = __DIR__ . DIRECTORY_SEPARATOR . 'san_uri_no_cn_fallback.pem.tmp';
++
++$serverCode = <<<'CODE'
++    $serverUri = "ssl://127.0.0.1:64321";
++    $serverFlags = STREAM_SERVER_BIND | STREAM_SERVER_LISTEN;
++    $serverCtx = stream_context_create(['ssl' => [
++        'local_cert' => '%s',
++    ]]);
++
++    $server = stream_socket_server($serverUri, $errno, $errstr, $serverFlags, $serverCtx);
++    phpt_notify();
++
++    @stream_socket_accept($server, 1);
++CODE;
++$serverCode = sprintf($serverCode, $certFile);
++
++$clientCode = <<<'CODE'
++    $serverUri = "ssl://127.0.0.1:64321";
++    $clientFlags = STREAM_CLIENT_CONNECT;
++    $clientCtx = stream_context_create(['ssl' => [
++        'verify_peer' => false,
++    ]]);
++
++    phpt_wait();
++
++    // The CN must not be considered because the certificate presents a URI-ID.
++    stream_context_set_option($clientCtx, 'ssl', 'peer_name', 'cn.example.org');
++    var_dump(stream_socket_client($serverUri, $errno, $errstr, 1, $clientFlags, $clientCtx));
++CODE;
++
++include 'CertificateGenerator.inc';
++$certificateGenerator = new CertificateGenerator();
++$certificateGenerator->saveNewCertAsFileWithKey(
++    'cn.example.org', $certFile, null, 'URI:https://san.example.org/x');
++
++include 'ServerClientTestCase.inc';
++ServerClientTestCase::getInstance()->run($clientCode, $serverCode);
++?>
++--CLEAN--
++<?php
++@unlink(__DIR__ . DIRECTORY_SEPARATOR . 'san_uri_no_cn_fallback.pem.tmp');
++?>
++--EXPECTF--
++Warning: stream_socket_client(): Peer certificate subjectAltName did not match expected name `cn.example.org' in %s on line %d
++
++Warning: stream_socket_client(): Failed to enable crypto in %s on line %d
++
++Warning: stream_socket_client(): unable to connect to ssl://127.0.0.1:%d (Unknown error) in %s on line %d
++bool(false)
+--- a/ext/openssl/xp_ssl.c
++++ b/ext/openssl/xp_ssl.c
+@@ -343,7 +343,7 @@
+ static zend_bool matches_wildcard_name(const char *subjectname, const char *certname) /* {{{ */
+ {
+ 	char *wildcard = NULL;
+-	int prefix_len, suffix_len, subject_len;
++	size_t prefix_len, suffix_len, subject_len;
+ 
+ 	if (strcasecmp(subjectname, certname) == 0) {
+ 		return 1;
+@@ -362,7 +362,7 @@
+ 
+ 	suffix_len = strlen(wildcard + 1);
+ 	subject_len = strlen(subjectname);
+-	if (suffix_len <= subject_len) {
++	if (suffix_len + prefix_len <= subject_len) {
+ 		/* 2) suffix must match
+ 		 * 3) no . between prefix and suffix
+ 		 **/
+@@ -374,7 +374,8 @@
+ }
+ /* }}} */
+ 
+-static zend_bool matches_san_list(X509 *peer, const char *subject_name) /* {{{ */
++static zend_bool matches_san_list(
++		X509 *peer, const char *subject_name, zend_bool *has_service_id)
+ {
+ 	int i, len;
+ 	unsigned char *cert_name = NULL;
+@@ -383,10 +384,14 @@
+ 	GENERAL_NAMES *alt_names = X509_get_ext_d2i(peer, NID_subject_alt_name, 0, 0);
+ 	int alt_name_count = sk_GENERAL_NAME_num(alt_names);
+ 
++	*has_service_id = 0;
++
+ 	for (i = 0; i < alt_name_count; i++) {
+ 		GENERAL_NAME *san = sk_GENERAL_NAME_value(alt_names, i);
+ 
+ 		if (san->type == GEN_DNS) {
++			*has_service_id = 1;
++
+ 			ASN1_STRING_to_UTF8(&cert_name, san->d.dNSName);
+ 			if (ASN1_STRING_length(san->d.dNSName) != strlen((const char*)cert_name)) {
+ 				OPENSSL_free(cert_name);
+@@ -421,6 +426,16 @@
+ 			 * Because IP SAN names are officially deprecated and are
+ 			 * not allowed by CAs starting in 2015. Deal with it.
+ 			 */
++		} else if (san->type == GEN_URI) {
++			*has_service_id = 1;
++		} else if (san->type == GEN_OTHERNAME) {
++			char oid[32];
++
++			/* SRV-ID, matched by OID because NID_SRVName needs OpenSSL 3.0 */
++			if (OBJ_obj2txt(oid, sizeof(oid), san->d.otherName->type_id, 1) > 0
++					&& strcmp(oid, "1.3.6.1.5.5.7.8.7") == 0) {
++				*has_service_id = 1;
++			}
+ 		}
+ 	}
+ 
+@@ -536,8 +551,16 @@
+ 		}
+ 
+ 		if (peer_name) {
+-			if (matches_san_list(peer, peer_name)) {
++			zend_bool has_service_id = 0;
++
++			if (matches_san_list(peer, peer_name, &has_service_id)) {
+ 				return SUCCESS;
++			} else if (has_service_id) {
++				/* CN must be ignored if the certificate presents a service identity. */
++				php_error_docref(NULL TSRMLS_CC, E_WARNING,
++					"Peer certificate subjectAltName did not match expected name `%s'",
++					peer_name);
++				return FAILURE;
+ 			} else if (matches_common_name(peer, peer_name TSRMLS_CC)) {
+ 				return SUCCESS;
+ 			} else {
+--- a/ext/phar/phar_internal.h
++++ b/ext/phar/phar_internal.h
+@@ -122,8 +122,13 @@
+ #define TAR_FILE    '0'
+ #define TAR_LINK    '1'
+ #define TAR_SYMLINK '2'
++#define TAR_CHAR    '3'
++#define TAR_BLOCK   '4'
+ #define TAR_DIR     '5'
++#define TAR_FIFO    '6'
+ #define TAR_NEW     '8'
++#define TAR_LONGLINK 'K'
++#define TAR_LONGNAME 'L'
+ #define TAR_GLOBAL_HDR 'g'
+ #define TAR_FILE_HDR   'x'
+ 
+--- a/ext/phar/tar.c
++++ b/ext/phar/tar.c
+@@ -36,6 +36,52 @@
+ 	return num;
+ }
+ /* }}} */
++
++static zend_bool phar_tar_type_has_data(char typeflag)
++{
++	switch (typeflag) {
++		case TAR_LINK:
++		case TAR_SYMLINK:
++		case TAR_CHAR:
++		case TAR_BLOCK:
++		case TAR_DIR:
++		case TAR_FIFO:
++			return 0;
++		default:
++			return 1;
++	}
++}
++
++static zend_bool phar_tar_size(const char *buf, size_t len, uint32_t *result)
++{
++	uint64_t num = 0;
++	size_t i = 0;
++
++	while (i < len && buf[i] == ' ') {
++		++i;
++	}
++
++	/* GNU base-256 encoding is only used for sizes that do not fit the octal field */
++	if (i < len && (((unsigned char) buf[i]) & 0x80)) {
++		return 0;
++	}
++
++	while (i < len && buf[i] >= '0' && buf[i] <= '7') {
++		num = num * 8 + (buf[i] - '0');
++		++i;
++	}
++
++	while (i < len && (buf[i] == ' ' || buf[i] == '\0')) {
++		++i;
++	}
++
++	if (i != len || num > UINT32_MAX - 511) {
++		return 0;
++	}
++
++	*result = (uint32_t) num;
++	return 1;
++}
+ 
+ /* adapted from format_octal() in libarchive
+  *
+@@ -263,8 +309,32 @@
+ 		memset(hdr->checksum, ' ', sizeof(hdr->checksum));
+ 		sum2 = phar_tar_checksum(buf, old?sizeof(old_tar_header):sizeof(tar_header));
+ 
+-		size = entry.uncompressed_filesize = entry.compressed_filesize =
+-			phar_tar_number(hdr->size, sizeof(hdr->size));
++		if (!phar_tar_size(hdr->size, sizeof(hdr->size), &size)) {
++			if (error) {
++				spprintf(error, 4096, "phar error: \"%s\" is a corrupted tar file (invalid entry size)", fname);
++			}
++			if (last_was_longlink) {
++				pefree(entry.filename, myphar->is_persistent);
++			}
++			php_stream_close(fp);
++			phar_destroy_phar_data(myphar TSRMLS_CC);
++			return FAILURE;
++		}
++		entry.uncompressed_filesize = entry.compressed_filesize = size;
++
++		/* GNU long link names are not supported, so refuse the record instead of
++		 * registering it as an entry and dropping the link target of the entry that follows */
++		if (hdr->typeflag == TAR_LONGLINK) {
++			if (error) {
++				spprintf(error, 4096, "phar error: \"%s\" is a tar file with an unsupported GNU long link entry", fname);
++			}
++			if (last_was_longlink) {
++				pefree(entry.filename, myphar->is_persistent);
++			}
++			php_stream_close(fp);
++			phar_destroy_phar_data(myphar TSRMLS_CC);
++			return FAILURE;
++		}
+ 
+ 		/* skip global/file headers (pax) */
+ 		if (!old && (hdr->typeflag == TAR_GLOBAL_HDR || hdr->typeflag == TAR_FILE_HDR)) {
+@@ -350,13 +420,13 @@
+ 			goto bail;
+ 		}
+ 
+-		if (!last_was_longlink && hdr->typeflag == 'L') {
++		if (!last_was_longlink && hdr->typeflag == TAR_LONGNAME) {
+ 			last_was_longlink = 1;
+ 			/* support the ././@LongLink system for storing long filenames */
+ 			entry.filename_len = entry.uncompressed_filesize;
+ 
+ 			/* Check for overflow - bug 61065 */
+-			if (entry.filename_len == UINT_MAX || entry.filename_len == 0) {
++			if (entry.filename_len == 0 || entry.filename_len > totalsize) {
+ 				if (error) {
+ 					spprintf(error, 4096, "phar error: \"%s\" is a corrupted tar file (invalid entry size)", fname);
+ 				}
+@@ -568,7 +638,7 @@
+ 
+ 		size = (size+511)&~511;
+ 
+-		if (((hdr->typeflag == '\0') || (hdr->typeflag == TAR_FILE)) && size > 0) {
++		if (phar_tar_type_has_data(hdr->typeflag) && size > 0) {
+ next:
+ 			/* this is not good enough - seek succeeds even on truncated tars */
+ 			php_stream_seek(fp, size, SEEK_CUR);
+--- /dev/null
++++ b/ext/phar/tests/tar/GHSA-j3wh-g957-2m85-longlink.phpt
+@@ -0,0 +1,50 @@
++--TEST--
++GHSA-j3wh-g957-2m85 (././@LongLink name longer than the archive)
++--SKIPIF--
++<?php if (!extension_loaded("phar")) die("skip"); ?>
++--INI--
++phar.require_hash=0
++--FILE--
++<?php
++function tar_header($name, $size, $typeflag = '0')
++{
++    $header = str_repeat("\0", 512);
++    $header = substr_replace($header, $name, 0, strlen($name));
++    $header = substr_replace($header, sprintf("%07o\0", 0644), 100, 8);
++    $header = substr_replace($header, sprintf("%07o\0", 0), 108, 8);
++    $header = substr_replace($header, sprintf("%07o\0", 0), 116, 8);
++    $header = substr_replace($header, $size, 124, 12);
++    $header = substr_replace($header, sprintf("%011o\0", 1700000000), 136, 12);
++    $header[156] = $typeflag;
++    $header = substr_replace($header, "ustar\0", 257, 6);
++    $header = substr_replace($header, "00", 263, 2);
++
++    $checksum = 0;
++    for ($i = 0; $i < 512; $i++) {
++        $checksum += ($i >= 148 && $i < 156) ? 0x20 : ord($header[$i]);
++    }
++
++    return substr_replace($header, sprintf("%06o\0 ", $checksum), 148, 8);
++}
++
++$fname = __DIR__ . '/' . basename(__FILE__, '.php') . '.tar';
++
++/* 2 GB of file name announced by a 2 KB archive */
++$tar  = tar_header('././@LongLink', "20000000000\0", 'L');
++$tar .= str_pad('long.txt', 512, "\0");
++$tar .= tar_header('short.txt', sprintf("%011o\0", 3)) . str_pad('abc', 512, "\0");
++$tar .= str_repeat("\0", 1024);
++file_put_contents($fname, $tar);
++
++try {
++    new PharData($fname);
++} catch (UnexpectedValueException $e) {
++    echo $e->getMessage(), "\n";
++}
++?>
++--CLEAN--
++<?php
++unlink(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.tar');
++?>
++--EXPECTF--
++phar error: "%s" is a corrupted tar file (invalid entry size)
+--- /dev/null
++++ b/ext/phar/tests/tar/GHSA-j3wh-g957-2m85-size.phpt
+@@ -0,0 +1,92 @@
++--TEST--
++GHSA-j3wh-g957-2m85 (tar entry injection via invalid entry size)
++--SKIPIF--
++<?php if (!extension_loaded("phar")) die("skip"); ?>
++--INI--
++phar.require_hash=0
++--FILE--
++<?php
++function tar_header($name, $size, $typeflag = '0')
++{
++    $header = str_repeat("\0", 512);
++    $header = substr_replace($header, $name, 0, strlen($name));
++    $header = substr_replace($header, sprintf("%07o\0", 0644), 100, 8);
++    $header = substr_replace($header, sprintf("%07o\0", 0), 108, 8);
++    $header = substr_replace($header, sprintf("%07o\0", 0), 116, 8);
++    $header = substr_replace($header, $size, 124, 12);
++    $header = substr_replace($header, sprintf("%011o\0", 1700000000), 136, 12);
++    $header[156] = $typeflag;
++    $header = substr_replace($header, "ustar\0", 257, 6);
++    $header = substr_replace($header, "00", 263, 2);
++
++    $checksum = 0;
++    for ($i = 0; $i < 512; $i++) {
++        $checksum += ($i >= 148 && $i < 156) ? 0x20 : ord($header[$i]);
++    }
++
++    return substr_replace($header, sprintf("%06o\0 ", $checksum), 148, 8);
++}
++
++function tar_dump($fname)
++{
++    try {
++        $phar = new PharData($fname);
++        $names = [];
++        foreach (new RecursiveIteratorIterator($phar) as $file) {
++            $names[] = $file->getFilename();
++        }
++        sort($names);
++        echo implode(', ', $names), "\n";
++    } catch (UnexpectedValueException $e) {
++        echo $e->getMessage(), "\n";
++    }
++}
++
++$base = __DIR__ . '/' . basename(__FILE__, '.php');
++
++/* the entry after the carrier is never reached by a conforming tar reader */
++$sizes = [
++    'octal overflow to 0'    => "40000000000\0",
++    'octal overflow to 1'    => "40000000001\0",
++    'octal padding overflow' => "37777777400\0",
++    'GNU base-256'           => "\x80" . str_repeat("\0", 9) . "\x02\x00",
++    'non-octal digits'       => "99999999999\0",
++    'trailing garbage'       => "0000000001XX",
++];
++
++$i = 0;
++foreach ($sizes as $label => $size) {
++    $fname = $base . '.' . $i++ . '.tar';
++    $tar  = tar_header('normal.txt', sprintf("%011o\0", 9)) . str_pad('NORMAL_OK', 512, "\0");
++    $tar .= tar_header('carrier.bin', $size);
++    $tar .= tar_header('injected.txt', sprintf("%011o\0", 8)) . str_pad('INJECTED', 512, "\0");
++    $tar .= str_repeat("\0", 1024);
++    file_put_contents($fname, $tar);
++
++    echo $label, ': ';
++    tar_dump($fname);
++}
++
++$fname = $base . '.valid.tar';
++$tar  = tar_header('normal.txt', sprintf("%011o\0", 9)) . str_pad('NORMAL_OK', 512, "\0");
++$tar .= tar_header('second.txt', sprintf("%011o\0", 8)) . str_pad('SECOND__', 512, "\0");
++$tar .= str_repeat("\0", 1024);
++file_put_contents($fname, $tar);
++
++echo 'valid archive: ';
++tar_dump($fname);
++?>
++--CLEAN--
++<?php
++foreach (glob(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.*.tar') as $file) {
++    unlink($file);
++}
++?>
++--EXPECTF--
++octal overflow to 0: phar error: "%s" is a corrupted tar file (invalid entry size)
++octal overflow to 1: phar error: "%s" is a corrupted tar file (invalid entry size)
++octal padding overflow: phar error: "%s" is a corrupted tar file (invalid entry size)
++GNU base-256: phar error: "%s" is a corrupted tar file (invalid entry size)
++non-octal digits: phar error: "%s" is a corrupted tar file (invalid entry size)
++trailing garbage: phar error: "%s" is a corrupted tar file (invalid entry size)
++valid archive: normal.txt, second.txt
+--- /dev/null
++++ b/ext/phar/tests/tar/GHSA-j3wh-g957-2m85-typeflag.phpt
+@@ -0,0 +1,79 @@
++--TEST--
++GHSA-j3wh-g957-2m85 (tar entry injection via entry types that carry data)
++--SKIPIF--
++<?php if (!extension_loaded("phar")) die("skip"); ?>
++--INI--
++phar.require_hash=0
++--FILE--
++<?php
++function tar_header($name, $size, $typeflag = '0')
++{
++    $header = str_repeat("\0", 512);
++    $header = substr_replace($header, $name, 0, strlen($name));
++    $header = substr_replace($header, sprintf("%07o\0", 0644), 100, 8);
++    $header = substr_replace($header, sprintf("%07o\0", 0), 108, 8);
++    $header = substr_replace($header, sprintf("%07o\0", 0), 116, 8);
++    $header = substr_replace($header, $size, 124, 12);
++    $header = substr_replace($header, sprintf("%011o\0", 1700000000), 136, 12);
++    $header[156] = $typeflag;
++    $header = substr_replace($header, "ustar\0", 257, 6);
++    $header = substr_replace($header, "00", 263, 2);
++
++    $checksum = 0;
++    for ($i = 0; $i < 512; $i++) {
++        $checksum += ($i >= 148 && $i < 156) ? 0x20 : ord($header[$i]);
++    }
++
++    return substr_replace($header, sprintf("%06o\0 ", $checksum), 148, 8);
++}
++
++$base = __DIR__ . '/' . basename(__FILE__, '.php');
++
++/* '5' and the other types below carry no data in any tar reader, so the
++ * injected header stays visible to all of them and is not hidden from
++ * anything that inspects the archive with a different implementation.
++ * 'K' is a GNU metadata record that is not supported and is refused. */
++$typeflags = [
++    'contiguous file' => '7',
++    'unknown type'    => 'Z',
++    'GNU long link'   => 'K',
++    'directory'       => '5',
++    'fifo'            => '6',
++];
++
++$i = 0;
++foreach ($typeflags as $label => $typeflag) {
++    $fname = $base . '.' . $i++ . '.tar';
++    $tar  = tar_header('normal.txt', sprintf("%011o\0", 9)) . str_pad('NORMAL_OK', 512, "\0");
++    $tar .= tar_header('carrier.bin', sprintf("%011o\0", 512), $typeflag);
++    /* the carrier's only data block is a tar header a conforming reader skips */
++    $tar .= tar_header('injected.txt', sprintf("%011o\0", 0));
++    $tar .= str_repeat("\0", 1024);
++    file_put_contents($fname, $tar);
++
++    echo $label, ': ';
++    try {
++        $phar = new PharData($fname);
++        $names = [];
++        foreach (new RecursiveIteratorIterator($phar) as $file) {
++            $names[] = $file->getFilename();
++        }
++        sort($names);
++        echo implode(', ', $names), "\n";
++    } catch (UnexpectedValueException $e) {
++        echo $e->getMessage(), "\n";
++    }
++}
++?>
++--CLEAN--
++<?php
++foreach (glob(__DIR__ . '/' . basename(__FILE__, '.clean.php') . '.*.tar') as $file) {
++    unlink($file);
++}
++?>
++--EXPECTF--
++contiguous file: carrier.bin, normal.txt
++unknown type: carrier.bin, normal.txt
++GNU long link: phar error: "%s" is a tar file with an unsupported GNU long link entry
++directory: injected.txt, normal.txt
++fifo: carrier.bin, injected.txt, normal.txt
+--- a/ext/standard/filters.c
++++ b/ext/standard/filters.c
+@@ -372,7 +372,7 @@
+ 	inst->line_ccnt = line_len;
+ 	inst->line_len = line_len;
+ 	if (lbchars != NULL) {
+-		inst->lbchars = (lbchars_dup ? pestrdup(lbchars, persistent) : lbchars);
++		inst->lbchars = (lbchars_dup ? pestrndup(lbchars, lbchars_len, persistent) : lbchars);
+ 		inst->lbchars_len = lbchars_len;
+ 	} else {
+ 		inst->lbchars = NULL;
+@@ -980,7 +980,7 @@
+ 	inst->line_ccnt = line_len;
+ 	inst->line_len = line_len;
+ 	if (lbchars != NULL) {
+-		inst->lbchars = (lbchars_dup ? pestrdup(lbchars, persistent) : lbchars);
++		inst->lbchars = (lbchars_dup ? pestrndup(lbchars, lbchars_len, persistent) : lbchars);
+ 		inst->lbchars_len = lbchars_len;
+ 	} else {
+ 		inst->lbchars = NULL;
+@@ -1193,7 +1193,7 @@
+ 	inst->next_char = 0;
+ 	inst->lb_ptr = inst->lb_cnt = 0;
+ 	if (lbchars != NULL) {
+-		inst->lbchars = (lbchars_dup ? pestrdup(lbchars, persistent) : lbchars);
++		inst->lbchars = (lbchars_dup ? pestrndup(lbchars, lbchars_len, persistent) : lbchars);
+ 		inst->lbchars_len = lbchars_len;
+ 	} else {
+ 		inst->lbchars = NULL;
+--- a/ext/standard/http_fopen_wrapper.c
++++ b/ext/standard/http_fopen_wrapper.c
+@@ -85,28 +85,71 @@
+ 
+ #define HTTP_WRAPPER_HEADER_INIT    1
+ #define HTTP_WRAPPER_REDIRECTED     2
+-
++#define HTTP_WRAPPER_KEEP_METHOD    4
++#define HTTP_WRAPPER_STRIP_AUTH     8
++
++static char *next_header_line(char *line)
++{
++	while (*line != '\0' && *line != '\r' && *line != '\n') {
++		line++;
++	}
++	if (*line == '\r') {
++		line++;
++	}
++	if (*line == '\n') {
++		line++;
++	}
++
++	return line;
++}
++
++/* Removes every line whose header name matches, along with the folded
++ * continuation lines carrying the rest of its value. Neither a repeated header
++ * nor an occurrence of the name inside another header's value may leave the real
++ * header behind, as that would defeat HTTP_WRAPPER_STRIP_AUTH. */
+ static inline void strip_header(char *header_bag, char *lc_header_bag,
+ 		const char *lc_header_name)
+ {
+-	char *lc_header_start = strstr(lc_header_bag, lc_header_name);
+-	char *header_start = header_bag + (lc_header_start - lc_header_bag);
+-
+-	if (lc_header_start
+-	&& (lc_header_start == lc_header_bag || *(lc_header_start-1) == '\n')
+-	) {
+-		char *lc_eol = strchr(lc_header_start, '\n');
+-		char *eol = header_start + (lc_eol - lc_header_start);
+-
+-		if (lc_eol) {
+-			size_t eollen = strlen(lc_eol);
+-
+-			memmove(lc_header_start, lc_eol+1, eollen);
+-			memmove(header_start, eol+1, eollen);
+-		} else {
+-			*lc_header_start = '\0';
+-			*header_start = '\0';
+-		}
++	size_t name_len = strlen(lc_header_name);
++	char *lc_line = lc_header_bag;
++
++	while (*lc_line != '\0') {
++		if (strncmp(lc_line, lc_header_name, name_len) != 0) {
++			lc_line = next_header_line(lc_line);
++			continue;
++		}
++
++		/* the whitespace RFC 7230 forbids before the colon is tolerated by some
++		 * servers, so it must not hide the header from us either */
++		const char *lc_colon = lc_line + name_len;
++		while (*lc_colon == ' ' || *lc_colon == '\t') {
++			lc_colon++;
++		}
++
++		if (*lc_colon != ':') {
++			lc_line = next_header_line(lc_line);
++			continue;
++		}
++
++		char *lc_next = next_header_line(lc_line);
++		while (*lc_next == ' ' || *lc_next == '\t') {
++			lc_next = next_header_line(lc_next);
++		}
++
++		if (*lc_next == '\0') {
++			/* drop the preceding line break too, or the one appended after the bag
++			 * would close the header block early */
++			while (lc_line > lc_header_bag
++					&& (*(lc_line - 1) == '\r' || *(lc_line - 1) == '\n')) {
++				--lc_line;
++			}
++		}
++
++		size_t tail_len = strlen(lc_next) + 1;
++		char *line = header_bag + (lc_line - lc_header_bag);
++
++		memmove(line, header_bag + (lc_next - lc_header_bag), tail_len);
++		memmove(lc_line, lc_next, tail_len);
+ 	}
+ }
+ 
+@@ -354,6 +397,7 @@
+ 	char *user_headers = NULL;
+ 	int header_init = ((flags & HTTP_WRAPPER_HEADER_INIT) != 0);
+ 	int redirected = ((flags & HTTP_WRAPPER_REDIRECTED) != 0);
++	int redirect_keep_method = ((flags & HTTP_WRAPPER_KEEP_METHOD) != 0);
+ 	int response_code = 0;
+ 
+ 	tmp_line[0] = '\0';
+@@ -591,7 +635,7 @@
+ 		if (Z_TYPE_PP(tmpzval) == IS_STRING && Z_STRLEN_PP(tmpzval) > 0) {
+ 			/* As per the RFC, automatically redirected requests MUST NOT use other methods than
+ 			 * GET and HEAD unless it can be confirmed by the user */
+-			if (!redirected
++			if (!redirected || redirect_keep_method
+ 				|| (Z_STRLEN_PP(tmpzval) == 3 && memcmp("GET", Z_STRVAL_PP(tmpzval), 3) == 0)
+ 				|| (Z_STRLEN_PP(tmpzval) == 4 && memcmp("HEAD",Z_STRVAL_PP(tmpzval), 4) == 0)
+ 			) {
+@@ -683,10 +727,25 @@
+ 			/* Make lowercase for easy comparison against 'standard' headers */
+ 			php_strtolower(tmp, strlen(tmp));
+ 
+-			if (!header_init) {
++			if (!header_init && !redirect_keep_method) {
+ 				/* strip POST headers on redirect */
+-				strip_header(user_headers, tmp, "content-length:");
+-				strip_header(user_headers, tmp, "content-type:");
++				strip_header(user_headers, tmp, "content-length");
++				strip_header(user_headers, tmp, "content-type");
++			}
++
++			if (flags & HTTP_WRAPPER_STRIP_AUTH) {
++				strip_header(user_headers, tmp, "authorization");
++				strip_header(user_headers, tmp, "cookie");
++				if (!use_proxy) {
++					strip_header(user_headers, tmp, "proxy-authorization");
++				}
++			}
++
++			if (*user_headers == '\0') {
++				/* everything got stripped, keeping the empty bag would append a
++				 * stray CRLF and end the header block early */
++				efree(user_headers);
++				user_headers = NULL;
+ 			}
+ 
+ 			if (check_has_header(tmp, "user-agent:")) {
+@@ -829,7 +888,7 @@
+ 		 * see bug #44603 for details. Since Content-Type maybe part of user's headers we need to do this check first.
+ 		 */
+ 		if (
+-				header_init &&
++				(header_init || redirect_keep_method) &&
+ 				context &&
+ 				!(have_header & HTTP_HEADER_CONTENT_LENGTH) &&
+ 				php_stream_context_get_option(context, "http", "content", &tmpzval) == SUCCESS &&
+@@ -846,7 +905,7 @@
+ 	}
+ 
+ 	/* Request content, such as for POST requests */
+-	if (header_init && context &&
++	if ((header_init || redirect_keep_method) && context &&
+ 		php_stream_context_get_option(context, "http", "content", &tmpzval) == SUCCESS &&
+ 		Z_TYPE_PP(tmpzval) == IS_STRING && Z_STRLEN_PP(tmpzval) > 0) {
+ 		if (!(have_header & HTTP_HEADER_CONTENT_LENGTH)) {
+@@ -1051,7 +1110,7 @@
+ 		if (header_info.location != NULL) {
+ 			char *new_path = NULL;
+ 
+-			if (strlen(header_info.location) < 8 ||
++			if (header_info.location_len < 8 ||
+ 					(strncasecmp(header_info.location, "http://", sizeof("http://")-1) &&
+ 							strncasecmp(header_info.location, "https://", sizeof("https://")-1) &&
+ 							strncasecmp(header_info.location, "ftp://", sizeof("ftp://")-1) &&
+@@ -1059,7 +1118,7 @@
+ 			{
+ 				char *loc_path = NULL;
+ 				if (*header_info.location != '/') {
+-					if (*(header_info.location+1) != '\0' && resource->path) {
++					if (header_info.location_len > 1 && resource->path) {
+ 						char *s = strrchr(resource->path, '/');
+ 						if (!s) {
+ 							s = resource->path;
+@@ -1094,13 +1153,21 @@
+ 				header_info.location = NULL;
+ 			}
+ 
+-			php_url_free(resource);
+-			/* check for invalid redirection URLs */
+-			if ((resource = php_url_parse(new_path)) == NULL) {
++			php_url *new_resource = php_url_parse(new_path);
++			if (new_resource == NULL) {
+ 				php_stream_wrapper_log_error(wrapper, options TSRMLS_CC, "Invalid redirect URL! %s", new_path);
+ 				efree(new_path);
+ 				goto out;
+ 			}
++
++			int default_port = use_ssl ? 443 : 80;
++			zend_bool same_origin = strcasecmp(resource->scheme, new_resource->scheme) == 0
++				&& strcasecmp(resource->host, new_resource->host) == 0
++				&& (resource->port ? resource->port : default_port)
++					== (new_resource->port ? new_resource->port : default_port);
++
++			php_url_free(resource);
++			resource = new_resource;
+ 
+ #define CHECK_FOR_CNTRL_CHARS(val) { \
+ 	if (val) { \
+@@ -1124,7 +1191,15 @@
+ 				CHECK_FOR_CNTRL_CHARS(resource->pass)
+ 				CHECK_FOR_CNTRL_CHARS(resource->path)
+ 			}
+-			stream = php_stream_url_wrap_http_ex(wrapper, new_path, mode, options, opened_path, context, --redirect_max, HTTP_WRAPPER_REDIRECTED STREAMS_CC TSRMLS_CC);
++			int new_flags = HTTP_WRAPPER_REDIRECTED | (flags & HTTP_WRAPPER_STRIP_AUTH);
++			if (!same_origin) {
++				new_flags |= HTTP_WRAPPER_STRIP_AUTH;
++			}
++			if (response_code == 307 || response_code == 308) {
++				/* Preserve the method and body on 307/308 redirects. */
++				new_flags |= HTTP_WRAPPER_KEEP_METHOD;
++			}
++			stream = php_stream_url_wrap_http_ex(wrapper, new_path, mode, options, opened_path, context, --redirect_max, new_flags STREAMS_CC TSRMLS_CC);
+ 			efree(new_path);
+ 		} else {
+ 			php_stream_wrapper_log_error(wrapper, options TSRMLS_CC, "HTTP request failed! %s", tmp_line);
+--- /dev/null
++++ b/ext/standard/tests/filters/ghsa-88hq-2827-7pg6.phpt
+@@ -0,0 +1,27 @@
++--TEST--
++GHSA-88hq-2827-7pg6: OOB read in convert stream filters when line-break-chars contains NUL
++--FILE--
++<?php
++
++// Test base64-encode: line-break-chars with embedded NUL must be preserved fully.
++// Before the fix, pestrdup() truncated at the NUL, but lbchars_len kept the
++// original length, causing a heap-buffer-overflow read during encoding.
++$opts = ["line-length" => 4, "line-break-chars" => "\0X"];
++$fp = fopen("php://temp", "r+");
++fwrite($fp, str_repeat("A", 6));
++rewind($fp);
++stream_filter_append($fp, "convert.base64-encode", STREAM_FILTER_READ, $opts);
++$out = stream_get_contents($fp);
++fclose($fp);
++
++// base64("AAAAAA") = "QUFBQUFB" (8 chars)
++// With line-length=4: "QUFB" + "\0X" + "QUFB"
++// Hex: 5155464200585155 4642
++echo bin2hex($out), "\n";
++
++echo "Done\n";
++
++?>
++--EXPECT--
++51554642005851554642
++Done
+--- a/ext/standard/tests/http/bug61548.phpt
++++ b/ext/standard/tests/http/bug61548.phpt
+@@ -55,7 +55,6 @@
+ First:1
+ Second:2
+ 
+-
+ POST / HTTP/1.0
+ Host: 127.0.0.1:12342
+ Connection: close
+@@ -68,7 +67,6 @@
+ Connection: close
+ First:1
+ Second:2
+-
+ 
+ POST / HTTP/1.0
+ Host: 127.0.0.1:12342
+--- a/ext/standard/tests/http/bug67430.phpt
++++ b/ext/standard/tests/http/bug67430.phpt
+@@ -41,7 +41,7 @@
+ Host: 127.0.0.1:12342
+ Connection: close
+ 
+-GET /foo HTTP/1.0
++POST /foo HTTP/1.0
+ Host: 127.0.0.1:12342
+ Connection: close
+ 
+--- /dev/null
++++ b/ext/standard/tests/http/gh11274.phpt
+@@ -0,0 +1,62 @@
++--TEST--
++GH-11274 (POST/PATCH request via file_get_contents + stream_context_create switches to GET after a HTTP 308 redirect)
++--INI--
++allow_url_fopen=1
++--CONFLICTS--
++server
++--FILE--
++<?php
++$serverCode = <<<'CODE'
++$uri = $_SERVER['REQUEST_URI'];
++if (isset($_GET["desired_status"]) && $uri[strlen($uri) - 1] !== '/') {
++    $desired_status = (int) $_GET["desired_status"];
++    http_response_code($desired_status);
++    header("Location: $uri/");
++    exit;
++}
++
++echo "method: ", $_SERVER['REQUEST_METHOD'], "; body: ", file_get_contents('php://input'), "\n";
++CODE;
++
++include __DIR__."/../../../../sapi/cli/tests/php_cli_server.inc";
++php_cli_server_start($serverCode, null);
++
++foreach ([null, 301, 302, 307, 308] as $status) {
++    if (is_null($status)) {
++        echo "-- Testing unredirected request --\n";
++    } else {
++        echo "-- Testing redirect status code $status --\n";
++    }
++    $suffix = $status ? "?desired_status=$status" : "";
++    echo file_get_contents("http://" . PHP_CLI_SERVER_ADDRESS . "/test$suffix", false, stream_context_create(['http' => ['method' => 'POST', 'header' => 'Content-type: application/x-www-form-urlencoded', 'content' => http_build_query(['hello' => 'world'])]]));
++    echo file_get_contents("http://" . PHP_CLI_SERVER_ADDRESS . "/test$suffix", false, stream_context_create(['http' => ['method' => 'PATCH', 'header' => 'Content-type: application/x-www-form-urlencoded', 'content' => http_build_query(['hello' => 'world'])]]));
++    echo file_get_contents("http://" . PHP_CLI_SERVER_ADDRESS . "/test/$suffix", false, stream_context_create(['http' => ['method' => 'POST', 'header' => 'Content-type: application/x-www-form-urlencoded', 'content' => http_build_query(['hello' => 'world'])]]));
++    echo file_get_contents("http://" . PHP_CLI_SERVER_ADDRESS . "/test/$suffix", false, stream_context_create(['http' => ['method' => 'PATCH', 'header' => 'Content-type: application/x-www-form-urlencoded', 'content' => http_build_query(['hello' => 'world'])]]));
++}
++?>
++--EXPECT--
++-- Testing unredirected request --
++method: POST; body: hello=world
++method: PATCH; body: hello=world
++method: POST; body: hello=world
++method: PATCH; body: hello=world
++-- Testing redirect status code 301 --
++method: GET; body: 
++method: GET; body: 
++method: GET; body: 
++method: GET; body: 
++-- Testing redirect status code 302 --
++method: GET; body: 
++method: GET; body: 
++method: GET; body: 
++method: GET; body: 
++-- Testing redirect status code 307 --
++method: POST; body: hello=world
++method: PATCH; body: hello=world
++method: POST; body: hello=world
++method: PATCH; body: hello=world
++-- Testing redirect status code 308 --
++method: POST; body: hello=world
++method: PATCH; body: hello=world
++method: POST; body: hello=world
++method: PATCH; body: hello=world
+--- /dev/null
++++ b/ext/standard/tests/http/ghsa-fpwc-w8rq-cr92.phpt
+@@ -0,0 +1,181 @@
++--TEST--
++GHSA-fpwc-w8rq-cr92: strip credentials from user headers on cross-origin redirect
++--INI--
++allow_url_fopen=1
++--SKIPIF--
++<?php require 'server.inc';
++  http_server_skipif('tcp://127.0.0.1:12342');
++  http_server_skipif('tcp://127.0.0.1:12343');
++  http_server_skipif('tcp://127.0.0.1:12344');
++  http_server_skipif('tcp://127.0.0.1:12345');
++  http_server_skipif('tcp://127.0.0.1:12346');
++  http_server_skipif('tcp://127.0.0.1:12347');
++  http_server_skipif('tcp://127.0.0.1:12348');
++?>
++--FILE--
++<?php
++require 'server.inc';
++
++function count_header($requests, $name) {
++    return preg_match_all('/^' . preg_quote($name, '/') . ':/mi', $requests);
++}
++
++function report($label, $requests) {
++    echo $label, "\n";
++    foreach (['Authorization', 'Cookie', 'Proxy-Authorization', 'X-Custom'] as $name) {
++        echo "  $name: ", count_header($requests, $name), "\n";
++    }
++}
++
++$ctx = stream_context_create(['http' => [
++    'header' => "Authorization: Bearer SECRET\r\n"
++        . "Cookie: sid=abc\r\n"
++        . "Proxy-Authorization: Basic Zm9vOmJhcg==\r\n"
++        . "X-Custom: keep-me",
++    'follow_location' => 1,
++]]);
++
++/* server B listens on a different port than server A, so the hop from A to B is
++ * cross-origin; B then redirects to itself: credentials must stay withheld for
++ * that same-origin hop too */
++$uriB = 'tcp://127.0.0.1:12342';
++$captureB = null;
++$pidB = http_server($uriB, [
++    "data://text/plain,HTTP/1.1 302 Found\r\nLocation: /second\r\nContent-Length: 0\r\n\r\n",
++    "data://text/plain,HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK",
++], $captureB);
++$uriB = preg_replace('#^tcp://#', 'http://', $uriB);
++
++$uriA = 'tcp://127.0.0.1:12343';
++$captureA = null;
++$pidA = http_server($uriA, [
++    "data://text/plain,HTTP/1.1 302 Found\r\nLocation: $uriB/first\r\nContent-Length: 0\r\n\r\n",
++], $captureA);
++$uriA = preg_replace('#^tcp://#', 'http://', $uriA);
++
++var_dump(file_get_contents($uriA . '/src', false, $ctx));
++
++http_server_kill($pidA);
++http_server_kill($pidB);
++
++rewind($captureA);
++rewind($captureB);
++report('--- origin A (1 request) ---', stream_get_contents($captureA));
++report('--- origin B (2 requests) ---', stream_get_contents($captureB));
++
++/* same origin throughout: credentials must be sent on both hops */
++$uriC = 'tcp://127.0.0.1:12344';
++$captureC = null;
++$pidC = http_server($uriC, [
++    "data://text/plain,HTTP/1.1 302 Found\r\nLocation: /next\r\nContent-Length: 0\r\n\r\n",
++    "data://text/plain,HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK",
++], $captureC);
++$uriC = preg_replace('#^tcp://#', 'http://', $uriC);
++
++var_dump(file_get_contents($uriC . '/first', false, $ctx));
++
++http_server_kill($pidC);
++
++rewind($captureC);
++report('--- origin C (2 requests) ---', stream_get_contents($captureC));
++
++/* a stripped header that was last in the bag must not leave a trailing line break
++ * behind, or the request body would be pushed out of the request */
++$ctx = stream_context_create(['http' => [
++    'method' => 'POST',
++    'content' => 'hello=world',
++    'header' => "X-Custom: keep-me\r\nAuthorization: Bearer SECRET",
++    'follow_location' => 1,
++]]);
++
++$uriH = 'tcp://127.0.0.1:12345';
++$captureH = null;
++$pidH = http_server($uriH, [
++    "data://text/plain,HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK",
++], $captureH);
++$uriH = preg_replace('#^tcp://#', 'http://', $uriH);
++
++$uriG = 'tcp://127.0.0.1:12346';
++$captureG = null;
++$pidG = http_server($uriG, [
++    "data://text/plain,HTTP/1.1 307 Temporary Redirect\r\nLocation: $uriH/second\r\nContent-Length: 0\r\n\r\n",
++], $captureG);
++$uriG = preg_replace('#^tcp://#', 'http://', $uriG);
++
++var_dump(@file_get_contents($uriG . '/first', false, $ctx));
++
++http_server_kill($pidG);
++http_server_kill($pidH);
++
++rewind($captureH);
++echo "--- credential header last in the bag (307) ---\n";
++echo preg_replace('/^Host:.*$/m', 'Host: ...', stream_get_contents($captureH));
++
++echo "--- malformed header bags ---\n";
++foreach ([
++    'folded value      ' => "Authorization:\r\n Bearer SECRET\r\nX-Custom: keep-me",
++    'folded value (tab)' => "Authorization:\r\n\tBearer SECRET\r\nX-Custom: keep-me",
++    'lone CR           ' => "X-Custom: keep-me\rAuthorization: Bearer SECRET",
++    'space before colon' => "Authorization : Bearer SECRET\r\nX-Custom: keep-me",
++    'tab before colon  ' => "Authorization\t: Bearer SECRET\r\nX-Custom: keep-me",
++] as $label => $header) {
++    $ctx = stream_context_create(['http' => ['header' => $header, 'follow_location' => 1]]);
++
++    $uriF = 'tcp://127.0.0.1:12347';
++    $captureF = null;
++    $pidF = http_server($uriF, [
++        "data://text/plain,HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK",
++    ], $captureF);
++    $uriF = preg_replace('#^tcp://#', 'http://', $uriF);
++
++    $uriE = 'tcp://127.0.0.1:12348';
++    $captureE = null;
++    $pidE = http_server($uriE, [
++        "data://text/plain,HTTP/1.1 302 Found\r\nLocation: $uriF/second\r\nContent-Length: 0\r\n\r\n",
++    ], $captureE);
++    $uriE = preg_replace('#^tcp://#', 'http://', $uriE);
++
++    file_get_contents($uriE . '/first', false, $ctx);
++
++    http_server_kill($pidE);
++    http_server_kill($pidF);
++
++    rewind($captureF);
++    $request = stream_get_contents($captureF);
++    printf("  %s  SECRET leaked: %d, X-Custom kept: %d\n", $label,
++        strpos($request, 'SECRET') !== false, strpos($request, 'X-Custom') !== false);
++}
++?>
++--EXPECT--
++string(2) "OK"
++--- origin A (1 request) ---
++  Authorization: 1
++  Cookie: 1
++  Proxy-Authorization: 1
++  X-Custom: 1
++--- origin B (2 requests) ---
++  Authorization: 0
++  Cookie: 0
++  Proxy-Authorization: 0
++  X-Custom: 2
++string(2) "OK"
++--- origin C (2 requests) ---
++  Authorization: 2
++  Cookie: 2
++  Proxy-Authorization: 2
++  X-Custom: 2
++string(2) "OK"
++--- credential header last in the bag (307) ---
++POST /second HTTP/1.0
++Host: ...
++Connection: close
++Content-Length: 11
++X-Custom: keep-me
++Content-Type: application/x-www-form-urlencoded
++
++hello=world--- malformed header bags ---
++  folded value        SECRET leaked: 0, X-Custom kept: 1
++  folded value (tab)  SECRET leaked: 0, X-Custom kept: 1
++  lone CR             SECRET leaked: 0, X-Custom kept: 1
++  space before colon  SECRET leaked: 0, X-Custom kept: 1
++  tab before colon    SECRET leaked: 0, X-Custom kept: 1
+--- /dev/null
++++ b/ext/standard/tests/http/http_empty_location_redirect.phpt
+@@ -0,0 +1,37 @@
++--TEST--
++Empty Location header must not over-read when building the redirect target
++--FILE--
++<?php
++$serverCode = <<<'CODE'
++$server = stream_socket_server("tcp://127.0.0.1:12342", $errno, $errstr);
++phpt_notify();
++
++for ($n = 0; $n < 4; $n++) {
++    $conn = stream_socket_accept($server, 10);
++    if (!$conn) {
++        break;
++    }
++    $req = fgets($conn);
++    while (trim(fgets($conn)) !== '') {}
++    $uri = explode(' ', $req)[1];
++    if ($n < 3) {
++        fwrite($conn, "HTTP/1.1 302 Found\r\nLocation:\r\nContent-Length: 0\r\n\r\n");
++    } else {
++        $body = "uri=$uri";
++        fwrite($conn, "HTTP/1.1 200 OK\r\nContent-Length: " . strlen($body) . "\r\n\r\n$body");
++    }
++    fclose($conn);
++}
++CODE;
++
++$clientCode = <<<'CODE'
++$ctx = stream_context_create(['http' => ['follow_location' => 1]]);
++phpt_wait();
++echo @file_get_contents("http://127.0.0.1:12342/a/b", false, $ctx), "\n";
++CODE;
++
++include sprintf("%s/../../../openssl/tests/ServerClientTestCase.inc", __DIR__);
++ServerClientTestCase::getInstance()->run($clientCode, $serverCode);
++?>
++--EXPECT--
++uri=/
+--- /dev/null
++++ b/ext/standard/tests/http/http_single_char_location_redirect.phpt
+@@ -0,0 +1,40 @@
++--TEST--
++Single-char relative Location header keeps resolving against the host root (pre-GH-23467 behavior)
++--DESCRIPTION--
++Not RFC 3986 compliant ("x" against "/a/b" gives "/a/x"), but matches
++PHP's long-standing behavior of resolving against the host root. See GH-23521.
++--FILE--
++<?php
++$serverCode = <<<'CODE'
++$server = stream_socket_server("tcp://127.0.0.1:12342", $errno, $errstr);
++phpt_notify();
++
++for ($n = 0; $n < 2; $n++) {
++    $conn = stream_socket_accept($server, 10);
++    if (!$conn) {
++        break;
++    }
++    $req = fgets($conn);
++    while (trim(fgets($conn)) !== '') {}
++    $uri = explode(' ', $req)[1];
++    if ($n < 1) {
++        fwrite($conn, "HTTP/1.1 302 Found\r\nLocation: x\r\nContent-Length: 0\r\n\r\n");
++    } else {
++        $body = "uri=$uri";
++        fwrite($conn, "HTTP/1.1 200 OK\r\nContent-Length: " . strlen($body) . "\r\n\r\n$body");
++    }
++    fclose($conn);
++}
++CODE;
++
++$clientCode = <<<'CODE'
++$ctx = stream_context_create(['http' => ['follow_location' => 1]]);
++phpt_wait();
++echo @file_get_contents("http://127.0.0.1:12342/a/b", false, $ctx), "\n";
++CODE;
++
++include sprintf("%s/../../../openssl/tests/ServerClientTestCase.inc", __DIR__);
++ServerClientTestCase::getInstance()->run($clientCode, $serverCode);
++?>
++--EXPECT--
++uri=/x
+--- a/sapi/fpm/fpm/fastcgi.c
++++ b/sapi/fpm/fpm/fastcgi.c
+@@ -786,7 +786,7 @@
+ 	if (client_sa.sa.sa_family == AF_INET6) {
+ 		for (i=0 ; allowed_clients[i].sa.sa_family ; i++) {
+ 			if (allowed_clients[i].sa.sa_family == AF_INET6
+-				&& !memcmp(&client_sa.sa_inet6.sin6_addr, &allowed_clients[i].sa_inet6.sin6_addr, 12)) {
++				&& !memcmp(&client_sa.sa_inet6.sin6_addr, &allowed_clients[i].sa_inet6.sin6_addr, sizeof(client_sa.sa_inet6.sin6_addr))) {
+ 				return 1;
+ 			}
+ #ifdef IN6_IS_ADDR_V4MAPPED
+--- /dev/null
++++ b/sapi/fpm/tests/ghsa-62xp-839h-2637-ipv6-allowed-clients.phpt
+@@ -0,0 +1,52 @@
++--TEST--
++GHSA-62xp-839h-2637: IPv6 allowed client compared on all 128 bits
++--SKIPIF--
++<?php
++include "skipif.inc";
++FPM\Tester::skipIfIPv6IsNotSupported();
++?>
++--FILE--
++<?php
++
++require_once "tester.inc";
++
++$cfg = <<<EOT
++[global]
++error_log = {{FILE:LOG}}
++[exact]
++listen = {{ADDR:IPv6:ANY[exact]}}
++listen.allowed_clients = ::1
++pm = static
++pm.max_children = 1
++[prefix]
++listen = {{ADDR:IPv6:ANY[prefix]}}
++listen.allowed_clients = ::dead:beef
++pm = static
++pm.max_children = 1
++catch_workers_output = yes
++EOT;
++
++$tester = new FPM\Tester($cfg);
++$tester->start();
++$tester->expectLogStartNotices();
++$tester->checkRequest('{{ADDR:IPv6[exact]}}', 'exact: ok', 'exact: error');
++$tester->checkRequest('{{ADDR:IPv6[prefix]}}', 'prefix: ok', 'prefix: error');
++$tester->terminate();
++$tester->expectLogWarning(
++    'child %d said into stderr: "ERROR: Connection disallowed: IP address \'::1\' has been dropped."',
++    'prefix'
++);
++$tester->expectLogTerminatingNotices();
++$tester->close();
++
++?>
++Done
++--EXPECT--
++exact: ok
++prefix: error
++Done
++--CLEAN--
++<?php
++require_once "tester.inc";
++FPM\Tester::clean();
++?>
+--- /dev/null
++++ b/sapi/fpm/tests/ghsa-62xp-839h-2637-v4mapped-allowed-clients.phpt
+@@ -0,0 +1,52 @@
++--TEST--
++GHSA-62xp-839h-2637: IPv4-mapped allowed client compared on all 128 bits
++--SKIPIF--
++<?php
++include "skipif.inc";
++FPM\Tester::skipIfIPv6IsNotSupported();
++?>
++--FILE--
++<?php
++
++require_once "tester.inc";
++
++$cfg = <<<EOT
++[global]
++error_log = {{FILE:LOG}}
++[exact]
++listen = {{ADDR:IPv6:ANY[exact]}}
++listen.allowed_clients = ::ffff:127.0.0.1
++pm = static
++pm.max_children = 1
++[prefix]
++listen = {{ADDR:IPv6:ANY[prefix]}}
++listen.allowed_clients = ::ffff:203.0.113.1
++pm = static
++pm.max_children = 1
++catch_workers_output = yes
++EOT;
++
++$tester = new FPM\Tester($cfg);
++$tester->start();
++$tester->expectLogStartNotices();
++$tester->checkRequest('{{ADDR:IPv4[exact]}}', 'exact: ok', 'exact: error');
++$tester->checkRequest('{{ADDR:IPv4[prefix]}}', 'prefix: ok', 'prefix: error');
++$tester->terminate();
++$tester->expectLogWarning(
++    'child %d said into stderr: "ERROR: Connection disallowed: IP address \'127.0.0.1\' has been dropped."',
++    'prefix'
++);
++$tester->expectLogTerminatingNotices();
++$tester->close();
++
++?>
++Done
++--EXPECT--
++exact: ok
++prefix: error
++Done
++--CLEAN--
++<?php
++require_once "tester.inc";
++FPM\Tester::clean();
++?>

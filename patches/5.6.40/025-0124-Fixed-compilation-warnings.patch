@@ -1,0 +1,25 @@
+Published-source: https://deb.freexian.com/extended-lts/pool/main/p/php5/php5_5.6.40%2Bdfsg-0%2Bdeb8u23.debian.tar.xz
+Published-patch: 0124-Fixed-compilation-warnings.patch
+
+From: Dmitry Stogov <dmitry@zend.com>
+Date: Tue, 22 Apr 2014 17:46:34 +0400
+Subject: Fixed compilation warnings
+
+Origin: https://github.com/php/php-src/commit/5864ce8a447b718d0912cb073afe87eddc47b2e8
+---
+ ext/libxml/libxml.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ext/libxml/libxml.c b/ext/libxml/libxml.c
+index 3fafde3..6d36011 100644
+--- a/ext/libxml/libxml.c
++++ b/ext/libxml/libxml.c
+@@ -500,7 +500,7 @@ static void _php_list_set_error_structure(xmlErrorPtr error, const char *msg)
+ 		error_copy.int1 = 0;
+ 		error_copy.int2 = 0;
+ 		error_copy.ctxt = NULL;
+-		error_copy.message = xmlStrdup(msg);
++		error_copy.message = (char*)xmlStrdup((xmlChar*)msg);
+ 		error_copy.file = NULL;
+ 		error_copy.str1 = NULL;
+ 		error_copy.str2 = NULL;

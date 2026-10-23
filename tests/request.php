@@ -1,5 +1,5 @@
 <?php
-/* Only served by the disposable test FPM pool. PHP 7.1-compatible syntax. */
+/* Only served by the disposable test FPM pool. */
 $earlyError = error_get_last();
 $action = isset($_GET['action']) ? $_GET['action'] : 'ping';
 $result = array('pid' => getmypid(), 'php' => PHP_VERSION, 'action' => $action);
@@ -51,6 +51,9 @@ if ($action === 'produce') {
 } elseif ($action === 'fields') {
     $result['post'] = $_POST;
     $result['limit'] = ini_get('max_multipart_body_parts');
+    $result['early_error'] = $earlyError;
+} elseif ($action === 'cookies') {
+    $result['cookies'] = $_COOKIE;
 }
 
 header('Content-Type: application/json');

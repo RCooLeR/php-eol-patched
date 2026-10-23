@@ -1,0 +1,82 @@
+# Extension map
+
+All eight build targets enable the extensions below. The optional installation sections in the shared [Dockerfile](Dockerfile) are enabled by default and have a start/end comment for each extension. [docker-bake.hcl](docker-bake.hcl) selects the base image and PHP release for each target.
+
+A check mark means the extension is included. It does not mean that the extension or its system libraries have complete security backport coverage; see [PATCHES.md](PATCHES.md).
+
+## PHP extensions
+
+| Extension | 5.6.40 | 7.0.33 | 7.1.33 | 7.2.34 | 7.3.33 | 7.4.33 | 8.0.30 | 8.1.34 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `Core` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `date` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `hash` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `libxml` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `mysqlnd` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `mysqli` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `PDO` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `pdo_mysql` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `openssl` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `pcre` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `Phar` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `Reflection` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `session` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `soap` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `SPL` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `standard` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `bcmath` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `ctype` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `curl` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `dom` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `exif` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `fileinfo` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `filter` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `gd` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `iconv` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `intl` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `json` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `mbstring` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `pdo_sqlite` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `SimpleXML` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `sockets` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `sqlite3` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `tokenizer` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `xml` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `xmlreader` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `xmlwriter` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `Zend OPcache` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `zip` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `zlib` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `ereg` | ✓ | — | — | — | — | — | — | — |
+| `apc` compatibility aliases | ✓ | — | — | — | — | — | — | — |
+
+`ereg` is part of PHP 5.6 and was removed in PHP 7. The PHP 5.6 `apc` module supplies APCu 4's compatibility aliases; it is not a separate APC package. JSON is built into PHP 8; earlier versions load it as an extension. GD includes JPEG, PNG and FreeType support. mysqli and PDO MySQL use mysqlnd. SQLite uses the system library.
+
+## PECL extensions
+
+Versions and download checksums are pinned in [extensions/pecl.tsv](extensions/pecl.tsv).
+
+| Extension | 5.6.40 | 7.0.33 | 7.1.33 | 7.2.34 | 7.3.33 | 7.4.33 | 8.0.30 | 8.1.34 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `redis` | 4.3.0 | 5.3.7 | 5.3.7 | 6.0.2 | 6.0.2 | 6.3.0 | 6.3.0 | 6.3.0 |
+| `apcu` | 4.0.11 | 5.1.28 | 5.1.28 | 5.1.28 | 5.1.28 | 5.1.28 | 5.1.28 | 5.1.28 |
+| `imagick` | 3.8.1 | 3.8.1 | 3.8.1 | 3.8.1 | 3.8.1 | 3.8.1 | 3.8.1 | 3.8.1 |
+| `memcached` | 2.2.0 | 3.4.0 | 3.4.0 | 3.4.0 | 3.4.0 | 3.4.0 | 3.4.0 | 3.4.0 |
+| `igbinary` | 2.0.8 | 3.2.16 | 3.2.16 | 3.2.16 | 3.2.16 | 3.2.16 | 3.2.16 | 3.2.16 |
+| `msgpack` | 0.5.7 (beta) | 3.0.1 | 3.0.1 | 3.0.1 | 3.0.1 | 3.0.1 | 3.0.1 | 3.0.1 |
+
+PHP 5.6 uses older compatible PECL releases. MessagePack 0.5.7 is marked beta by its publisher. These versions are included for compatibility and are not a claim of ongoing upstream security support.
+
+Redis and Memcached are client extensions; their servers are not included. The build enables their available igbinary/MessagePack serializers. Redis 4.3.0 does not provide its newer JSON/MessagePack serializer options. APCu is enabled for FPM; PHP's default disables its CLI cache. Imagick uses the distribution's ImageMagick libraries and policy. External format delegates such as Ghostscript are not included.
+
+## Inspect an image
+
+```sh
+docker buildx bake --load
+docker run --rm php-eol-patched:5.6.40 php -m
+docker run --rm php-eol-patched:8.1.34 php --ri redis
+```
+
+Replace the tag with any PHP release in the tables. Each image also contains its module list and PECL pins under `/usr/share/php-eol-patched/`. Tests compare loaded modules and PECL versions with this build profile and exercise extension functions through FPM.
+
+The runtime contains PHP and the libraries/data needed by these extensions. Composer, Node.js, database servers, mail tools, a shell, a package manager and a compiler are not included. `pcntl` and `posix` are available only in the test stage.

@@ -11,12 +11,16 @@ permissions:
 jobs:
   php:
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       max-parallel: 2
       matrix:
         include:
+          - target: php56
+            version: 5.6.40
+          - target: php70
+            version: 7.0.33
           - target: php71
             version: 7.1.33
           - target: php72

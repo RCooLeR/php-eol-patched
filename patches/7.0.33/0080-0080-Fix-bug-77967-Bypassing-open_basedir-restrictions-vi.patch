@@ -1,0 +1,32 @@
+Published-source: https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz
+Published-patch: 0080-Fix-bug-77967-Bypassing-open_basedir-restrictions-vi.patch
+Scope: selected PHP runtime components and their tests; packaging and unrelated extensions omitted.
+
+From: Stanislav Malyshev <stas@php.net>
+Date: Mon, 27 May 2019 18:04:00 -0700
+Subject: Fix bug #77967 - Bypassing open_basedir restrictions via file uris
+
+(cherry picked from commit c34895e837b50213c2bb201c612904342d2bd216)
+---
+ NEWS                  | 15 +++++++++------
+ ext/sqlite3/sqlite3.c |  9 +++++++++
+ 2 files changed, 18 insertions(+), 6 deletions(-)
+
+--- a/ext/sqlite3/sqlite3.c
++++ b/ext/sqlite3/sqlite3.c
+@@ -2054,6 +2054,15 @@ static int php_sqlite3_authorizer(void *autharg, int access_type, const char *ar
+ 				}
+ #endif
+ 
++				if (strncmp(arg3, "file:", 5) == 0) {
++					/* starts with "file:" */
++					if (!arg3[5]) {
++						return SQLITE_DENY;
++					}
++					if (php_check_open_basedir(arg3 + 5)) {
++						return SQLITE_DENY;
++					}
++				}
+ 				if (php_check_open_basedir(arg3)) {
+ 					return SQLITE_DENY;
+ 				}

@@ -6,6 +6,187 @@
   },
   "versions": [
     {
+      "version": "5.6.40",
+      "archive": "https://codeload.github.com/php/php-src/tar.gz/refs/tags/php-5.6.40",
+      "archive_sha256": "c38f1fbe990973aa8ce3fb77e07f2c5f623e72165c609a14629f2bdadfcd271f",
+      "retrieved": "2026-10-23",
+      "licenses": [
+        {
+          "path": "php-5.6.40/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-5.6.40/LICENSE",
+          "sha256": "fa5de16a10912b2f6ab46d07240412e19d757b1581b2ab2e90772fb45c8aff7d"
+        },
+        {
+          "path": "php-5.6.40/TSRM/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-5.6.40/TSRM/LICENSE",
+          "sha256": "fe97b8423e34199f7df3e65fd53c4df067a56ab6fe0f2296474ba7da0656460c"
+        },
+        {
+          "path": "php-5.6.40/Zend/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-5.6.40/Zend/LICENSE",
+          "sha256": "8d286e86ef7c19b210050eac33c97e0a43db161b06bdd1fc4f5afefd859cdbb2"
+        },
+        {
+          "path": "php-5.6.40/ext/bcmath/libbcmath/COPYING.LIB",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-5.6.40/ext/bcmath/libbcmath/COPYING.LIB",
+          "sha256": "5bbcbb737e60fe9deba08ecbd00920cfcc3403ba2e534c64fdeea49d6bb87509"
+        },
+        {
+          "path": "php-5.6.40/ext/date/lib/LICENSE.rst",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-5.6.40/ext/date/lib/LICENSE.rst",
+          "sha256": "138d2f7193c51c599f71485281370bf492c4b45f4c294cbf45aa17cb4e652350"
+        },
+        {
+          "path": "php-5.6.40/ext/ereg/regex/COPYRIGHT",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-5.6.40/ext/ereg/regex/COPYRIGHT",
+          "sha256": "7038d25c431199a638a8079c6cd4b65e6ed6c786c6bba42839e6d41c4acbc84a"
+        },
+        {
+          "path": "php-5.6.40/ext/fileinfo/libmagic/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-5.6.40/ext/fileinfo/libmagic/LICENSE",
+          "sha256": "6b813a2c7a62646fa9346c05b1145b01b2181227d06d46d464839995b98f2518"
+        },
+        {
+          "path": "php-5.6.40/ext/gd/libgd/COPYING",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-5.6.40/ext/gd/libgd/COPYING",
+          "sha256": "c82e49f43e064d75682bc393cb0a8c9f12e264d0217dd463517f586213efc195"
+        },
+        {
+          "path": "php-5.6.40/ext/mbstring/libmbfl/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-5.6.40/ext/mbstring/libmbfl/LICENSE",
+          "sha256": "eea173a556abac0370461e57e12aab266894ea6be3874c2be05fd87871f75449"
+        },
+        {
+          "path": "php-5.6.40/ext/mbstring/oniguruma/COPYING",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-5.6.40/ext/mbstring/oniguruma/COPYING",
+          "sha256": "0367dd7457d2499db8d1619ddd34223772d87f64d3db6aef9fab27753c0d0eda"
+        },
+        {
+          "path": "php-5.6.40/ext/pcre/pcrelib/COPYING",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-5.6.40/ext/pcre/pcrelib/COPYING",
+          "sha256": "17abe1dbb92b21ab173cf9757dd57b0b15cd8d863b2ccdef635fdbef03077fb0"
+        },
+        {
+          "path": "php-5.6.40/ext/pcre/pcrelib/LICENCE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-5.6.40/ext/pcre/pcrelib/LICENCE",
+          "sha256": "449113f28b34ee4731e548c341a2889efbbd522c73be850279bce7e8add86b95"
+        },
+        {
+          "path": "php-5.6.40/ext/phar/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-5.6.40/ext/phar/LICENSE",
+          "sha256": "054b6caf9745f33f1f33f9822285e9d359b2cff3bda3521ea3bc0ff19382c498"
+        },
+        {
+          "path": "php-5.6.40/ext/zip/LICENSE_libzip",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-5.6.40/ext/zip/LICENSE_libzip",
+          "sha256": "541eaec844746cdf91e48ba59cae80d62ffdec49778128463be3d55143088401"
+        },
+        {
+          "path": "php-5.6.40/sapi/fpm/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-5.6.40/sapi/fpm/LICENSE",
+          "sha256": "28b9b14401f49784efd2246b32f745c2cd998f4f425be677f29e02a33e68bfed"
+        }
+      ],
+      "notices": 480,
+      "notice_bytes": 643753,
+      "source_notices": {
+        "path": "php-5.6.40/SOURCE-NOTICES.txt",
+        "notices": 480,
+        "notice_bytes": 643753,
+        "sha256": "03476ed9b64e9fce93289b428a015a3fa39f1476166c4e0e3b71c4ace4601eef",
+        "source_files": 1088
+      },
+      "notice_source_archives_verified": "2026-10-23"
+    },
+    {
+      "version": "7.0.33",
+      "archive": "https://codeload.github.com/php/php-src/tar.gz/refs/tags/php-7.0.33",
+      "archive_sha256": "d89bfb1dd0c13aab33b81f4dd278cbea3274299fc49acd600ef42b8bee7b3612",
+      "retrieved": "2026-10-23",
+      "licenses": [
+        {
+          "path": "php-7.0.33/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.0.33/LICENSE",
+          "sha256": "a44951f93b10c87c3f7cd9f311d95999c57c95ed950eec32b14c1c7ea6baf25e"
+        },
+        {
+          "path": "php-7.0.33/TSRM/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.0.33/TSRM/LICENSE",
+          "sha256": "fe97b8423e34199f7df3e65fd53c4df067a56ab6fe0f2296474ba7da0656460c"
+        },
+        {
+          "path": "php-7.0.33/Zend/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.0.33/Zend/LICENSE",
+          "sha256": "8d286e86ef7c19b210050eac33c97e0a43db161b06bdd1fc4f5afefd859cdbb2"
+        },
+        {
+          "path": "php-7.0.33/ext/bcmath/libbcmath/COPYING.LIB",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.0.33/ext/bcmath/libbcmath/COPYING.LIB",
+          "sha256": "5bbcbb737e60fe9deba08ecbd00920cfcc3403ba2e534c64fdeea49d6bb87509"
+        },
+        {
+          "path": "php-7.0.33/ext/date/lib/LICENSE.rst",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.0.33/ext/date/lib/LICENSE.rst",
+          "sha256": "138d2f7193c51c599f71485281370bf492c4b45f4c294cbf45aa17cb4e652350"
+        },
+        {
+          "path": "php-7.0.33/ext/fileinfo/libmagic/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.0.33/ext/fileinfo/libmagic/LICENSE",
+          "sha256": "6b813a2c7a62646fa9346c05b1145b01b2181227d06d46d464839995b98f2518"
+        },
+        {
+          "path": "php-7.0.33/ext/gd/libgd/COPYING",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.0.33/ext/gd/libgd/COPYING",
+          "sha256": "c82e49f43e064d75682bc393cb0a8c9f12e264d0217dd463517f586213efc195"
+        },
+        {
+          "path": "php-7.0.33/ext/mbstring/libmbfl/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.0.33/ext/mbstring/libmbfl/LICENSE",
+          "sha256": "eea173a556abac0370461e57e12aab266894ea6be3874c2be05fd87871f75449"
+        },
+        {
+          "path": "php-7.0.33/ext/mbstring/oniguruma/COPYING",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.0.33/ext/mbstring/oniguruma/COPYING",
+          "sha256": "0367dd7457d2499db8d1619ddd34223772d87f64d3db6aef9fab27753c0d0eda"
+        },
+        {
+          "path": "php-7.0.33/ext/pcre/pcrelib/COPYING",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.0.33/ext/pcre/pcrelib/COPYING",
+          "sha256": "17abe1dbb92b21ab173cf9757dd57b0b15cd8d863b2ccdef635fdbef03077fb0"
+        },
+        {
+          "path": "php-7.0.33/ext/pcre/pcrelib/LICENCE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.0.33/ext/pcre/pcrelib/LICENCE",
+          "sha256": "449113f28b34ee4731e548c341a2889efbbd522c73be850279bce7e8add86b95"
+        },
+        {
+          "path": "php-7.0.33/ext/phar/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.0.33/ext/phar/LICENSE",
+          "sha256": "054b6caf9745f33f1f33f9822285e9d359b2cff3bda3521ea3bc0ff19382c498"
+        },
+        {
+          "path": "php-7.0.33/ext/zip/LICENSE_libzip",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.0.33/ext/zip/LICENSE_libzip",
+          "sha256": "c9d4f8b71c6ed6f9b19b5e6fc0a7247cd5239a2c14e1de78ec4a3754f4854f32"
+        },
+        {
+          "path": "php-7.0.33/sapi/fpm/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.0.33/sapi/fpm/LICENSE",
+          "sha256": "28b9b14401f49784efd2246b32f745c2cd998f4f425be677f29e02a33e68bfed"
+        }
+      ],
+      "notices": 492,
+      "notice_bytes": 671919,
+      "source_notices": {
+        "path": "php-7.0.33/SOURCE-NOTICES.txt",
+        "notices": 492,
+        "notice_bytes": 671919,
+        "sha256": "01aa82ad3d6b7a8fb108d371bb0f4ca05f9f414f111ce650ee40c918fad0f035",
+        "source_files": 1129
+      },
+      "notice_source_archives_verified": "2026-10-23"
+    },
+    {
       "version": "7.1.33",
       "archive": "https://codeload.github.com/php/php-src/tar.gz/refs/tags/php-7.1.33",
       "archive_sha256": "f80a795a09328a9441bae4a8a60fa0d6d43ec5adc98f5aa5f51d06f4522c07fe",
@@ -28,9 +209,34 @@
           "sha256": "509aeb3be64e428d7e0004ce224620ab01bf94adaacefbb449611939df56bc5b"
         },
         {
+          "path": "php-7.1.33/ext/bcmath/libbcmath/COPYING.LIB",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.1.33/ext/bcmath/libbcmath/COPYING.LIB",
+          "sha256": "794d42bb61efc31014df323e828af910c1473664885ce76b4bb9c4c4638718c5"
+        },
+        {
           "path": "php-7.1.33/ext/date/lib/LICENSE.rst",
           "source": "https://raw.githubusercontent.com/php/php-src/php-7.1.33/ext/date/lib/LICENSE.rst",
           "sha256": "138d2f7193c51c599f71485281370bf492c4b45f4c294cbf45aa17cb4e652350"
+        },
+        {
+          "path": "php-7.1.33/ext/fileinfo/libmagic/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.1.33/ext/fileinfo/libmagic/LICENSE",
+          "sha256": "6b813a2c7a62646fa9346c05b1145b01b2181227d06d46d464839995b98f2518"
+        },
+        {
+          "path": "php-7.1.33/ext/gd/libgd/COPYING",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.1.33/ext/gd/libgd/COPYING",
+          "sha256": "c82e49f43e064d75682bc393cb0a8c9f12e264d0217dd463517f586213efc195"
+        },
+        {
+          "path": "php-7.1.33/ext/mbstring/libmbfl/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.1.33/ext/mbstring/libmbfl/LICENSE",
+          "sha256": "c38856d04dc924d23f8d18b83238c3d56c44a5ada7d33fc4e185a9430078c8da"
+        },
+        {
+          "path": "php-7.1.33/ext/mbstring/oniguruma/COPYING",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.1.33/ext/mbstring/oniguruma/COPYING",
+          "sha256": "0367dd7457d2499db8d1619ddd34223772d87f64d3db6aef9fab27753c0d0eda"
         },
         {
           "path": "php-7.1.33/ext/pcre/pcrelib/COPYING",
@@ -48,11 +254,24 @@
           "sha256": "2d953a25bd32a888eedbd959bb6397994e13f579fe21a4d7edfb8b51e82f397c"
         },
         {
+          "path": "php-7.1.33/ext/zip/LICENSE_libzip",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.1.33/ext/zip/LICENSE_libzip",
+          "sha256": "c9d4f8b71c6ed6f9b19b5e6fc0a7247cd5239a2c14e1de78ec4a3754f4854f32"
+        },
+        {
           "path": "php-7.1.33/sapi/fpm/LICENSE",
           "source": "https://raw.githubusercontent.com/php/php-src/php-7.1.33/sapi/fpm/LICENSE",
           "sha256": "28b9b14401f49784efd2246b32f745c2cd998f4f425be677f29e02a33e68bfed"
         }
-      ]
+      ],
+      "extension_source_notices": {
+        "path": "php-7.1.33/EXTENSION-SOURCE-NOTICES.txt",
+        "notices": 266,
+        "notice_bytes": 375643,
+        "sha256": "d78cb98dccff3547d0cd2df70197a9b618ee790d407061a6f5887d7b870e5aa9",
+        "source_files": 593
+      },
+      "notice_source_archives_verified": "2026-10-23"
     },
     {
       "version": "7.2.34",
@@ -77,9 +296,34 @@
           "sha256": "509aeb3be64e428d7e0004ce224620ab01bf94adaacefbb449611939df56bc5b"
         },
         {
+          "path": "php-7.2.34/ext/bcmath/libbcmath/COPYING.LIB",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.2.34/ext/bcmath/libbcmath/COPYING.LIB",
+          "sha256": "794d42bb61efc31014df323e828af910c1473664885ce76b4bb9c4c4638718c5"
+        },
+        {
           "path": "php-7.2.34/ext/date/lib/LICENSE.rst",
           "source": "https://raw.githubusercontent.com/php/php-src/php-7.2.34/ext/date/lib/LICENSE.rst",
           "sha256": "06978e8ec0a3845f921e9f84707de2bf2360f75d86541a3ee446a7ed826bb737"
+        },
+        {
+          "path": "php-7.2.34/ext/fileinfo/libmagic/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.2.34/ext/fileinfo/libmagic/LICENSE",
+          "sha256": "6b813a2c7a62646fa9346c05b1145b01b2181227d06d46d464839995b98f2518"
+        },
+        {
+          "path": "php-7.2.34/ext/gd/libgd/COPYING",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.2.34/ext/gd/libgd/COPYING",
+          "sha256": "c82e49f43e064d75682bc393cb0a8c9f12e264d0217dd463517f586213efc195"
+        },
+        {
+          "path": "php-7.2.34/ext/mbstring/libmbfl/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.2.34/ext/mbstring/libmbfl/LICENSE",
+          "sha256": "c38856d04dc924d23f8d18b83238c3d56c44a5ada7d33fc4e185a9430078c8da"
+        },
+        {
+          "path": "php-7.2.34/ext/mbstring/oniguruma/COPYING",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.2.34/ext/mbstring/oniguruma/COPYING",
+          "sha256": "b7255f7a573bb9319aa04071de41a0f5daf33c3d545b9301c484841587730aec"
         },
         {
           "path": "php-7.2.34/ext/pcre/pcrelib/COPYING",
@@ -97,11 +341,24 @@
           "sha256": "2d953a25bd32a888eedbd959bb6397994e13f579fe21a4d7edfb8b51e82f397c"
         },
         {
+          "path": "php-7.2.34/ext/zip/LICENSE_libzip",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.2.34/ext/zip/LICENSE_libzip",
+          "sha256": "c9d4f8b71c6ed6f9b19b5e6fc0a7247cd5239a2c14e1de78ec4a3754f4854f32"
+        },
+        {
           "path": "php-7.2.34/sapi/fpm/LICENSE",
           "source": "https://raw.githubusercontent.com/php/php-src/php-7.2.34/sapi/fpm/LICENSE",
           "sha256": "28b9b14401f49784efd2246b32f745c2cd998f4f425be677f29e02a33e68bfed"
         }
-      ]
+      ],
+      "extension_source_notices": {
+        "path": "php-7.2.34/EXTENSION-SOURCE-NOTICES.txt",
+        "notices": 271,
+        "notice_bytes": 381905,
+        "sha256": "b5d04f8312e2b251eff06b9ed61972a3bd9bcc7ec22723bd5e2b9e7120e70ccd",
+        "source_files": 595
+      },
+      "notice_source_archives_verified": "2026-10-23"
     },
     {
       "version": "7.3.33",
@@ -126,16 +383,54 @@
           "sha256": "509aeb3be64e428d7e0004ce224620ab01bf94adaacefbb449611939df56bc5b"
         },
         {
+          "path": "php-7.3.33/ext/bcmath/libbcmath/COPYING.LIB",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.3.33/ext/bcmath/libbcmath/COPYING.LIB",
+          "sha256": "794d42bb61efc31014df323e828af910c1473664885ce76b4bb9c4c4638718c5"
+        },
+        {
           "path": "php-7.3.33/ext/date/lib/LICENSE.rst",
           "source": "https://raw.githubusercontent.com/php/php-src/php-7.3.33/ext/date/lib/LICENSE.rst",
           "sha256": "45a3fab7d2821ff6e6c1f133ea7745c0b92a49ea86337948de933b442efd1dc3"
+        },
+        {
+          "path": "php-7.3.33/ext/fileinfo/libmagic/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.3.33/ext/fileinfo/libmagic/LICENSE",
+          "sha256": "6b813a2c7a62646fa9346c05b1145b01b2181227d06d46d464839995b98f2518"
+        },
+        {
+          "path": "php-7.3.33/ext/gd/libgd/COPYING",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.3.33/ext/gd/libgd/COPYING",
+          "sha256": "c82e49f43e064d75682bc393cb0a8c9f12e264d0217dd463517f586213efc195"
+        },
+        {
+          "path": "php-7.3.33/ext/mbstring/libmbfl/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.3.33/ext/mbstring/libmbfl/LICENSE",
+          "sha256": "c38856d04dc924d23f8d18b83238c3d56c44a5ada7d33fc4e185a9430078c8da"
+        },
+        {
+          "path": "php-7.3.33/ext/mbstring/oniguruma/COPYING",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.3.33/ext/mbstring/oniguruma/COPYING",
+          "sha256": "ae266a1ad1c2ef50baf14a1a2993e926cd46d09c6cc8b0b3a8498e44da2746b8"
+        },
+        {
+          "path": "php-7.3.33/ext/zip/LICENSE_libzip",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.3.33/ext/zip/LICENSE_libzip",
+          "sha256": "c9d4f8b71c6ed6f9b19b5e6fc0a7247cd5239a2c14e1de78ec4a3754f4854f32"
         },
         {
           "path": "php-7.3.33/sapi/fpm/LICENSE",
           "source": "https://raw.githubusercontent.com/php/php-src/php-7.3.33/sapi/fpm/LICENSE",
           "sha256": "28b9b14401f49784efd2246b32f745c2cd998f4f425be677f29e02a33e68bfed"
         }
-      ]
+      ],
+      "extension_source_notices": {
+        "path": "php-7.3.33/EXTENSION-SOURCE-NOTICES.txt",
+        "notices": 266,
+        "notice_bytes": 377629,
+        "sha256": "e6cb28c8663eacfbd6aab9dce951cfcc819d3dbe7a45f8d9d0b9b50d1694b695",
+        "source_files": 597
+      },
+      "notice_source_archives_verified": "2026-10-23"
     },
     {
       "version": "7.4.33",
@@ -160,16 +455,39 @@
           "sha256": "509aeb3be64e428d7e0004ce224620ab01bf94adaacefbb449611939df56bc5b"
         },
         {
+          "path": "php-7.4.33/ext/bcmath/libbcmath/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.4.33/ext/bcmath/libbcmath/LICENSE",
+          "sha256": "7586d794d062a2a4a16513d95358aecaee4450e2062f7e64ce5ce63ac7212fd6"
+        },
+        {
           "path": "php-7.4.33/ext/date/lib/LICENSE.rst",
           "source": "https://raw.githubusercontent.com/php/php-src/php-7.4.33/ext/date/lib/LICENSE.rst",
           "sha256": "45a3fab7d2821ff6e6c1f133ea7745c0b92a49ea86337948de933b442efd1dc3"
+        },
+        {
+          "path": "php-7.4.33/ext/fileinfo/libmagic/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.4.33/ext/fileinfo/libmagic/LICENSE",
+          "sha256": "6b813a2c7a62646fa9346c05b1145b01b2181227d06d46d464839995b98f2518"
+        },
+        {
+          "path": "php-7.4.33/ext/mbstring/libmbfl/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-7.4.33/ext/mbstring/libmbfl/LICENSE",
+          "sha256": "31d9cadcc63c15b79fc59c70f043956104a34c75f23f0ac0ada53c1edfeb88ca"
         },
         {
           "path": "php-7.4.33/sapi/fpm/LICENSE",
           "source": "https://raw.githubusercontent.com/php/php-src/php-7.4.33/sapi/fpm/LICENSE",
           "sha256": "28b9b14401f49784efd2246b32f745c2cd998f4f425be677f29e02a33e68bfed"
         }
-      ]
+      ],
+      "extension_source_notices": {
+        "path": "php-7.4.33/EXTENSION-SOURCE-NOTICES.txt",
+        "notices": 149,
+        "notice_bytes": 186219,
+        "sha256": "33310880b2c3d0c2df10fb213fc66217fa8869a6df0c1ecd4959abab1050f326",
+        "source_files": 428
+      },
+      "notice_source_archives_verified": "2026-10-23"
     },
     {
       "version": "8.0.30",
@@ -194,16 +512,44 @@
           "sha256": "509aeb3be64e428d7e0004ce224620ab01bf94adaacefbb449611939df56bc5b"
         },
         {
+          "path": "php-8.0.30/ext/bcmath/libbcmath/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-8.0.30/ext/bcmath/libbcmath/LICENSE",
+          "sha256": "7586d794d062a2a4a16513d95358aecaee4450e2062f7e64ce5ce63ac7212fd6"
+        },
+        {
           "path": "php-8.0.30/ext/date/lib/LICENSE.rst",
           "source": "https://raw.githubusercontent.com/php/php-src/php-8.0.30/ext/date/lib/LICENSE.rst",
           "sha256": "45a3fab7d2821ff6e6c1f133ea7745c0b92a49ea86337948de933b442efd1dc3"
+        },
+        {
+          "path": "php-8.0.30/ext/fileinfo/libmagic/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-8.0.30/ext/fileinfo/libmagic/LICENSE",
+          "sha256": "6b813a2c7a62646fa9346c05b1145b01b2181227d06d46d464839995b98f2518"
+        },
+        {
+          "path": "php-8.0.30/ext/mbstring/libmbfl/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-8.0.30/ext/mbstring/libmbfl/LICENSE",
+          "sha256": "31d9cadcc63c15b79fc59c70f043956104a34c75f23f0ac0ada53c1edfeb88ca"
+        },
+        {
+          "path": "php-8.0.30/ext/opcache/jit/libudis86/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-8.0.30/ext/opcache/jit/libudis86/LICENSE",
+          "sha256": "1070640aab24327354da44507627d1db6c67482a6facc8375a758796a05e3dff"
         },
         {
           "path": "php-8.0.30/sapi/fpm/LICENSE",
           "source": "https://raw.githubusercontent.com/php/php-src/php-8.0.30/sapi/fpm/LICENSE",
           "sha256": "28b9b14401f49784efd2246b32f745c2cd998f4f425be677f29e02a33e68bfed"
         }
-      ]
+      ],
+      "extension_source_notices": {
+        "path": "php-8.0.30/EXTENSION-SOURCE-NOTICES.txt",
+        "notices": 180,
+        "notice_bytes": 207400,
+        "sha256": "860b2ead28b8d9fb8bd56bc14f7d8c6ef48f5af8ead237f672bce539afda7106",
+        "source_files": 457
+      },
+      "notice_source_archives_verified": "2026-10-23"
     },
     {
       "version": "8.1.34",
@@ -233,9 +579,19 @@
           "sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566"
         },
         {
+          "path": "php-8.1.34/ext/bcmath/libbcmath/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-8.1.34/ext/bcmath/libbcmath/LICENSE",
+          "sha256": "7586d794d062a2a4a16513d95358aecaee4450e2062f7e64ce5ce63ac7212fd6"
+        },
+        {
           "path": "php-8.1.34/ext/date/lib/LICENSE.rst",
           "source": "https://raw.githubusercontent.com/php/php-src/php-8.1.34/ext/date/lib/LICENSE.rst",
           "sha256": "2120d029e7c67b9d08c1f665f1c3ed581206f00970b664cccdebe1419bf566e9"
+        },
+        {
+          "path": "php-8.1.34/ext/fileinfo/libmagic/LICENSE",
+          "source": "https://raw.githubusercontent.com/php/php-src/php-8.1.34/ext/fileinfo/libmagic/LICENSE",
+          "sha256": "6b813a2c7a62646fa9346c05b1145b01b2181227d06d46d464839995b98f2518"
         },
         {
           "path": "php-8.1.34/ext/mbstring/libmbfl/LICENSE",
@@ -252,7 +608,70 @@
           "source": "https://raw.githubusercontent.com/php/php-src/php-8.1.34/sapi/fpm/LICENSE",
           "sha256": "28b9b14401f49784efd2246b32f745c2cd998f4f425be677f29e02a33e68bfed"
         }
-      ]
+      ],
+      "extension_source_notices": {
+        "path": "php-8.1.34/EXTENSION-SOURCE-NOTICES.txt",
+        "notices": 101,
+        "notice_bytes": 100383,
+        "sha256": "9dc8fb77fd4edc0ec68ce3d87fdc6deb3022c93154707004cc25354960b166a5",
+        "source_files": 175
+      },
+      "notice_source_archives_verified": "2026-10-23"
     }
-  ]
+  ],
+  "expanded_extensions_retrieved": "2026-10-23",
+  "expanded_notice_scope": {
+    "source_roots": [
+      "TSRM/",
+      "Zend/",
+      "main/",
+      "sapi/cli/",
+      "sapi/fpm/",
+      "ext/standard/",
+      "ext/date/",
+      "ext/hash/",
+      "ext/pcre/",
+      "ext/phar/",
+      "ext/session/",
+      "ext/soap/",
+      "ext/openssl/",
+      "ext/mysqlnd/",
+      "ext/mysqli/",
+      "ext/pdo/",
+      "ext/pdo_mysql/",
+      "ext/libxml/",
+      "ext/reflection/",
+      "ext/spl/",
+      "ext/ereg/",
+      "ext/gd/",
+      "ext/intl/",
+      "ext/curl/",
+      "ext/zip/",
+      "ext/bcmath/",
+      "ext/mbstring/",
+      "ext/xml/",
+      "ext/dom/",
+      "ext/simplexml/",
+      "ext/xmlreader/",
+      "ext/xmlwriter/",
+      "ext/ctype/",
+      "ext/fileinfo/",
+      "ext/filter/",
+      "ext/iconv/",
+      "ext/tokenizer/",
+      "ext/opcache/",
+      "ext/exif/",
+      "ext/sockets/",
+      "ext/json/",
+      "ext/sqlite3/",
+      "ext/pdo_sqlite/",
+      "ext/zlib/"
+    ],
+    "excluded_bundled_sqlite_sources": [
+      "ext/sqlite3/libsqlite/",
+      "ext/pdo_sqlite/sqlite/"
+    ],
+    "libzip": "Bundled source notices are retained where present in the PHP source archive; the build may use external libzip.",
+    "existing_notice_files": "Existing SOURCE-NOTICES.txt and original license files are unchanged; additional notices are in EXTENSION-SOURCE-NOTICES.txt."
+  }
 }

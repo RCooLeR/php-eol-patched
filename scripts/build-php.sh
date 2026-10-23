@@ -14,12 +14,15 @@ args=(
   --enable-mysqlnd --with-mysqli=mysqlnd --enable-pdo --with-pdo-mysql=mysqlnd
 )
 case "$version" in
-  7.1.33|7.2.34|7.3.33) args+=(--enable-libxml --enable-hash --disable-opcache) ;;
+  5.6.40|7.0.33|7.1.33|7.2.34|7.3.33) args+=(--enable-libxml --enable-hash --disable-opcache) ;;
   7.4.33|8.0.30) args+=(--with-libxml --disable-opcache) ;;
   8.1.34) args+=(--with-libxml --enable-exif --enable-mbstring --enable-opcache --with-zlib) ;;
   *) printf 'Unsupported PHP release: %s\n' "$version" >&2; exit 2 ;;
 esac
 export CFLAGS="${PHP_CFLAGS:-}" CPPFLAGS="${PHP_CPPFLAGS:-}" LDFLAGS="${PHP_LDFLAGS:-}"
+if [[ "$version" == 5.6.40 ]]; then
+  ./buildconf --force
+fi
 ./configure "${args[@]}"
 make -j"${BUILD_JOBS:-2}"
 # The builder's original extension modules are not part of this build.

@@ -1,0 +1,1855 @@
+Copyright and license notices from PHP 8.1.34.
+Selected runtime source components only. Original wording is retained.
+Full source: https://codeload.github.com/php/php-src/tar.gz/refs/tags/php-8.1.34
+
+Files: Zend/zend_ini_parser.y
+/*
+   +----------------------------------------------------------------------+
+   | Zend Engine                                                          |
+   +----------------------------------------------------------------------+
+   | Copyright (c) Zend Technologies Ltd. (http://www.zend.com)           |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 2.00 of the Zend license,     |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | http://www.zend.com/license/2_00.txt.                                |
+   | If you did not receive a copy of the Zend license and are unable to  |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@zend.com so we can mail you a copy immediately.              |
+   +----------------------------------------------------------------------+
+   | Authors: Zeev Suraski <zeev@php.net>                                 |
+   |          Jani Taskinen <jani@php.net>                                |
+   +----------------------------------------------------------------------+
+*/
+
+Files: Zend/zend_ini_scanner.l
+/*
+   +----------------------------------------------------------------------+
+   | Zend Engine                                                          |
+   +----------------------------------------------------------------------+
+   | Copyright (c) Zend Technologies Ltd. (http://www.zend.com)           |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 2.00 of the Zend license,     |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | http://www.zend.com/license/2_00.txt.                                |
+   | If you did not receive a copy of the Zend license and are unable to  |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@zend.com so we can mail you a copy immediately.              |
+   +----------------------------------------------------------------------+
+   | Authors: Zeev Suraski <zeev@php.net>                                 |
+   |          Jani Taskinen <jani@php.net>                                |
+   |          Marcus Boerger <helly@php.net>                              |
+   |          Nuno Lopes <nlopess@php.net>                                |
+   |          Scott MacVicar <scottmac@php.net>                           |
+   +----------------------------------------------------------------------+
+*/
+
+Files: Zend/zend_language_parser.y
+/*
+   +----------------------------------------------------------------------+
+   | Zend Engine                                                          |
+   +----------------------------------------------------------------------+
+   | Copyright (c) Zend Technologies Ltd. (http://www.zend.com)           |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 2.00 of the Zend license,     |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | http://www.zend.com/license/2_00.txt.                                |
+   | If you did not receive a copy of the Zend license and are unable to  |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@zend.com so we can mail you a copy immediately.              |
+   +----------------------------------------------------------------------+
+   | Authors: Andi Gutmans <andi@php.net>                                 |
+   |          Zeev Suraski <zeev@php.net>                                 |
+   |          Nikita Popov <nikic@php.net>                                |
+   +----------------------------------------------------------------------+
+*/
+
+Files: Zend/zend_language_scanner.l
+/*
+   +----------------------------------------------------------------------+
+   | Zend Engine                                                          |
+   +----------------------------------------------------------------------+
+   | Copyright (c) Zend Technologies Ltd. (http://www.zend.com)           |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 2.00 of the Zend license,     |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | http://www.zend.com/license/2_00.txt.                                |
+   | If you did not receive a copy of the Zend license and are unable to  |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@zend.com so we can mail you a copy immediately.              |
+   +----------------------------------------------------------------------+
+   | Authors: Marcus Boerger <helly@php.net>                              |
+   |          Nuno Lopes <nlopess@php.net>                                |
+   |          Scott MacVicar <scottmac@php.net>                           |
+   | Flex version authors:                                                |
+   |          Andi Gutmans <andi@php.net>                                 |
+   |          Zeev Suraski <zeev@php.net>                                 |
+   +----------------------------------------------------------------------+
+*/
+
+Files: ext/bcmath/bcmath.c, ext/bcmath/php_bcmath.h
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Author: Andi Gutmans <andi@php.net>                                  |
+   +----------------------------------------------------------------------+
+*/
+
+Files: ext/bcmath/libbcmath/src/add.c, ext/bcmath/libbcmath/src/bcmath.h, ext/bcmath/libbcmath/src/compare.c, ext/bcmath/libbcmath/src/debug.c, ext/bcmath/libbcmath/src/div.c, ext/bcmath/libbcmath/src/divmod.c, ext/bcmath/libbcmath/src/doaddsub.c, ext/bcmath/libbcmath/src/init.c, ext/bcmath/libbcmath/src/int2num.c, ext/bcmath/libbcmath/src/nearzero.c, ext/bcmath/libbcmath/src/neg.c, ext/bcmath/libbcmath/src/num2long.c, ext/bcmath/libbcmath/src/num2str.c, ext/bcmath/libbcmath/src/output.c, ext/bcmath/libbcmath/src/private.h, ext/bcmath/libbcmath/src/raise.c, ext/bcmath/libbcmath/src/raisemod.c, ext/bcmath/libbcmath/src/recmul.c, ext/bcmath/libbcmath/src/rmzero.c, ext/bcmath/libbcmath/src/sqrt.c, ext/bcmath/libbcmath/src/str2num.c, ext/bcmath/libbcmath/src/sub.c, ext/bcmath/libbcmath/src/zero.c
+/*
+    Copyright (C) 1991, 1992, 1993, 1994, 1997 Free Software Foundation, Inc.
+    Copyright (C) 2000 Philip A. Nelson
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.  (LICENSE)
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to:
+
+      The Free Software Foundation, Inc.
+      59 Temple Place, Suite 330
+      Boston, MA 02111-1307 USA.
+
+    You may contact the author by:
+       e-mail:  philnelson@acm.org
+      us-mail:  Philip A. Nelson
+                Computer Science Department, 9062
+                Western Washington University
+                Bellingham, WA 98226-9062
+
+*************************************************************************/
+
+Files: ext/ctype/ctype.c, ext/ctype/php_ctype.h
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Author: Hartmut Holzgraefe <hholzgra@php.net>                        |
+   +----------------------------------------------------------------------+
+ */
+
+Files: ext/curl/curl_file.c
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Author: Stanislav Malyshev <stas@php.net>                            |
+   +----------------------------------------------------------------------+
+ */
+
+Files: ext/curl/curl_private.h, ext/curl/php_curl.h
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Author: Sterling Hughes <sterling@php.net>                           |
+   |         Wez Furlong <wez@thebrainroom.com>                           |
+   +----------------------------------------------------------------------+
+*/
+
+Files: ext/curl/interface.c, ext/curl/multi.c
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Author: Sterling Hughes <sterling@php.net>                           |
+   +----------------------------------------------------------------------+
+*/
+
+Files: ext/curl/share.c
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Author: Pierrick Charron <pierrick@php.net>                          |
+   +----------------------------------------------------------------------+
+*/
+
+Files: ext/date/lib/parse_date.re
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2015-2019 Derick Rethans
+ * Copyright (c) 2018 MongoDB, Inc.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+Files: ext/date/lib/parse_iso_intervals.re
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2015-2019 Derick Rethans
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+Files: ext/dom/attr.c, ext/dom/cdatasection.c, ext/dom/characterdata.c, ext/dom/comment.c, ext/dom/document.c, ext/dom/documentfragment.c, ext/dom/documenttype.c, ext/dom/dom_ce.h, ext/dom/dom_iterators.c, ext/dom/dom_properties.h, ext/dom/domexception.c, ext/dom/domexception.h, ext/dom/domimplementation.c, ext/dom/element.c, ext/dom/entity.c, ext/dom/entityreference.c, ext/dom/namednodemap.c, ext/dom/node.c, ext/dom/nodelist.c, ext/dom/notation.c, ext/dom/processinginstruction.c, ext/dom/text.c, ext/dom/xpath.c
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Authors: Christian Stocker <chregu@php.net>                          |
+   |          Rob Richards <rrichards@php.net>                            |
+   +----------------------------------------------------------------------+
+*/
+
+Files: ext/dom/parentnode.c
+/*
+   +----------------------------------------------------------------------+
+   | PHP Version 7                                                        |
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Authors: Benjamin Eberlei <beberlei@php.net>                         |
+   +----------------------------------------------------------------------+
+*/
+
+Files: ext/dom/php_dom.c
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Authors: Christian Stocker <chregu@php.net>                          |
+   |          Rob Richards <rrichards@php.net>                            |
+   |          Marcus Borger <helly@php.net>                               |
+   +----------------------------------------------------------------------+
+*/
+
+Files: ext/dom/php_dom.h
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Authors: Christian Stocker <chregu@php.net>                          |
+   |          Rob Richards <rrichards@php.net>							  |
+   |          Marcus Borger <helly@php.net>                               |
+   +----------------------------------------------------------------------+
+*/
+
+Files: ext/dom/xml_common.h
+/*
+  +----------------------------------------------------------------------+
+  | Copyright (c) The PHP Group                                          |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | https://www.php.net/license/3_01.txt                                 |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Authors: Christian Stocker <chregu@php.net>                          |
+  |          Rob Richards <rrichards@php.net>                            |
+  +----------------------------------------------------------------------+
+*/
+
+Files: ext/fileinfo/fileinfo.c, ext/fileinfo/php_fileinfo.h
+/*
+  +----------------------------------------------------------------------+
+  | Copyright (c) The PHP Group                                          |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | https://www.php.net/license/3_01.txt                                 |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Author: Ilia Alshanetsky <ilia@php.net>                              |
+  +----------------------------------------------------------------------+
+*/
+
+Files: ext/fileinfo/libmagic/apprentice.c, ext/fileinfo/libmagic/ascmagic.c, ext/fileinfo/libmagic/compress.c, ext/fileinfo/libmagic/encoding.c, ext/fileinfo/libmagic/file.h, ext/fileinfo/libmagic/fsmagic.c, ext/fileinfo/libmagic/is_tar.c, ext/fileinfo/libmagic/print.c, ext/fileinfo/libmagic/softmagic.c, ext/fileinfo/libmagic/tar.h
+/*
+ * Copyright (c) Ian F. Darwin 1986-1995.
+ * Software written by Ian F. Darwin and others;
+ * maintained 1995-present by Christos Zoulas and others.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice immediately at the beginning of the file, without modification,
+ *    this list of conditions, and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+
+Files: ext/fileinfo/libmagic/apptype.c
+/*
+ * Adapted from: apptype.c, Written by Eberhard Mattes and put into the
+ * public domain
+ *
+ * Notes: 1. Qualify the filename so that DosQueryAppType does not do extraneous
+ * searches.
+ *
+ * 2. DosQueryAppType will return FAPPTYP_DOS on a file ending with ".com"
+ * (other than an OS/2 exe or Win exe with this name). Eberhard Mattes
+ * remarks Tue, 6 Apr 93: Moreover, it reports the type of the (new and very
+ * bug ridden) Win Emacs as "OS/2 executable".
+ *
+ * 3. apptype() uses the filename if given, otherwise a tmp file is created with
+ * the contents of buf. If buf is not the complete file, apptype can
+ * incorrectly identify the exe type. The "-z" option of "file" is the reason
+ * for this ugly code.
+ */
+
+Files: ext/fileinfo/libmagic/buffer.c
+/*
+ * Copyright (c) Christos Zoulas 2017.
+ * All Rights Reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice immediately at the beginning of the file, without modification,
+ *    this list of conditions, and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+
+Files: ext/fileinfo/libmagic/cdf.c, ext/fileinfo/libmagic/cdf.h, ext/fileinfo/libmagic/cdf_time.c
+/*-
+ * Copyright (c) 2008 Christos Zoulas
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE NETBSD FOUNDATION, INC. AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+ * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION OR CONTRIBUTORS
+ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
+Files: ext/fileinfo/libmagic/der.c, ext/fileinfo/libmagic/der.h
+/*-
+ * Copyright (c) 2016 Christos Zoulas
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE NETBSD FOUNDATION, INC. AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+ * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION OR CONTRIBUTORS
+ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
+Files: ext/fileinfo/libmagic/elfclass.h
+/*
+ * Copyright (c) Christos Zoulas 2008.
+ * All Rights Reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice immediately at the beginning of the file, without modification,
+ *    this list of conditions, and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+
+Files: ext/fileinfo/libmagic/funcs.c, ext/fileinfo/libmagic/magic.c, ext/fileinfo/libmagic/magic.h
+/*
+ * Copyright (c) Christos Zoulas 2003.
+ * All Rights Reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice immediately at the beginning of the file, without modification,
+ *    this list of conditions, and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+
+Files: ext/fileinfo/libmagic/is_csv.c
+/*-
+ * Copyright (c) 2019 Christos Zoulas
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE NETBSD FOUNDATION, INC. AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+ * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION OR CONTRIBUTORS
+ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
+Files: ext/fileinfo/libmagic/is_json.c
+/*-
+ * Copyright (c) 2018 Christos Zoulas
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE NETBSD FOUNDATION, INC. AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+ * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION OR CONTRIBUTORS
+ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
+Files: ext/fileinfo/libmagic/is_tar.c
+/*
+ * is_tar() -- figure out whether file is a tar archive.
+ *
+ * Stolen (by the author!) from the public domain tar program:
+ * Public Domain version written 26 Aug 1985 John Gilmore (ihnp4!hoptoad!gnu).
+ *
+ * @(#)list.c 1.18 9/23/86 Public Domain - gnu
+ *
+ * Comments changed and some code/comments reformatted
+ * for file command by Ian Darwin.
+ */
+
+Files: ext/fileinfo/libmagic/readcdf.c
+/*-
+ * Copyright (c) 2008, 2016 Christos Zoulas
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE NETBSD FOUNDATION, INC. AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+ * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION OR CONTRIBUTORS
+ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
+Files: ext/fileinfo/libmagic/strcasestr.c
+/*-
+ * Copyright (c) 1990, 1993
+ *	The Regents of the University of California.  All rights reserved.
+ *
+ * This code is derived from software contributed to Berkeley by
+ * Chris Torek.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+
+Files: ext/fileinfo/libmagic/tar.h
+/*
+ * Header file for public domain tar (tape archive) program.
+ *
+ * @(#)tar.h 1.20 86/10/29	Public Domain.
+ *
+ * Created 25 August 1985 by John Gilmore, ihnp4!hoptoad!gnu.
+ *
+ * $File: tar.h,v 1.13 2010/11/30 14:58:53 rrt Exp $ # checkin only
+ */
+
+Files: ext/filter/callback_filter.c, ext/filter/filter_private.h, ext/filter/sanitizing_filters.c
+/*
+  +----------------------------------------------------------------------+
+  | Copyright (c) The PHP Group                                          |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | https://www.php.net/license/3_01.txt                                 |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Authors: Derick Rethans <derick@php.net>                             |
+  +----------------------------------------------------------------------+
+*/
+
+Files: ext/filter/filter.c
+/*
+  +----------------------------------------------------------------------+
+  | Copyright (c) The PHP Group                                          |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | https://www.php.net/license/3_01.txt                                 |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Authors: Rasmus Lerdorf <rasmus@php.net>                             |
+  |          Derick Rethans <derick@php.net>                             |
+  |          Pierre-A. Joye <pierre@php.net>                             |
+  |          Ilia Alshanetsky <iliaa@php.net>                            |
+  +----------------------------------------------------------------------+
+*/
+
+Files: ext/filter/logical_filters.c
+/*
+  +----------------------------------------------------------------------+
+  | Copyright (c) The PHP Group                                          |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | https://www.php.net/license/3_01.txt                                 |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Authors: Derick Rethans <derick@php.net>                             |
+  |          Pierre-A. Joye <pierre@php.net>                             |
+  |          Kévin Dunglas <dunglas@gmail.com>                           |
+  +----------------------------------------------------------------------+
+*/
+
+Files: ext/filter/logical_filters.c
+/*
+	 * The regex below is based on a regex by Michael Rushton.
+	 * However, it is not identical.  I changed it to only consider routeable
+	 * addresses as valid.  Michael's regex considers a@b a valid address
+	 * which conflicts with section 2.3.5 of RFC 5321 which states that:
+	 *
+	 *   Only resolvable, fully-qualified domain names (FQDNs) are permitted
+	 *   when domain names are used in SMTP.  In other words, names that can
+	 *   be resolved to MX RRs or address (i.e., A or AAAA) RRs (as discussed
+	 *   in Section 5) are permitted, as are CNAME RRs whose targets can be
+	 *   resolved, in turn, to MX or address RRs.  Local nicknames or
+	 *   unqualified names MUST NOT be used.
+	 *
+	 * This regex does not handle comments and folding whitespace.  While
+	 * this is technically valid in an email address, these parts aren't
+	 * actually part of the address itself.
+	 *
+	 * Michael's regex carries this copyright:
+	 *
+	 * Copyright © Michael Rushton 2009-10
+	 * http://squiloople.com/
+	 * Feel free to use and redistribute this code. But please keep this copyright notice.
+	 *
+	 */
+
+Files: ext/filter/php_filter.h
+/*
+  +----------------------------------------------------------------------+
+  | Copyright (c) The PHP Group                                          |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | https://www.php.net/license/3_01.txt                                 |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Authors: Rasmus Lerdorf <rasmus@php.net>                             |
+  |          Derick Rethans <derick@php.net>                             |
+  +----------------------------------------------------------------------+
+*/
+
+Files: ext/gd/gd.c
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Authors: Rasmus Lerdorf <rasmus@php.net>                             |
+   |          Stig Bakken <ssb@php.net>                                   |
+   |          Jim Winstead <jimw@php.net>                                 |
+   +----------------------------------------------------------------------+
+ */
+
+Files: ext/gd/gd.c
+/* gd 1.2 is copyright 1994, 1995, Quest Protein Database Center,
+   Cold Spring Harbor Labs. */
+
+Files: ext/gd/libgd/gd.h
+/* gd.h: declarations file for the graphic-draw module.
+ * Permission to use, copy, modify, and distribute this software and its
+ * documentation for any purpose and without fee is hereby granted, provided
+ * that the above copyright notice appear in all copies and that both that
+ * copyright notice and this permission notice appear in supporting
+ * documentation.  This software is provided "AS IS." Thomas Boutell and
+ * Boutell.Com, Inc. disclaim all warranties, either express or implied,
+ * including but not limited to implied warranties of merchantability and
+ * fitness for a particular purpose, with respect to this code and accompanying
+ * documentation. */
+
+Files: ext/gd/libgd/gd_gd2.c
+/*
+   * gd_gd2.c
+   *
+   * Implements the I/O and support for the GD2 format.
+   *
+   * Changing the definition of GD2_DBG (below) will cause copious messages
+   * to be displayed while it processes requests.
+   *
+   * Designed, Written & Copyright 1999, Philip Warner.
+   *
+ */
+
+Files: ext/gd/libgd/gd_gif_out.c
+/* Code drawn from ppmtogif.c, from the pbmplus package
+**
+** Based on GIFENCOD by David Rowley <mgardi@watdscu.waterloo.edu>. A
+** Lempel-Zim compression based on "compress".
+**
+** Modified by Marcel Wijkstra <wijkstra@fwi.uva.nl>
+**
+** Copyright (C) 1989 by Jef Poskanzer.
+**
+** Permission to use, copy, modify, and distribute this software and its
+** documentation for any purpose and without fee is hereby granted, provided
+** that the above copyright notice appear in all copies and that both that
+** copyright notice and this permission notice appear in supporting
+** documentation.  This software is provided "as is" without express or
+** implied warranty.
+**
+** The Graphics Interchange Format(c) is the Copyright property of
+** CompuServe Incorporated.  GIF(sm) is a Service Mark property of
+** CompuServe Incorporated.
+*/
+
+Files: ext/gd/libgd/gd_jpeg.c
+/*
+ * gd_jpeg.c: Read and write JPEG (JFIF) format image files using the
+ * gd graphics library (http://www.boutell.com/gd/).
+ *
+ * This software is based in part on the work of the Independent JPEG
+ * Group.  For more information on the IJG JPEG software (and JPEG
+ * documentation, etc.), see ftp://ftp.uu.net/graphics/jpeg/.
+ *
+ * NOTE: IJG 12-bit JSAMPLE (BITS_IN_JSAMPLE == 12) mode is not
+ * supported at all on read in gd 2.0, and is not supported on write
+ * except for palette images, which is sort of pointless (TBB). Even that
+ * has never been tested according to DB.
+ *
+ * Copyright 2000 Doug Becker, mailto:thebeckers@home.com
+ *
+ * Modification 4/18/00 TBB: JPEG_DEBUG rather than just DEBUG,
+ * so VC++ builds don't spew to standard output, causing
+ * major CGI brain damage
+ *
+ * 2.0.10: more efficient gdImageCreateFromJpegCtx, thanks to
+ * Christian Aberger
+ */
+
+Files: ext/gd/libgd/gd_png.c
+/*---------------------------------------------------------------------------
+
+    gd_png.c                 Copyright 1999 Greg Roelofs and Thomas Boutell
+
+    The routines in this file, gdImagePng*() and gdImageCreateFromPng*(),
+    are drop-in replacements for gdImageGif*() and gdImageCreateFromGif*(),
+    except that these functions are noisier in the case of errors (comment
+    out all fprintf() statements to disable that).
+
+    GD 2.0 supports RGBA truecolor and will read and write truecolor PNGs.
+    GD 2.0 supports 8 bits of color resolution per channel and
+    7 bits of alpha channel resolution. Images with more than 8 bits
+    per channel are reduced to 8 bits. Images with an alpha channel are
+    only able to resolve down to '1/128th opaque' instead of '1/256th',
+    and this conversion is also automatic. I very much doubt you can see it.
+    Both tRNS and true alpha are supported.
+
+    Gamma is ignored, and there is no support for text annotations.
+
+    Last updated:  9 February 2001
+
+  ---------------------------------------------------------------------------*/
+
+Files: ext/gd/libgd/gd_topal.c
+/*
+ * gd_topal, adapted from jquant2.c
+ *
+ * Copyright (C) 1991-1996, Thomas G. Lane.
+ * This file is part of the Independent JPEG Group's software.
+ * For conditions of distribution and use, see the accompanying README file.
+ *
+ * This file contains 2-pass color quantization (color mapping) routines.
+ * These routines provide selection of a custom color map for an image,
+ * followed by mapping of the image to that color map, with optional
+ * Floyd-Steinberg dithering.
+ * It is also possible to use just the second pass to map to an arbitrary
+ * externally-given color map.
+ *
+ * Note: ordered dithering is not supported, since there isn't any fast
+ * way to compute intercolor distances; it's unclear that ordered dither's
+ * fundamental assumptions even hold with an irregularly spaced color map.
+ */
+
+Files: ext/gd/libgd/gd_wbmp.c
+/*
+   WBMP: Wireless Bitmap Type 0: B/W, Uncompressed Bitmap
+   Specification of the WBMP format can be found in the file:
+   SPEC-WAESpec-19990524.pdf
+   You can download the WAP specification on: http://www.wapforum.com/
+
+   gd_wbmp.c
+
+   Copyright (C) Johan Van den Brande (johan@vandenbrande.com)
+
+   Fixed: gdImageWBMPPtr, gdImageWBMP
+
+   Recoded: gdImageWBMPCtx for use with my wbmp library
+   (wbmp library included, but you can find the latest distribution
+   at http://www.vandenbrande.com/wbmp)
+
+   Implemented: gdImageCreateFromWBMPCtx, gdImageCreateFromWBMP
+
+   ---------------------------------------------------------------------------
+
+   Parts of this code are from Maurice Smurlo.
+
+
+   ** Copyright (C) Maurice Szmurlo --- T-SIT --- January 2000
+   ** (Maurice.Szmurlo@info.unicaen.fr)
+
+   ** Permission to use, copy, modify, and distribute this software and its
+   ** documentation for any purpose and without fee is hereby granted, provided
+   ** that the above copyright notice appear in all copies and that both that
+   ** copyright notice and this permission notice appear in supporting
+   ** documentation.  This software is provided "as is" without express or
+   ** implied warranty.
+
+   ---------------------------------------------------------------------------
+   Parts od this code are inspired by  'pbmtowbmp.c' and 'wbmptopbm.c' by
+   Terje Sannum <terje@looplab.com>.
+   **
+   ** Permission to use, copy, modify, and distribute this software and its
+   ** documentation for any purpose and without fee is hereby granted, provided
+   ** that the above copyright notice appear in all copies and that both that
+   ** copyright notice and this permission notice appear in supporting
+   ** documentation.  This software is provided "as is" without express or
+   ** implied warranty.
+   **
+   ---------------------------------------------------------------------------
+
+   Todo:
+
+   gdCreateFromWBMP function for reading WBMP files
+
+   ----------------------------------------------------------------------------
+ */
+
+Files: ext/gd/libgd/gd_xbm.c
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Author: Marcus Boerger <helly@php.net>                               |
+   +----------------------------------------------------------------------+
+ */
+
+Files: ext/gd/libgd/gdfontg.c
+/*
+   This is a header file for gd font, generated using
+   bdftogd version 0.51 by Jan Pazdziora, adelton@fi.muni.cz
+   from bdf font
+   -Misc-Fixed-Bold-R-Normal-Sans-15-140-75-75-C-90-ISO8859-2
+   at Mon Jan 26 14:45:58 1998.
+   The original bdf was holding following copyright:
+   "Libor Skarvada, libor@informatics.muni.cz"
+ */
+
+Files: ext/gd/libgd/gdfontg.h
+/*
+	This is a header file for gd font, generated using
+	bdftogd version 0.51 by Jan Pazdziora, adelton@fi.muni.cz
+	from bdf font
+	-Misc-Fixed-Bold-R-Normal-Sans-15-140-75-75-C-90-ISO8859-2
+	at Mon Jan 26 14:45:58 1998.
+	The original bdf was holding following copyright:
+	"Libor Skarvada, libor@informatics.muni.cz"
+ */
+
+Files: ext/gd/libgd/gdfontl.c
+/*
+   This is a header file for gd font, generated using
+   bdftogd version 0.5 by Jan Pazdziora, adelton@fi.muni.cz
+   from bdf font
+   -misc-fixed-medium-r-normal--16-140-75-75-c-80-iso8859-2
+   at Tue Jan  6 19:39:27 1998.
+
+   The original bdf was holding following copyright:
+   "Libor Skarvada, libor@informatics.muni.cz"
+ */
+
+Files: ext/gd/libgd/gdfontl.h
+/*
+	This is a header file for gd font, generated using
+	bdftogd version 0.5 by Jan Pazdziora, adelton@fi.muni.cz
+	from bdf font
+	-misc-fixed-medium-r-normal--16-140-75-75-c-80-iso8859-2
+	at Tue Jan  6 19:39:27 1998.
+
+	The original bdf was holding following copyright:
+	"Libor Skarvada, libor@informatics.muni.cz"
+ */
+
+Files: ext/gd/libgd/gdfontmb.c
+/*
+   This is a header file for gd font, generated using
+   bdftogd version 0.5 by Jan Pazdziora, adelton@fi.muni.cz
+   from bdf font
+   -misc-fixed-bold-r-normal-sans-13-94-100-100-c-70-iso8859-2
+   at Thu Jan  8 13:54:57 1998.
+   No copyright info was found in the original bdf.
+ */
+
+Files: ext/gd/libgd/gdfontmb.h
+/*
+	This is a header file for gd font, generated using
+	bdftogd version 0.5 by Jan Pazdziora, adelton@fi.muni.cz
+	from bdf font
+	-misc-fixed-bold-r-normal-sans-13-94-100-100-c-70-iso8859-2
+	at Thu Jan  8 13:54:57 1998.
+	No copyright info was found in the original bdf.
+ */
+
+Files: ext/gd/libgd/gdfonts.c
+/*
+   This is a header file for gd font, generated using
+   bdftogd version 0.5 by Jan Pazdziora, adelton@fi.muni.cz
+   from bdf font
+   -misc-fixed-medium-r-semicondensed-sans-12-116-75-75-c-60-iso8859-2
+   at Thu Jan  8 14:13:20 1998.
+   No copyright info was found in the original bdf.
+ */
+
+Files: ext/gd/libgd/gdfonts.h
+/*
+	This is a header file for gd font, generated using
+	bdftogd version 0.5 by Jan Pazdziora, adelton@fi.muni.cz
+	from bdf font
+	-misc-fixed-medium-r-semicondensed-sans-12-116-75-75-c-60-iso8859-2
+	at Thu Jan  8 14:13:20 1998.
+	No copyright info was found in the original bdf.
+ */
+
+Files: ext/gd/libgd/gdfontt.c
+/*
+   This is a header file for gd font, generated using
+   bdftogd version 0.5 by Jan Pazdziora, adelton@fi.muni.cz
+   from bdf font
+   -Misc-Fixed-Medium-R-Normal--8-80-75-75-C-50-ISO8859-2
+   at Thu Jan  8 13:49:54 1998.
+   The original bdf was holding following copyright:
+   "Libor Skarvada, libor@informatics.muni.cz"
+ */
+
+Files: ext/gd/libgd/gdfontt.h
+/*
+	This is a header file for gd font, generated using
+	bdftogd version 0.5 by Jan Pazdziora, adelton@fi.muni.cz
+	from bdf font
+	-Misc-Fixed-Medium-R-Normal--8-80-75-75-C-50-ISO8859-2
+	at Thu Jan  8 13:49:54 1998.
+	The original bdf was holding following copyright:
+	"Libor Skarvada, libor@informatics.muni.cz"
+ */
+
+Files: ext/gd/libgd/gdft.c
+/*
+ * tclUtf.c --
+ *
+ *      Routines for manipulating UTF-8 strings.
+ *
+ * Copyright (c) 1997-1998 Sun Microsystems, Inc.
+ *
+ * See the file "license.terms" for information on usage and redistribution
+ * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+ *
+ * SCCS: @(#) tclUtf.c 1.25 98/01/28 18:02:43
+ */
+
+Files: ext/gd/php_gd.h
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Authors: Rasmus Lerdorf <rasmus@php.net>                             |
+   |          Stig Bakken <ssb@php.net>                                   |
+   +----------------------------------------------------------------------+
+*/
+
+Files: ext/hash/sha3/generic32lc/KeccakSponge.inc, ext/hash/sha3/generic64lc/KeccakSponge.inc
+/*
+Implementation by the Keccak, Keyak and Ketje Teams, namely, Guido Bertoni,
+Joan Daemen, Michaël Peeters, Gilles Van Assche and Ronny Van Keer, hereby
+denoted as "the implementer".
+
+For more information, feedback or questions, please refer to our websites:
+http://keccak.noekeon.org/
+http://keyak.noekeon.org/
+http://ketje.noekeon.org/
+
+To the extent possible under law, the implementer has waived all copyright
+and related or neighboring rights to the source code in this file.
+http://creativecommons.org/publicdomain/zero/1.0/
+*/
+
+Files: ext/iconv/iconv.c
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Authors: Rui Hirokawa <rui_hirokawa@ybb.ne.jp>                       |
+   |          Stig Bakken <ssb@php.net>                                   |
+   |          Moriyoshi Koizumi <moriyoshi@php.net>                       |
+   +----------------------------------------------------------------------+
+ */
+
+Files: ext/iconv/php_iconv.h
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Authors: Rui Hirokawa <rui_hirokawa@ybb.ne.jp>                       |
+   |          Stig Bakken <ssb@php.net>                                   |
+   +----------------------------------------------------------------------+
+ */
+
+Files: ext/intl/idn/idn.c
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Author: Pierre A. Joye <pierre@php.net>                              |
+   |         Gustavo Lopes  <cataphract@php.net>                          |
+   +----------------------------------------------------------------------+
+ */
+
+Files: ext/intl/idn/idn.h
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Author: Pierre A. Joye <pierre@php.net>                              |
+   +----------------------------------------------------------------------+
+ */
+
+Files: ext/json/json_parser.y, ext/json/json_scanner.re
+/*
+  +----------------------------------------------------------------------+
+  | Copyright (c) The PHP Group                                          |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | https://www.php.net/license/3_01.txt                                 |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Author: Jakub Zelenka <bukka@php.net>                                |
+  +----------------------------------------------------------------------+
+*/
+
+Files: ext/opcache/jit/dynasm/dasm_arm.lua
+------------------------------------------------------------------------------
+-- DynASM ARM module.
+--
+-- Copyright (C) 2005-2021 Mike Pall. All rights reserved.
+-- See dynasm.lua for full copyright notice.
+------------------------------------------------------------------------------
+
+
+Files: ext/opcache/jit/dynasm/dasm_arm64.lua
+------------------------------------------------------------------------------
+-- DynASM ARM64 module.
+--
+-- Copyright (C) 2005-2021 Mike Pall. All rights reserved.
+-- See dynasm.lua for full copyright notice.
+------------------------------------------------------------------------------
+
+
+Files: ext/opcache/jit/dynasm/dasm_mips.lua
+------------------------------------------------------------------------------
+-- DynASM MIPS32/MIPS64 module.
+--
+-- Copyright (C) 2005-2021 Mike Pall. All rights reserved.
+-- See dynasm.lua for full copyright notice.
+------------------------------------------------------------------------------
+
+
+Files: ext/opcache/jit/dynasm/dasm_mips64.lua
+------------------------------------------------------------------------------
+-- DynASM MIPS64 module.
+--
+-- Copyright (C) 2005-2021 Mike Pall. All rights reserved.
+-- See dynasm.lua for full copyright notice.
+------------------------------------------------------------------------------
+-- This module just sets 64 bit mode for the combined MIPS/MIPS64 module.
+-- All the interesting stuff is there.
+------------------------------------------------------------------------------
+
+
+Files: ext/opcache/jit/dynasm/dasm_ppc.lua
+------------------------------------------------------------------------------
+-- DynASM PPC/PPC64 module.
+--
+-- Copyright (C) 2005-2021 Mike Pall. All rights reserved.
+-- See dynasm.lua for full copyright notice.
+--
+-- Support for various extensions contributed by Caio Souza Oliveira.
+------------------------------------------------------------------------------
+
+
+Files: ext/opcache/jit/dynasm/dasm_x64.lua
+------------------------------------------------------------------------------
+-- DynASM x64 module.
+--
+-- Copyright (C) 2005-2021 Mike Pall. All rights reserved.
+-- See dynasm.lua for full copyright notice.
+------------------------------------------------------------------------------
+-- This module just sets 64 bit mode for the combined x86/x64 module.
+-- All the interesting stuff is there.
+------------------------------------------------------------------------------
+
+
+Files: ext/opcache/jit/dynasm/dasm_x86.lua
+------------------------------------------------------------------------------
+-- DynASM x86/x64 module.
+--
+-- Copyright (C) 2005-2021 Mike Pall. All rights reserved.
+-- See dynasm.lua for full copyright notice.
+------------------------------------------------------------------------------
+
+
+Files: ext/opcache/jit/dynasm/dynasm.lua
+------------------------------------------------------------------------------
+-- DynASM. A dynamic assembler for code generation engines.
+-- Originally designed and implemented for LuaJIT.
+--
+-- Copyright (C) 2005-2021 Mike Pall. All rights reserved.
+-- See below for full copyright notice.
+------------------------------------------------------------------------------
+
+
+Files: ext/opcache/jit/dynasm/dynasm.lua
+
+Copyright (C) 2005-2021 Mike Pall. All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+[ MIT license: https://www.opensource.org/licenses/mit-license.php ]
+
+
+Files: ext/opcache/jit/zend_jit_arm64.dasc
+/*
+ *  +----------------------------------------------------------------------+
+ *  | Zend JIT                                                             |
+ *  +----------------------------------------------------------------------+
+ *  | Copyright (c) The PHP Group                                          |
+ *  +----------------------------------------------------------------------+
+ *  | This source file is subject to version 3.01 of the PHP license,      |
+ *  | that is bundled with this package in the file LICENSE, and is        |
+ *  | available through the world-wide-web at the following url:           |
+ *  | https://www.php.net/license/3_01.txt                                 |
+ *  | If you did not receive a copy of the PHP license and are unable to   |
+ *  | obtain it through the world-wide-web, please send a note to          |
+ *  | license@php.net so we can mail you a copy immediately.               |
+ *  +----------------------------------------------------------------------+
+ *  | Authors: Dmitry Stogov <dmitry@php.net>                              |
+ *  |          Xinchen Hui <laruence@php.net>                              |
+ *  |          Hao Sun <hao.sun@arm.com>                                   |
+ *  +----------------------------------------------------------------------+
+ */
+
+Files: ext/opcache/jit/zend_jit_x86.dasc
+/*
+ *  +----------------------------------------------------------------------+
+ *  | Zend JIT                                                             |
+ *  +----------------------------------------------------------------------+
+ *  | Copyright (c) The PHP Group                                          |
+ *  +----------------------------------------------------------------------+
+ *  | This source file is subject to version 3.01 of the PHP license,      |
+ *  | that is bundled with this package in the file LICENSE, and is        |
+ *  | available through the world-wide-web at the following url:           |
+ *  | https://www.php.net/license/3_01.txt                                 |
+ *  | If you did not receive a copy of the PHP license and are unable to   |
+ *  | obtain it through the world-wide-web, please send a note to          |
+ *  | license@php.net so we can mail you a copy immediately.               |
+ *  +----------------------------------------------------------------------+
+ *  | Authors: Dmitry Stogov <dmitry@php.net>                              |
+ *  |          Xinchen Hui <laruence@php.net>                              |
+ *  +----------------------------------------------------------------------+
+ */
+
+Files: ext/pdo/pdo_sql_parser.re
+/*
+  +----------------------------------------------------------------------+
+  | Copyright (c) The PHP Group                                          |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | https://www.php.net/license/3_01.txt                                 |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Author: George Schlossnagle <george@omniti.com>                      |
+  +----------------------------------------------------------------------+
+*/
+
+Files: ext/pdo_sqlite/pdo_sqlite.c, ext/pdo_sqlite/php_pdo_sqlite.h, ext/pdo_sqlite/php_pdo_sqlite_int.h, ext/pdo_sqlite/sqlite_driver.c, ext/pdo_sqlite/sqlite_statement.c
+/*
+  +----------------------------------------------------------------------+
+  | Copyright (c) The PHP Group                                          |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | https://www.php.net/license/3_01.txt                                 |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Author: Wez Furlong <wez@php.net>                                    |
+  +----------------------------------------------------------------------+
+*/
+
+Files: ext/phar/phar_path_check.re
+/*
+  +----------------------------------------------------------------------+
+  | phar php single-file executable PHP extension                        |
+  +----------------------------------------------------------------------+
+  | Copyright (c) The PHP Group                                          |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | https://www.php.net/license/3_01.txt                                 |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Authors: Marcus Boerger <helly@php.net>                              |
+  +----------------------------------------------------------------------+
+*/
+
+Files: ext/simplexml/php_simplexml.h
+/*
+  +----------------------------------------------------------------------+
+  | Copyright (c) The PHP Group                                          |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | https://www.php.net/license/3_01.txt                                 |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Author: Sterling Hughes <sterling@php.net>                           |
+  +----------------------------------------------------------------------+
+*/
+
+Files: ext/simplexml/php_simplexml_exports.h
+/*
+  +----------------------------------------------------------------------+
+  | Copyright (c) The PHP Group                                          |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | https://www.php.net/license/3_01.txt                                 |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Author: Sterling Hughes <sterling@php.net>                           |
+  |         Marcus Boerger <helly@php.net>                               |
+  |         Rob Richards <rrichards@php.net>                             |
+  +----------------------------------------------------------------------+
+*/
+
+Files: ext/simplexml/simplexml.c
+/*
+  +----------------------------------------------------------------------+
+  | Copyright (c) The PHP Group                                          |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | https://www.php.net/license/3_01.txt                                 |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Authors: Sterling Hughes <sterling@php.net>                          |
+  |          Marcus Boerger <helly@php.net>                              |
+  |          Rob Richards <rrichards@php.net>                            |
+  +----------------------------------------------------------------------+
+*/
+
+Files: ext/sockets/multicast.c, ext/sockets/multicast.h, ext/sockets/sendrecvmsg.c
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Authors: Gustavo Lopes    <cataphract@php.net>                       |
+   +----------------------------------------------------------------------+
+ */
+
+Files: ext/sockets/php_sockets.h
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Authors: Chris Vandomelen <chrisv@b0rked.dhs.org>                    |
+   |          Sterling Hughes  <sterling@php.net>                         |
+   |                                                                      |
+   | WinSock: Daniel Beulshausen <daniel@php4win.de>                      |
+   +----------------------------------------------------------------------+
+ */
+
+Files: ext/sockets/sockets.c
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Authors: Chris Vandomelen <chrisv@b0rked.dhs.org>                    |
+   |          Sterling Hughes  <sterling@php.net>                         |
+   |          Jason Greene     <jason@php.net>                            |
+   |          Gustavo Lopes    <cataphract@php.net>                       |
+   | WinSock: Daniel Beulshausen <daniel@php4win.de>                      |
+   +----------------------------------------------------------------------+
+ */
+
+Files: ext/sockets/unix_socket_constants.h, ext/sockets/win32_socket_constants.h
+/*
+  +----------------------------------------------------------------------+
+  | Copyright (c) The PHP Group                                          |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | https://www.php.net/license/3_01.txt                                 |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Author: Jason Greene <jason@php.net>                                 |
+  +----------------------------------------------------------------------+
+*/
+
+Files: ext/sockets/windows_common.h
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+ */
+
+Files: ext/sqlite3/php_sqlite3.h, ext/sqlite3/php_sqlite3_structs.h, ext/sqlite3/sqlite3.c
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Authors: Scott MacVicar <scottmac@php.net>                           |
+   +----------------------------------------------------------------------+
+*/
+
+Files: ext/standard/url_scanner_ex.re
+/*
+  +----------------------------------------------------------------------+
+  | Copyright (c) The PHP Group                                          |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | https://www.php.net/license/3_01.txt                                 |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Author: Sascha Schumann <sascha@schumann.cx>                         |
+  |         Yasuo Ohgaki <yohgaki@ohgaki.net>                            |
+  +----------------------------------------------------------------------+
+*/
+
+Files: ext/standard/var_unserializer.re
+/*
+  +----------------------------------------------------------------------+
+  | Copyright (c) The PHP Group                                          |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | https://www.php.net/license/3_01.txt                                 |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Author: Sascha Schumann <sascha@schumann.cx>                         |
+  +----------------------------------------------------------------------+
+*/
+
+Files: ext/tokenizer/php_tokenizer.h
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Author: Andrei Zmievski <andrei@php.net>                             |
+   +----------------------------------------------------------------------+
+ */
+
+Files: ext/tokenizer/tokenizer.c
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Author: Andrei Zmievski <andrei@php.net>                             |
+   +----------------------------------------------------------------------+
+*/
+
+Files: ext/tokenizer/tokenizer_data.c
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Author: Johannes Schlueter <johannes@php.net>                        |
+   +----------------------------------------------------------------------+
+*/
+
+Files: ext/xml/compat.c
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Authors: Sterling Hughes <sterling@php.net>                          |
+   +----------------------------------------------------------------------+
+ */
+
+Files: ext/xml/expat_compat.h
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Authors: Sterling Hughes <sterling@php.net>                          |
+   +----------------------------------------------------------------------+
+*/
+
+Files: ext/xml/php_xml.h
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Authors: Stig Sæther Bakken <ssb@php.net>                            |
+   |          Thies C. Arntzen <thies@thieso.net>                         |
+   |          Sterling Hughes <sterling@php.net>                          |
+   +----------------------------------------------------------------------+
+*/
+
+Files: ext/xml/xml.c
+/*
+   +----------------------------------------------------------------------+
+   | Copyright (c) The PHP Group                                          |
+   +----------------------------------------------------------------------+
+   | This source file is subject to version 3.01 of the PHP license,      |
+   | that is bundled with this package in the file LICENSE, and is        |
+   | available through the world-wide-web at the following url:           |
+   | https://www.php.net/license/3_01.txt                                 |
+   | If you did not receive a copy of the PHP license and are unable to   |
+   | obtain it through the world-wide-web, please send a note to          |
+   | license@php.net so we can mail you a copy immediately.               |
+   +----------------------------------------------------------------------+
+   | Authors: Stig Sæther Bakken <ssb@php.net>                            |
+   |          Thies C. Arntzen <thies@thieso.net>                         |
+   |          Sterling Hughes <sterling@php.net>                          |
+   +----------------------------------------------------------------------+
+ */
+
+Files: ext/xmlreader/php_xmlreader.c, ext/xmlreader/php_xmlreader.h
+/*
+  +----------------------------------------------------------------------+
+  | Copyright (c) The PHP Group                                          |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | https://www.php.net/license/3_01.txt                                 |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Author: Rob Richards <rrichards@php.net>                             |
+  +----------------------------------------------------------------------+
+*/
+
+Files: ext/xmlwriter/php_xmlwriter.c, ext/xmlwriter/php_xmlwriter.h
+/*
+  +----------------------------------------------------------------------+
+  | Copyright (c) The PHP Group                                          |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | https://www.php.net/license/3_01.txt                                 |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Author: Rob Richards <rrichards@php.net>                             |
+  |         Pierre-A. Joye <pajoye@php.net>                              |
+  +----------------------------------------------------------------------+
+*/
+
+Files: ext/zip/php_zip.c, ext/zip/zip_stream.c
+/*
+  +----------------------------------------------------------------------+
+  | Copyright (c) The PHP Group                                          |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | https://www.php.net/license/3_01.txt                                 |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Author: Piere-Alain Joye <pierre@php.net>                            |
+  +----------------------------------------------------------------------+
+*/
+
+Files: ext/zip/php_zip.h
+/*
+  +----------------------------------------------------------------------+
+  | Copyright (c) The PHP Group                                          |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | https://www.php.net/license/3_01.txt                                 |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Author: Pierre-Alain Joye <pajoye@php.net>                           |
+  +----------------------------------------------------------------------+
+*/
+

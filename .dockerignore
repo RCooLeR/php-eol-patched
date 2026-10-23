@@ -18,3 +18,6 @@
 !PATCHES.md
 !SECURITY.md
 !compose.example.yaml
+!extensions/
+!extensions/**
+!EXTENSIONS.md

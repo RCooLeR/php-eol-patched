@@ -1,0 +1,23 @@
+Published-source: https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz
+Published-patch: 0115-Fix-typo-in-recent-bugfix.patch
+Scope: selected PHP runtime components and their tests; packaging and unrelated extensions omitted.
+
+From: "Christoph M. Becker" <cmbecker69@gmx.de>
+Date: Fri, 14 Feb 2020 09:21:13 +0100
+Subject: Fix typo in recent bugfix
+
+(cherry picked from commit 8308196c97418ba4c8381bed0962ae160623027a)
+---
+ NEWS                        | 2 +-
+ ext/dom/tests/bug77569.phpt | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+--- a/ext/dom/tests/bug77569.phpt
++++ b/ext/dom/tests/bug77569.phpt
+@@ -1,5 +1,5 @@
+ --TEST--
+-Bug #77569 (Write Acess Violation in DomImplementation)
++Bug #77569 (Write Access Violation in DomImplementation)
+ --SKIPIF--
+ <?php
+ if (!extension_loaded('dom')) die('skip dom extension not available');

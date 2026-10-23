@@ -1,0 +1,1644 @@
+Subject: Backport published socket, Phar, GIF and ctype fixes to PHP 5.6
+CVE: CVE-2025-1220, CVE-2026-7260, CVE-2026-9672, CVE-2026-7258
+Origin: https://github.com/php/php-src/commit/cac8f7f1cf4939f55f06b68120040f057682d89c
+Origin: https://github.com/php/php-src/commit/2e0fa0a44441d74bf8cc4e1ce1c8af9cd4209f52
+Origin: https://github.com/php/php-src/commit/fcd691b377d02285740744bee17c0f298be227d5
+Origin: https://github.com/php/php-src/commit/8bdee7e4c6f4e92f9e89841d53855d9ffbdbfe54
+
+Based on the published Freexian PHP 7.0 patches. Retain PHP 5.6 long port
+formatting, char-pointer error strings, hash-table lookup and TSRMLS APIs.
+The ctype changes cover core and enabled extensions, preserving native
+buffer members and generated scanner counterparts. Disabled extensions,
+SAPIs and standalone Windows sources are omitted. Published network and
+Phar assertions are unchanged; the three tar fixtures retain their bytes.
+
+diff --git a/Zend/zend_compile.c b/Zend/zend_compile.c
+index f91f029e486f04b9084693b6ea53c3d29c84b466..e95b0c9cbcf6e2766d307b384f2d74be98f564f2 100644
+--- a/Zend/zend_compile.c
++++ b/Zend/zend_compile.c
+@@ -7460,7 +7460,7 @@ ZEND_API size_t zend_dirname(char *path, size_t len)
+ 	/* Note that on Win32 CWD is per drive (heritage from CP/M).
+ 	 * This means dirname("c:foo") maps to "c:." or "c:" - which means CWD on C: drive.
+ 	 */
+-	if ((2 <= len) && isalpha((int)((unsigned char *)path)[0]) && (':' == path[1])) {
++	if ((2 <= len) && isalpha((unsigned char)path[0]) && (':' == path[1])) {
+ 		/* Skip over the drive spec (if any) so as not to change */
+ 		path += 2;
+ 		len_adjust += 2;
+diff --git a/Zend/zend_operators.c b/Zend/zend_operators.c
+index 620722c41867dac7e0bd15616169928d3a2da046..bd0f038a05411906a6edbea68eebde7a189f6254 100644
+--- a/Zend/zend_operators.c
++++ b/Zend/zend_operators.c
+@@ -2261,8 +2261,8 @@ ZEND_API int zend_binary_strcasecmp_l(const char *s1, uint len1, const char *s2,
+ 
+ 	len = MIN(len1, len2);
+ 	while (len--) {
+-		c1 = zend_tolower((int)*(unsigned char *)s1++);
+-		c2 = zend_tolower((int)*(unsigned char *)s2++);
++		c1 = zend_tolower((unsigned char)*(s1++));
++		c2 = zend_tolower((unsigned char)*(s2++));
+ 		if (c1 != c2) {
+ 			return c1 - c2;
+ 		}
+@@ -2282,8 +2282,8 @@ ZEND_API int zend_binary_strncasecmp_l(const char *s1, uint len1, const char *s2
+ 	}
+ 	len = MIN(length, MIN(len1, len2));
+ 	while (len--) {
+-		c1 = zend_tolower((int)*(unsigned char *)s1++);
+-		c2 = zend_tolower((int)*(unsigned char *)s2++);
++		c1 = zend_tolower((unsigned char)*(s1++));
++		c2 = zend_tolower((unsigned char)*(s2++));
+ 		if (c1 != c2) {
+ 			return c1 - c2;
+ 		}
+diff --git a/Zend/zend_virtual_cwd.c b/Zend/zend_virtual_cwd.c
+index 875c8da41c5ad9c8a384f6e23272650ab64b7c77..12ba1b46847d947f8834b48f5889762bc59ee208 100644
+--- a/Zend/zend_virtual_cwd.c
++++ b/Zend/zend_virtual_cwd.c
+@@ -469,7 +469,7 @@ CWD_API void virtual_cwd_startup(void) /* {{{ */
+ 	main_cwd_state.cwd_length = strlen(cwd);
+ #ifdef TSRM_WIN32
+ 	if (main_cwd_state.cwd_length >= 2 && cwd[1] == ':') {
+-		cwd[0] = toupper(cwd[0]);
++		cwd[0] = toupper((unsigned char)cwd[0]);
+ 	}
+ #endif
+ 	main_cwd_state.cwd = strdup(cwd);
+@@ -548,7 +548,7 @@ CWD_API char *virtual_getcwd_ex(size_t *length TSRMLS_DC) /* {{{ */
+ 			return NULL;
+ 		}
+ 		memcpy(retval, state->cwd, *length);
+-		retval[0] = toupper(retval[0]);
++		retval[0] = toupper((unsigned char)retval[0]);
+ 		retval[*length-1] = DEFAULT_SLASH;
+ 		retval[*length] = '\0';
+ 		return retval;
+@@ -1286,7 +1286,7 @@ CWD_API int virtual_file_ex(cwd_state *state, const char *path, verify_path_func
+ 			if (resolved_path[start] == 0) {
+ 				goto verify;
+ 			}
+-			resolved_path[start] = toupper(resolved_path[start]);
++			resolved_path[start] = toupper((unsigned char)resolved_path[start]);
+ 			start++;
+ 		}
+ 		resolved_path[start++] = DEFAULT_SLASH;
+@@ -1294,13 +1294,13 @@ CWD_API int virtual_file_ex(cwd_state *state, const char *path, verify_path_func
+ 			if (resolved_path[start] == 0) {
+ 				goto verify;
+ 			}
+-			resolved_path[start] = toupper(resolved_path[start]);
++			resolved_path[start] = toupper((unsigned char)resolved_path[start]);
+ 			start++;
+ 		}
+ 		resolved_path[start++] = DEFAULT_SLASH;
+ 	} else if (IS_ABSOLUTE_PATH(resolved_path, path_length)) {
+ 		/* skip DRIVE name */
+-		resolved_path[0] = toupper(resolved_path[0]);
++		resolved_path[0] = toupper((unsigned char)resolved_path[0]);
+ 		resolved_path[2] = DEFAULT_SLASH;
+ 		start = 3;
+ 	}
+diff --git a/Zend/zend_virtual_cwd.h b/Zend/zend_virtual_cwd.h
+index 86c93153c5ad3a6ab438f1f7f461ac527612a55f..6b2f0810f6f1dfa2ed0253930cba5ddee258daed 100644
+--- a/Zend/zend_virtual_cwd.h
++++ b/Zend/zend_virtual_cwd.h
+@@ -70,7 +70,7 @@ typedef unsigned short mode_t;
+ #define IS_UNC_PATH(path, len) \
+ 	(len >= 2 && IS_SLASH(path[0]) && IS_SLASH(path[1]))
+ #define IS_ABSOLUTE_PATH(path, len) \
+-	(len >= 2 && ((isalpha(path[0]) && path[1] == ':') || IS_UNC_PATH(path, len)))
++	(len >= 2 && ((isalpha((unsigned char)(path)[0]) && path[1] == ':') || IS_UNC_PATH(path, len)))
+ 
+ #elif defined(NETWARE)
+ #ifdef HAVE_DIRENT_H
+diff --git a/ext/date/lib/parse_date.c b/ext/date/lib/parse_date.c
+index 094437832648cbade459d3ef2becfa50b3b8765d..a21ca5c11e6774e15970911e3f9c0f4234ef66c6 100644
+--- a/ext/date/lib/parse_date.c
++++ b/ext/date/lib/parse_date.c
+@@ -485,7 +485,7 @@ static timelib_sll timelib_get_nr(char **ptr, int max_length)
+ 
+ static void timelib_skip_day_suffix(char **ptr)
+ {
+-	if (isspace(**ptr)) {
++	if (isspace((unsigned char)**ptr)) {
+ 		return;
+ 	}
+ 	if (!strncasecmp(*ptr, "nd", 2) || !strncasecmp(*ptr, "rd", 2) ||!strncasecmp(*ptr, "st", 2) || !strncasecmp(*ptr, "th", 2)) {
+@@ -23758,10 +23758,10 @@ timelib_time* timelib_strtotime(char *s, size_t len, struct timelib_error_contai
+ 	in.errors->error_messages = NULL;
+ 
+ 	if (len > 0) {
+-		while (isspace(*s) && s < e) {
++		while (isspace((unsigned char)*s) && s < e) {
+ 			s++;
+ 		}
+-		while (isspace(*e) && e > s) {
++		while (isspace((unsigned char)*e) && e > s) {
+ 			e--;
+ 		}
+ 	}
+diff --git a/ext/date/lib/parse_date.re b/ext/date/lib/parse_date.re
+index d96d7448e6528cd3544a8736465aa33d5f9f1bcb..4024bb8802f9895111898678c4bbc627c4d9b23b 100644
+--- a/ext/date/lib/parse_date.re
++++ b/ext/date/lib/parse_date.re
+@@ -484,7 +484,7 @@ static timelib_sll timelib_get_nr(char **ptr, int max_length)
+ 
+ static void timelib_skip_day_suffix(char **ptr)
+ {
+-	if (isspace(**ptr)) {
++	if (isspace((unsigned char)**ptr)) {
+ 		return;
+ 	}
+ 	if (!strncasecmp(*ptr, "nd", 2) || !strncasecmp(*ptr, "rd", 2) ||!strncasecmp(*ptr, "st", 2) || !strncasecmp(*ptr, "th", 2)) {
+@@ -1745,10 +1745,10 @@ timelib_time* timelib_strtotime(char *s, size_t len, struct timelib_error_contai
+ 	in.errors->error_messages = NULL;
+ 
+ 	if (len > 0) {
+-		while (isspace(*s) && s < e) {
++		while (isspace((unsigned char)*s) && s < e) {
+ 			s++;
+ 		}
+-		while (isspace(*e) && e > s) {
++		while (isspace((unsigned char)*e) && e > s) {
+ 			e--;
+ 		}
+ 	}
+diff --git a/ext/date/lib/parse_iso_intervals.c b/ext/date/lib/parse_iso_intervals.c
+index 7d1de0dde96d18b102b3797d0ff69897b999ba34..89c97c215009bf2d6e47d219066863e0da80513a 100644
+--- a/ext/date/lib/parse_iso_intervals.c
++++ b/ext/date/lib/parse_iso_intervals.c
+@@ -927,10 +927,10 @@ void timelib_strtointerval(char *s, size_t len,
+ 	in.errors->error_messages = NULL;
+ 
+ 	if (len > 0) {
+-		while (isspace(*s) && s < e) {
++		while (isspace((unsigned char)*s) && s < e) {
+ 			s++;
+ 		}
+-		while (isspace(*e) && e > s) {
++		while (isspace((unsigned char)*e) && e > s) {
+ 			e--;
+ 		}
+ 	}
+diff --git a/ext/date/lib/parse_iso_intervals.re b/ext/date/lib/parse_iso_intervals.re
+index 6f23bb16f276ddedfc866c2c3e28a25ccaffdf29..81be45a091cb0124a372233db5e636c6ae0e16b8 100644
+--- a/ext/date/lib/parse_iso_intervals.re
++++ b/ext/date/lib/parse_iso_intervals.re
+@@ -421,10 +421,10 @@ void timelib_strtointerval(char *s, size_t len,
+ 	in.errors->error_messages = NULL;
+ 
+ 	if (len > 0) {
+-		while (isspace(*s) && s < e) {
++		while (isspace((unsigned char)*s) && s < e) {
+ 			s++;
+ 		}
+-		while (isspace(*e) && e > s) {
++		while (isspace((unsigned char)*e) && e > s) {
+ 			e--;
+ 		}
+ 	}
+diff --git a/ext/date/lib/timelib.c b/ext/date/lib/timelib.c
+index b9fb66f00fbbfd8d24969cfebec582050c126350..c5e0f4dc1450b442e81950cf72903e4e2a46d84f 100644
+--- a/ext/date/lib/timelib.c
++++ b/ext/date/lib/timelib.c
+@@ -97,7 +97,7 @@ void timelib_time_tz_abbr_update(timelib_time* tm, char* tz_abbr)
+ 	TIMELIB_TIME_FREE(tm->tz_abbr);
+ 	tm->tz_abbr = timelib_strdup(tz_abbr);
+ 	for (i = 0; i < tz_abbr_len; i++) {
+-		tm->tz_abbr[i] = toupper(tz_abbr[i]);
++		tm->tz_abbr[i] = toupper((unsigned char)tz_abbr[i]);
+ 	}
+ }
+ 
+diff --git a/ext/filter/logical_filters.c b/ext/filter/logical_filters.c
+index 39260f3622a773c2e8895bf68abfae6015ece4c2..d333796518f9a909bbda258312b9ce9b40bd0d66 100644
+--- a/ext/filter/logical_filters.c
++++ b/ext/filter/logical_filters.c
+@@ -471,21 +471,21 @@ static int _php_filter_validate_domain(char * domain, int len) /* {{{ */
+ 	}
+ 
+ 	/* First char must be alphanumeric */
+-	if(*s == '.' || (hostname && !isalnum((int)*(unsigned char *)s))) {
++	if(*s == '.' || (hostname && !isalnum((unsigned char)*s))) {
+ 		return 0;
+ 	}
+ 
+ 	while (s < e) {
+ 		if (*s == '.') {
+ 			/* The first and the last character of a label must be alphanumeric */
+-			if (*(s + 1) == '.' || (hostname && (!isalnum((int)*(unsigned char *)(s - 1)) || !isalnum((int)*(unsigned char *)(s + 1))))) {
++			if (*(s + 1) == '.' || (hostname && (!isalnum((unsigned char)s[-1]) || !isalnum((unsigned char)s[1])))) {
+ 				return 0;
+ 			}
+ 
+ 			/* Reset label length counter */
+ 			i = 1;
+ 		} else {
+-			if (i > 63 || (hostname && *s != '-' && !isalnum((int)*(unsigned char *)s))) {
++			if (i > 63 || (hostname && *s != '-' && !isalnum((unsigned char)*s))) {
+ 				return 0;
+ 			}
+ 
+@@ -506,9 +506,9 @@ static int is_userinfo_valid(char *str)
+ 	size_t len = strlen(str);
+ 
+ 	while (p - str < len) {
+-		if (isalpha(*p) || isdigit(*p) || strchr(valid, *p)) {
++		if (isalpha((unsigned char)*p) || isdigit((unsigned char)*p) || strchr(valid, *p)) {
+ 			p++;
+-		} else if (*p == '%' && p - str <= len - 3 && isdigit(*(p+1)) && isxdigit(*(p+2))) {
++		} else if (*p == '%' && p - str <= len - 3 && isdigit((unsigned char)p[1]) && isxdigit((unsigned char)p[2])) {
+ 			p += 3;
+ 		} else {
+ 			return 0;
+diff --git a/ext/gd/libgd/gd_gif_in.c b/ext/gd/libgd/gd_gif_in.c
+index 16776d362e638e8971bebd310a31f8c4abeab32f..44a1bdf25fcd6eb848068deaed16ac2fd4610a0a 100644
+--- a/ext/gd/libgd/gd_gif_in.c
++++ b/ext/gd/libgd/gd_gif_in.c
+@@ -449,7 +449,7 @@ LWZReadByte_(gdIOCtx *fd, LZW_STATIC_DATA *sd, char flag, int input_code_size, i
+ 			sd->table[1][i] = i;
+ 		}
+ 		for (; i < (1<<MAX_LWZ_BITS); ++i)
+-			sd->table[0][i] = sd->table[1][0] = 0;
++			sd->table[0][i] = sd->table[1][i] = 0;
+ 
+ 		sd->sp = sd->stack;
+ 
+@@ -493,6 +493,8 @@ LWZReadByte_(gdIOCtx *fd, LZW_STATIC_DATA *sd, char flag, int input_code_size, i
+ 
+ 			if (count != 0)
+ 				return -2;
++
++			return -2;
+ 		}
+ 
+ 		incode = code;
+@@ -559,7 +561,7 @@ ReadImage(gdImagePtr im, gdIOCtx *fd, int len, int height, unsigned char (*cmap)
+ 	int             v;
+ 	int             xpos = 0, ypos = 0, pass = 0;
+ 	int i;
+-	LZW_STATIC_DATA sd;
++	LZW_STATIC_DATA sd = {0};
+ 
+ 
+ 	/*
+diff --git a/ext/gd/libgd/xbm.c b/ext/gd/libgd/xbm.c
+index 99931a587833162ac6bf38bb073980e71d10999d..41dcd5083e3b6962ae2f97314344cb004b265ce0 100644
+--- a/ext/gd/libgd/xbm.c
++++ b/ext/gd/libgd/xbm.c
+@@ -192,7 +192,7 @@ void gdImageXbmCtx(gdImagePtr image, char* file_name, int fg, gdIOCtx * out)
+ 	} else {
+ 		for (i=0; i<l; i++) {
+ 			/* only in C-locale isalnum() would work */
+-			if (!isupper(name[i]) && !islower(name[i]) && !isdigit(name[i])) {
++			if (!isupper((unsigned char)name[i]) && !islower((unsigned char)name[i]) && !isdigit((unsigned char)name[i])) {
+ 				name[i] = '_';
+ 			}
+ 		}
+diff --git a/ext/intl/locale/locale_methods.c b/ext/intl/locale/locale_methods.c
+index 34d148b1b4d4a942078da3d3e7a70f92ac646ec5..bd5f8de83459ddd7764e97165c660c6abff95101 100644
+--- a/ext/intl/locale/locale_methods.c
++++ b/ext/intl/locale/locale_methods.c
+@@ -1215,7 +1215,7 @@ static int strToMatch(const char* str ,char *retstr)
+ 		if( *str == '-' ){
+ 			*retstr =  '_';
+ 		} else {
+-			*retstr = tolower(*str);
++			*retstr = tolower((unsigned char)*str);
+ 		}
+             str++;
+             retstr++;
+diff --git a/ext/mbstring/mbstring.c b/ext/mbstring/mbstring.c
+index cf5f8ed4230f856c0466f4605bc9197068b9acc8..4709ee4ee539905b21aa55d7607a8e91f1919d2d 100644
+--- a/ext/mbstring/mbstring.c
++++ b/ext/mbstring/mbstring.c
+@@ -1156,7 +1156,7 @@ static char *php_mb_rfc1867_getword(const zend_encoding *encoding, char **line,
+ 
+ static char *php_mb_rfc1867_getword_conf(const zend_encoding *encoding, char *str TSRMLS_DC) /* {{{ */
+ {
+-	while (*str && isspace(*(unsigned char *)str)) {
++	while (*str && isspace((unsigned char)*str)) {
+ 		++str;
+ 	}
+ 
+@@ -1172,7 +1172,7 @@ static char *php_mb_rfc1867_getword_conf(const zend_encoding *encoding, char *st
+ 	} else {
+ 		char *strend = str;
+ 
+-		while (*strend && !isspace(*(unsigned char *)strend)) {
++		while (*strend && !isspace((unsigned char)*strend)) {
+ 			++strend;
+ 		}
+ 		return php_mb_rfc1867_substring_conf(encoding, str, strend - str, 0 TSRMLS_CC);
+diff --git a/ext/pcre/php_pcre.c b/ext/pcre/php_pcre.c
+index 2a8ff199b8ffcc2f49491dceb77d84f3b6753135..ea54cb07d5870b740599fb916ebdc106a5e4a1dd 100644
+--- a/ext/pcre/php_pcre.c
++++ b/ext/pcre/php_pcre.c
+@@ -306,7 +306,7 @@ PHPAPI pcre_cache_entry* pcre_get_compiled_regex_cache(char *regex, int regex_le
+ 
+ 	/* Parse through the leading whitespace, and display a warning if we
+ 	   get to the end without encountering a delimiter. */
+-	while (isspace((int)*(unsigned char *)p)) p++;
++	while (isspace((unsigned char)*p)) p++;
+ 	if (*p == 0) {
+ 		php_error_docref(NULL TSRMLS_CC, E_WARNING,
+ 						 p < regex + regex_len ? "Null byte in regex" : "Empty regular expression");
+@@ -316,7 +316,7 @@ PHPAPI pcre_cache_entry* pcre_get_compiled_regex_cache(char *regex, int regex_le
+ 	/* Get the delimiter and display a warning if it is alphanumeric
+ 	   or a backslash. */
+ 	delimiter = *p++;
+-	if (isalnum((int)*(unsigned char *)&delimiter) || delimiter == '\\') {
++	if (isalnum((unsigned char)delimiter) || delimiter == '\\') {
+ 		php_error_docref(NULL TSRMLS_CC,E_WARNING, "Delimiter must not be alphanumeric or backslash");
+ 		return NULL;
+ 	}
+diff --git a/ext/pdo/pdo.c b/ext/pdo/pdo.c
+index 3bbc42e27e318a60320d04401c4e202b2a68869e..6daa998617e188909628001519dd89f7d8c8caf8 100644
+--- a/ext/pdo/pdo.c
++++ b/ext/pdo/pdo.c
+@@ -303,7 +303,7 @@ PDO_API int php_pdo_parse_data_source(const char *data_source,
+ 			}
+ 		}
+ 
+-		while (i < data_source_len && isspace(data_source[i])) {
++		while (i < data_source_len && isspace((unsigned char)data_source[i])) {
+ 			i++;
+ 		}
+ 
+diff --git a/ext/pdo/pdo_sql_parser.c b/ext/pdo/pdo_sql_parser.c
+index 820831de58fd0562a3a79f0e4ac2c7d5eb93687a..7992ba9542fa186aa6256e6d8c6cabb93b2bd504 100644
+--- a/ext/pdo/pdo_sql_parser.c
++++ b/ext/pdo/pdo_sql_parser.c
+@@ -393,7 +393,7 @@ PDO_API int pdo_parse_params(pdo_stmt_t *stmt, char *inquery, int inquery_len,
+ 		if (t == PDO_PARSER_BIND || t == PDO_PARSER_BIND_POS) {
+ 			if (t == PDO_PARSER_BIND) {
+ 				int len = s.cur - s.tok;
+-				if ((inquery < (s.cur - len)) && isalnum(*(s.cur - len - 1))) {
++				if ((inquery < (s.cur - len)) && isalnum((unsigned char)s.cur[-len - 1])) {
+ 					continue;
+ 				}
+ 				query_type |= PDO_PLACEHOLDER_NAMED;
+diff --git a/ext/pdo/pdo_sql_parser.re b/ext/pdo/pdo_sql_parser.re
+index bed5befa87feeb6360925231a278af9a63c2413d..0b69ddcc4d8709c240fa3dc37352ca5c14e680d1 100644
+--- a/ext/pdo/pdo_sql_parser.re
++++ b/ext/pdo/pdo_sql_parser.re
+@@ -99,7 +99,7 @@ PDO_API int pdo_parse_params(pdo_stmt_t *stmt, char *inquery, int inquery_len,
+ 		if (t == PDO_PARSER_BIND || t == PDO_PARSER_BIND_POS) {
+ 			if (t == PDO_PARSER_BIND) {
+ 				int len = s.cur - s.tok;
+-				if ((inquery < (s.cur - len)) && isalnum(*(s.cur - len - 1))) {
++				if ((inquery < (s.cur - len)) && isalnum((unsigned char)s.cur[-len - 1])) {
+ 					continue;
+ 				}
+ 				query_type |= PDO_PLACEHOLDER_NAMED;
+diff --git a/ext/pdo/pdo_stmt.c b/ext/pdo/pdo_stmt.c
+index 9f9ada9be3bfc1c088b166da9b69671aedabf5a9..11aa2dec0f47eeab575b95f019c847c753195008 100644
+--- a/ext/pdo/pdo_stmt.c
++++ b/ext/pdo/pdo_stmt.c
+@@ -220,7 +220,7 @@ int pdo_stmt_describe_columns(pdo_stmt_t *stmt TSRMLS_DC) /* {{{ */
+ 			switch (stmt->dbh->desired_case) {
+ 				case PDO_CASE_UPPER:
+ 					while (*s != '\0') {
+-						*s = toupper(*s);
++						*s = toupper((unsigned char)*s);
+ 						s++;
+ 					}
+ 					break;
+diff --git a/ext/phar/tests/tar/files/circular_symlinks.tar b/ext/phar/tests/tar/files/circular_symlinks.tar
+new file mode 100644
+index 0000000000000000000000000000000000000000..2af7bb8c2384bb98ddeaaa31211dfb8b3850fc42
+GIT binary patch
+literal 10240
+zc-rmJK?;K~5Cza2rALS%c%2fVfr2Zo_cyw1-HF}!-saD4J~Q<_zMdsqDmH!2dp6(s
+qJ9jbV7#^u^<%Vm^E%T>LZGE_>f1LQ-|BL?v000000000099RJs7$MI9
+
+literal 0
+Hc-jL100001
+
+diff --git a/ext/phar/tests/tar/files/circular_symlinks_long.tar b/ext/phar/tests/tar/files/circular_symlinks_long.tar
+new file mode 100644
+index 0000000000000000000000000000000000000000..b2b4c1cb095c13d455f191f74e6598859cbe6a4e
+GIT binary patch
+literal 215040
+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
+S{QUg<{QUg<{QUlU-+ur^XD3(y
+
+literal 0
+Hc-jL100001
+
+diff --git a/ext/phar/tests/tar/files/circular_symlinks_rho.tar b/ext/phar/tests/tar/files/circular_symlinks_rho.tar
+new file mode 100644
+index 0000000000000000000000000000000000000000..2ccbf17c8c63f4ce3cdc7ead281d919108a350d4
+GIT binary patch
+literal 10240
+zc-rmMK?=e!5J1r!#UrFKc%4#P3xX@#-oH`kMmHiv3ck0Q>@ws-#_R3UcA=_RoN|87
+z;&r~Co0xJ8hcrHxJJ(%qnda_Zt`Gm|7f<|E|Fre*^{?H(-(ml}^&j-F-GA6&|D*pO
+N000000002s6DvQ)L$3e;
+
+literal 0
+Hc-jL100001
+
+diff --git a/ext/phar/tests/tar/ghsa-vc5h-9ppw-p5f3-symlink-circular.phpt b/ext/phar/tests/tar/ghsa-vc5h-9ppw-p5f3-symlink-circular.phpt
+new file mode 100644
+index 0000000000000000000000000000000000000000..5d397b5b98df2ceb0abd0932bb1fdf684cfb1e0a
+--- /dev/null
++++ b/ext/phar/tests/tar/ghsa-vc5h-9ppw-p5f3-symlink-circular.phpt
+@@ -0,0 +1,27 @@
++--TEST--
++GHSA-vc5h-9ppw-p5f3 (circular symlinks in tar should not cause stack overflow)
++--CREDITS--
++Calvin Young - eWalker Consulting (HK) Limited
++Enoch Chow - Isomorph Cyber
++--SKIPIF--
++<?php if (!extension_loaded("phar")) die("skip");?>
++--FILE--
++<?php
++$base = dirname(__FILE__);
++
++// simple 2-cycle
++$phar = new PharData($base . '/files/circular_symlinks.tar');
++var_dump($phar['file_a']->getContent() === '');
++
++// rho-shaped cycle (tail leading into a loop)
++$phar = new PharData($base . '/files/circular_symlinks_rho.tar');
++var_dump($phar['file_a']->getContent() === '');
++
++// long cycle (400 entries)
++$phar = new PharData($base . '/files/circular_symlinks_long.tar');
++var_dump($phar['link_0']->getContent() === '');
++?>
++--EXPECT--
++bool(true)
++bool(true)
++bool(true)
+diff --git a/ext/phar/util.c b/ext/phar/util.c
+index 06e4e55da7af6f6319134c1bf1ad27df9dda3880..0db8110d03d5ac70b4b2bb8be3ca3dbefdc4476c 100644
+--- a/ext/phar/util.c
++++ b/ext/phar/util.c
+@@ -61,30 +61,59 @@ static char *phar_get_link_location(phar_entry_info *entry TSRMLS_DC) /* {{{ */
+ }
+ /* }}} */
+ 
+-phar_entry_info *phar_get_link_source(phar_entry_info *entry TSRMLS_DC) /* {{{ */
++static phar_entry_info *phar_follow_one_link(phar_entry_info *entry TSRMLS_DC)
+ {
+ 	phar_entry_info *link_entry;
+ 	char *link;
+ 
+-	if (!entry->link) {
+-		return entry;
+-	}
+-
+ 	link = phar_get_link_location(entry TSRMLS_CC);
+ 	if (SUCCESS == zend_hash_find(&(entry->phar->manifest), entry->link, strlen(entry->link), (void **)&link_entry) ||
+ 		SUCCESS == zend_hash_find(&(entry->phar->manifest), link, strlen(link), (void **)&link_entry)) {
+ 		if (link != entry->link) {
+ 			efree(link);
+ 		}
+-		return phar_get_link_source(link_entry TSRMLS_CC);
+-	} else {
+-		if (link != entry->link) {
+-			efree(link);
++		return link_entry;
++	}
++
++	if (link != entry->link) {
++		efree(link);
++	}
++	return NULL;
++}
++
++phar_entry_info *phar_get_link_source(phar_entry_info *entry TSRMLS_DC)
++{
++	phar_entry_info *slow, *fast;
++
++	if (!entry->link) {
++		return entry;
++	}
++
++	/*
++	 * Use Floyd's cycle detection algorithm to follow the symlink chain without unbounded
++	 * recursion. Each entry has at most one outgoing link, so if a cycle exists the fast pointer
++	 * will eventually meet the slow one. Otherwise the fast pointer reaches the end first.
++	 */
++	slow = fast = entry;
++	while (1) {
++		fast = phar_follow_one_link(fast TSRMLS_CC);
++		if (!fast || !fast->link) {
++			return fast;
++		}
++		fast = phar_follow_one_link(fast TSRMLS_CC);
++		if (!fast || !fast->link) {
++			return fast;
++		}
++
++		/* no need to check slow as it's always behind */
++		slow = phar_follow_one_link(slow TSRMLS_CC);
++
++		if (slow == fast) {
++			/* circular symlink chain */
++			return NULL;
+ 		}
+-		return NULL;
+ 	}
+ }
+-/* }}} */
+ 
+ /* retrieve a phar_entry_info's current file pointer for reading contents */
+ php_stream *phar_get_efp(phar_entry_info *entry, int follow_links TSRMLS_DC) /* {{{ */
+diff --git a/ext/standard/file.c b/ext/standard/file.c
+index 067f9614eb8c5fdc011e8b5abbec946997368a8f..f9a6ffde9dd3bd34ed8bdfa66dbb3e5bd735a4ed 100644
+--- a/ext/standard/file.c
++++ b/ext/standard/file.c
+@@ -2090,7 +2090,7 @@ PHPAPI void php_fgetcsv(php_stream *stream, char delimiter, char enclosure, char
+ 		inc_len = (bptr < limit ? (*bptr == '\0' ? 1: php_mblen(bptr, limit - bptr)): 0);
+ 		if (inc_len == 1) {
+ 			char *tmp = bptr;
+-			while ((*tmp != delimiter) && isspace((int)*(unsigned char *)tmp)) {
++			while ((*tmp != delimiter) && isspace((unsigned char)*tmp)) {
+ 				tmp++;
+   			}
+ 			if (*tmp == enclosure) {
+diff --git a/ext/standard/filters.c b/ext/standard/filters.c
+index a0a6dfaf0350d0318c8c1302c77d3f3cc9e86e68..f09c8c51185946e729cee4390add4afbfb443e87 100644
+--- a/ext/standard/filters.c
++++ b/ext/standard/filters.c
+@@ -1094,7 +1094,7 @@ static php_conv_err_t php_conv_qprint_decode_convert(php_conv_qprint_decode *ins
+ 					goto out;
+ 				}
+ 
+-				if (!isxdigit((int) *ps)) {
++				if (!isxdigit(*ps)) {
+ 					err = PHP_CONV_ERR_INVALID_SEQ;
+ 					goto out;
+ 				}
+diff --git a/ext/standard/formatted_print.c b/ext/standard/formatted_print.c
+index 9529cad93024ebb254f8e87e88b258ca98863b1d..e4a1f27ccd5592145ca7868819b554ee401ea493 100644
+--- a/ext/standard/formatted_print.c
++++ b/ext/standard/formatted_print.c
+@@ -458,10 +458,10 @@ php_formatted_print(int ht, int *len, int use_array, int format_offset TSRMLS_DC
+ 
+ 			PRINTF_DEBUG(("sprintf: first looking at '%c', inpos=%d\n",
+ 						  format[inpos], inpos));
+-			if (isascii((int)format[inpos]) && !isalpha((int)format[inpos])) {
++			if (isascii((unsigned char)format[inpos]) && !isalpha((unsigned char)format[inpos])) {
+ 				/* first look for argnum */
+ 				temppos = inpos;
+-				while (isdigit((int)format[temppos])) temppos++;
++				while (isdigit((unsigned char)format[temppos])) temppos++;
+ 				if (format[temppos] == '$') {
+ 					argnum = php_sprintf_getnumber(format, &inpos);
+ 
+@@ -505,7 +505,7 @@ php_formatted_print(int ht, int *len, int use_array, int format_offset TSRMLS_DC
+ 
+ 
+ 				/* after modifiers comes width */
+-				if (isdigit((int)format[inpos])) {
++				if (isdigit((unsigned char)format[inpos])) {
+ 					PRINTF_DEBUG(("sprintf: getting width\n"));
+ 					if ((width = php_sprintf_getnumber(format, &inpos)) < 0) {
+ 						efree(result);
+@@ -523,7 +523,7 @@ php_formatted_print(int ht, int *len, int use_array, int format_offset TSRMLS_DC
+ 				if (format[inpos] == '.') {
+ 					inpos++;
+ 					PRINTF_DEBUG(("sprintf: getting precision\n"));
+-					if (isdigit((int)format[inpos])) {
++					if (isdigit((unsigned char)format[inpos])) {
+ 						if ((precision = php_sprintf_getnumber(format, &inpos)) < 0) {
+ 							efree(result);
+ 							efree(args);
+diff --git a/ext/standard/fsock.c b/ext/standard/fsock.c
+index fbeaf57ce61a88adb1637843f70c71888584a63a..1289f03c729fa787100f364a553fab026128ec04 100644
+--- a/ext/standard/fsock.c
++++ b/ext/standard/fsock.c
+@@ -27,6 +27,24 @@
+ #include "php_network.h"
+ #include "file.h"
+ 
++static size_t php_fsockopen_format_host_port(char **message, const char *prefix, size_t prefix_len,
++	const char *host, size_t host_len, long port)
++{
++	char portbuf[32];
++	int portlen = snprintf(portbuf, sizeof(portbuf), ":%ld", port);
++	size_t total_len = prefix_len + host_len + portlen;
++	char *result = emalloc(total_len + 1);
++
++	if (prefix_len > 0) {
++		memcpy(result, prefix, prefix_len);
++	}
++	memcpy(result + prefix_len, host, host_len);
++	memcpy(result + prefix_len + host_len, portbuf, portlen);
++	result[total_len] = '\0';
++	*message = result;
++	return total_len;
++}
++
+ /* {{{ php_fsockopen() */
+ 
+ static void php_fsockopen_stream(INTERNAL_FUNCTION_PARAMETERS, int persistent)
+@@ -52,11 +70,12 @@ static void php_fsockopen_stream(INTERNAL_FUNCTION_PARAMETERS, int persistent)
+ 	}
+ 
+ 	if (persistent) {
+-		spprintf(&hashkey, 0, "pfsockopen__%s:%ld", host, port);
++		php_fsockopen_format_host_port(&hashkey, "pfsockopen__", strlen("pfsockopen__"), host,
++				host_len, port);
+ 	}
+ 
+ 	if (port > 0) {
+-		hostname_len = spprintf(&hostname, 0, "%s:%ld", host, port);
++		hostname_len = php_fsockopen_format_host_port(&hostname, "", 0, host, host_len, port);
+ 	} else {
+ 		hostname_len = host_len;
+ 		hostname = host;
+diff --git a/ext/standard/ftp_fopen_wrapper.c b/ext/standard/ftp_fopen_wrapper.c
+index 5bffa47855c1e89894c1e25a43213021c86a607c..7d6670b127b68012e9a260bb45e58ba757a3b729 100644
+--- a/ext/standard/ftp_fopen_wrapper.c
++++ b/ext/standard/ftp_fopen_wrapper.c
+@@ -84,8 +84,8 @@ static inline int get_ftp_result(php_stream *stream, char *buffer, size_t buffer
+ {
+ 	buffer[0] = '\0'; /* in case read fails to read anything */
+ 	while (php_stream_gets(stream, buffer, buffer_size-1) &&
+-		   !(isdigit((int) buffer[0]) && isdigit((int) buffer[1]) &&
+-			 isdigit((int) buffer[2]) && buffer[3] == ' '));
++		   !(isdigit((unsigned char)buffer[0]) && isdigit((unsigned char)buffer[1]) &&
++			 isdigit((unsigned char)buffer[2]) && buffer[3] == ' '));
+ 	return strtol(buffer, NULL, 10);
+ }
+ /* }}} */
+@@ -237,7 +237,7 @@ static php_stream *php_ftp_fopen_connect(php_stream_wrapper *wrapper, const char
+ #define PHP_FTP_CNTRL_CHK(val, val_len, err_msg) {	\
+ 	unsigned char *s = val, *e = s + val_len;	\
+ 	while (s < e) {	\
+-		if (iscntrl(*s)) {	\
++		if (iscntrl((unsigned char)*s)) {	\
+ 			php_stream_wrapper_log_error(wrapper, options TSRMLS_CC, err_msg, val);	\
+ 			goto connect_errexit;	\
+ 		}	\
+@@ -349,14 +349,14 @@ static unsigned short php_fopen_do_pasv(php_stream *stream, char *ip, size_t ip_
+ 		/* parse pasv command (129, 80, 95, 25, 13, 221) */
+ 		tpath = tmp_line;
+ 		/* skip over the "227 Some message " part */
+-		for (tpath += 4; *tpath && !isdigit((int) *tpath); tpath++);
++		for (tpath += 4; *tpath && !isdigit((unsigned char)*tpath); tpath++);
+ 		if (!*tpath) {
+ 			return 0;
+ 		}
+ 		/* skip over the host ip, to get the port */
+ 		hoststart = tpath;
+ 		for (i = 0; i < 4; i++) {
+-			for (; isdigit((int) *tpath); tpath++);
++			for (; isdigit((unsigned char)*tpath); tpath++);
+ 			if (*tpath != ',') {
+ 				return 0;
+ 			}
+@@ -843,7 +843,7 @@ static int php_stream_ftp_url_stat(php_stream_wrapper *wrapper, const char *url,
+ 		struct tm tm, tmbuf, *gmt;
+ 		time_t stamp;
+ 
+-		while (p - tmp_line < sizeof(tmp_line) && !isdigit(*p)) {
++		while (p - tmp_line < sizeof(tmp_line) && !isdigit((unsigned char)*p)) {
+ 			p++;
+ 		}
+ 
+diff --git a/ext/standard/html.c b/ext/standard/html.c
+index 3a7aba256aa51eb6efcc9573fa52d82b9437697f..e10ed0e895e0fb3c1195e4dd4bbb134d7533f979 100644
+--- a/ext/standard/html.c
++++ b/ext/standard/html.c
+@@ -799,8 +799,8 @@ static inline int process_numeric_entity(const char **buf, unsigned *code_point)
+ 
+ 	/* strtol allows whitespace and other stuff in the beginning
+ 		* we're not interested */
+-	if ((hexadecimal && !isxdigit(**buf)) ||
+-			(!hexadecimal && !isdigit(**buf))) {
++	if ((hexadecimal && !isxdigit((unsigned char)**buf)) ||
++			(!hexadecimal && !isdigit((unsigned char)**buf))) {
+ 		return FAILURE;
+ 	}
+ 
+diff --git a/ext/standard/math.c b/ext/standard/math.c
+index bb64425ee3903af2bf2a8ebb17750c014bc6920d..1c0b24ea9f5051704064ae3047ba4743f2d3b193 100644
+--- a/ext/standard/math.c
++++ b/ext/standard/math.c
+@@ -1097,7 +1097,7 @@ static char *_php_math_number_format_ex_len(double d, int dec, char *dec_point,
+ 
+ 	tmplen = spprintf(&tmpbuf, 0, "%.*F", dec, d);
+ 
+-	if (tmpbuf == NULL || !isdigit((int)tmpbuf[0])) {
++	if (tmpbuf == NULL || !isdigit((unsigned char)tmpbuf[0])) {
+ 		if (result_len) {
+ 			*result_len = tmplen;
+ 		}
+diff --git a/ext/standard/metaphone.c b/ext/standard/metaphone.c
+index 84cf2f0adaeb5e0c53593bd77e83e9b39950cf9d..aecd49df5dd425d75fb321f8914f5de9236cb373 100644
+--- a/ext/standard/metaphone.c
++++ b/ext/standard/metaphone.c
+@@ -85,7 +85,7 @@ char _codes[26] =
+ };
+ 
+ 
+-#define ENCODE(c) (isalpha(c) ? _codes[((toupper(c)) - 'A')] : 0)
++#define ENCODE(c) (isalpha((unsigned char)(c)) ? _codes[((toupper((unsigned char)(c))) - 'A')] : 0)
+ 
+ #define isvowel(c)  (ENCODE(c) & 1)		/* AEIOU */
+ 
+@@ -109,17 +109,17 @@ char _codes[26] =
+  * accesssing the array directly... */
+ 
+ /* Look at the next letter in the word */
+-#define Next_Letter (toupper(word[w_idx+1]))
++#define Next_Letter (toupper((unsigned char)word[w_idx+1]))
+ /* Look at the current letter in the word */
+-#define Curr_Letter (toupper(word[w_idx]))
++#define Curr_Letter (toupper((unsigned char)word[w_idx]))
+ /* Go N letters back. */
+-#define Look_Back_Letter(n)	(w_idx >= n ? toupper(word[w_idx-n]) : '\0')
++#define Look_Back_Letter(n)	(w_idx >= n ? toupper((unsigned char)word[w_idx-n]) : '\0')
+ /* Previous letter.  I dunno, should this return null on failure? */
+ #define Prev_Letter (Look_Back_Letter(1))
+ /* Look two letters down.  It makes sure you don't walk off the string. */
+-#define After_Next_Letter	(Next_Letter != '\0' ? toupper(word[w_idx+2]) \
++#define After_Next_Letter	(Next_Letter != '\0' ? toupper((unsigned char)word[w_idx+2]) \
+ 											     : '\0')
+-#define Look_Ahead_Letter(n) (toupper(Lookahead(word+w_idx, n)))
++#define Look_Ahead_Letter(n) (toupper((unsigned char)Lookahead(word+w_idx, n)))
+ 
+ 
+ /* Allows us to safely look ahead an arbitrary # of letters */
+@@ -160,7 +160,7 @@ static char Lookahead(char *word, int how_far)
+ #define Phone_Len	(p_idx)
+ 
+ /* Note is a letter is a 'break' in the word */
+-#define Isbreak(c)  (!isalpha(c))
++#define Isbreak(c)  (!isalpha((unsigned char)(c)))
+ 
+ /* {{{ metaphone
+  */
+@@ -195,7 +195,7 @@ static int metaphone(unsigned char *word, int word_len, long max_phonemes, char
+ 
+ /*-- The first phoneme has to be processed specially. --*/
+ 	/* Find our first letter */
+-	for (; !isalpha(Curr_Letter); w_idx++) {
++	for (; !isalpha((unsigned char)Curr_Letter); w_idx++) {
+ 		/* On the off chance we were given nothing but crap... */
+ 		if (Curr_Letter == '\0') {
+ 			End_Phoned_Word
+@@ -279,7 +279,7 @@ static int metaphone(unsigned char *word, int word_len, long max_phonemes, char
+ 		 */
+ 
+ 		/* Ignore non-alphas */
+-		if (!isalpha(Curr_Letter))
++		if (!isalpha((unsigned char)Curr_Letter))
+ 			continue;
+ 
+ 		/* Drop duplicates, except CC */
+diff --git a/ext/standard/quot_print.c b/ext/standard/quot_print.c
+index 6d5835e9a2453606d84c297f251051fd67dcc85c..07f1bd3ace60e3b07b5744d19b77de48b8e7cb6a 100644
+--- a/ext/standard/quot_print.c
++++ b/ext/standard/quot_print.c
+@@ -220,11 +220,11 @@ PHP_FUNCTION(quoted_printable_decode)
+ 		switch (str_in[i]) {
+ 		case '=':
+ 			if (str_in[i + 1] && str_in[i + 2] &&
+-				isxdigit((int) str_in[i + 1]) &&
+-				isxdigit((int) str_in[i + 2]))
++				isxdigit((unsigned char)str_in[i + 1]) &&
++				isxdigit((unsigned char)str_in[i + 2]))
+ 			{
+-				str_out[j++] = (php_hex2int((int) str_in[i + 1]) << 4)
+-						+ php_hex2int((int) str_in[i + 2]);
++				str_out[j++] = (php_hex2int((unsigned char)str_in[i + 1]) << 4)
++						+ php_hex2int((unsigned char)str_in[i + 2]);
+ 				i += 3;
+ 			} else  /* check for soft line break according to RFC 2045*/ {
+ 				k = 1;
+diff --git a/ext/standard/scanf.c b/ext/standard/scanf.c
+index ace6d7a8b3ceb3253f04cad812a70ca440475f33..9234406253bdf7a68154c34e1a7db2599051410e 100644
+--- a/ext/standard/scanf.c
++++ b/ext/standard/scanf.c
+@@ -350,7 +350,7 @@ PHPAPI int ValidateFormat(char *format, int numVars, int *totalSubs)
+ 			goto xpgCheckDone;
+ 		}
+ 
+-		if ( isdigit( (int)*ch ) ) {
++		if ( isdigit( (unsigned char)*ch ) ) {
+ 			/*
+ 			 * Check for an XPG3-style %n$ specification.  Note: there
+ 			 * must not be a mixture of XPG3 specs and non-XPG3 specs
+@@ -670,9 +670,9 @@ PHPAPI int php_sscanf_internal( char *string, char *format,
+ 		/*
+ 		 * If we see whitespace in the format, skip whitespace in the string.
+ 		 */
+-		if ( isspace( (int)*ch ) ) {
++		if ( isspace( (unsigned char)*ch ) ) {
+ 			sch = *string;
+-			while ( isspace( (int)sch ) ) {
++			while ( isspace( (unsigned char)sch ) ) {
+ 				if (*string == '\0') {
+ 					goto done;
+ 				}
+@@ -829,7 +829,7 @@ literal:
+ 		if (!(flags & SCAN_NOSKIP)) {
+ 			while (*string != '\0') {
+ 				sch = *string;
+-				if (! isspace((int)sch) ) {
++				if (! isspace((unsigned char)sch) ) {
+ 					break;
+ 				}
+ 				string++;
+@@ -855,7 +855,7 @@ literal:
+ 				end = string;
+ 				while (*end != '\0') {
+ 					sch = *end;
+-					if ( isspace( (int)sch ) ) {
++					if ( isspace( (unsigned char)sch ) ) {
+ 						break;
+ 					}
+ 					end++;
+diff --git a/ext/standard/soundex.c b/ext/standard/soundex.c
+index 4c8761630d57e6a4140322ebe4a917597d35e69d..2515104f61564e18a6ff99d31904955c9277e547 100644
+--- a/ext/standard/soundex.c
++++ b/ext/standard/soundex.c
+@@ -74,7 +74,7 @@ PHP_FUNCTION(soundex)
+ 		/* BUG: should also map here accented letters used in non */
+ 		/* English words or names (also found in English text!): */
+ 		/* esstsett, thorn, n-tilde, c-cedilla, s-caron, ... */
+-		code = toupper((int)(unsigned char)str[i]);
++		code = toupper((unsigned char)str[i]);
+ 		if (code >= 'A' && code <= 'Z') {
+ 			if (_small == 0) {
+ 				/* remember first valid char */
+diff --git a/ext/standard/string.c b/ext/standard/string.c
+index 4687b2022159e62a20540ac8aad1c61e16e00824..2b8a1bc11e3845f27b86753e8c2efa91ea80f35b 100644
+--- a/ext/standard/string.c
++++ b/ext/standard/string.c
+@@ -3464,9 +3464,9 @@ PHPAPI void php_stripcslashes(char *str, int *len)
+ 				case 'f':  *target++='\f'; nlen--; break;
+ 				case '\\': *target++='\\'; nlen--; break;
+ 				case 'x':
+-					if (source+1 < end && isxdigit((int)(*(source+1)))) {
++					if (source+1 < end && isxdigit((unsigned char)source[1])) {
+ 						numtmp[0] = *++source;
+-						if (source+1 < end && isxdigit((int)(*(source+1)))) {
++						if (source+1 < end && isxdigit((unsigned char)source[1])) {
+ 							numtmp[1] = *++source;
+ 							numtmp[2] = '\0';
+ 							nlen-=3;
+@@ -4121,7 +4121,7 @@ static void php_hebrev(INTERNAL_FUNCTION_PARAMETERS, int convert_newlines)
+ 
+ 	do {
+ 		if (block_type == _HEB_BLOCK_TYPE_HEB) {
+-			while ((isheb((int)*(tmp+1)) || _isblank((int)*(tmp+1)) || ispunct((int)*(tmp+1)) || (int)*(tmp+1)=='\n' ) && block_end<str_len-1) {
++			while ((isheb((int)*(tmp+1)) || _isblank((int)*(tmp+1)) || ispunct((unsigned char)tmp[1]) || (int)*(tmp+1)=='\n' ) && block_end<str_len-1) {
+ 				tmp++;
+ 				block_end++;
+ 				block_length++;
+@@ -4171,7 +4171,7 @@ static void php_hebrev(INTERNAL_FUNCTION_PARAMETERS, int convert_newlines)
+ 				block_end++;
+ 				block_length++;
+ 			}
+-			while ((_isblank((int)*tmp) || ispunct((int)*tmp)) && *tmp!='/' && *tmp!='-' && block_end > block_start) {
++			while ((_isblank((int)*tmp) || ispunct((unsigned char)*tmp)) && *tmp!='/' && *tmp!='-' && block_end > block_start) {
+ 				tmp--;
+ 				block_end--;
+ 			}
+@@ -4561,7 +4561,7 @@ int php_tag_find(char *tag, int len, char *set) {
+ 				done =1;
+ 				break;
+ 			default:
+-				if (!isspace((int)c)) {
++				if (!isspace((unsigned char)c)) {
+ 					if (state == 0) {
+ 						state=1;
+ 					}
+diff --git a/ext/standard/strnatcmp.c b/ext/standard/strnatcmp.c
+index 4b07740beaae4aff3f17e0ce3e0756ae1e96ed5f..8410dcd16d64e973eff16c7131eac25ea2788106 100644
+--- a/ext/standard/strnatcmp.c
++++ b/ext/standard/strnatcmp.c
+@@ -52,12 +52,12 @@ compare_right(char const **a, char const *aend, char const **b, char const *bend
+ 	   both numbers to know that they have the same magnitude, so we
+ 	   remember it in BIAS. */
+ 	for(;; (*a)++, (*b)++) {
+-		if ((*a == aend || !isdigit((int)(unsigned char)**a)) &&
+-			(*b == bend || !isdigit((int)(unsigned char)**b)))
++		if ((*a == aend || !isdigit((unsigned char)**a)) &&
++			(*b == bend || !isdigit((unsigned char)**b)))
+ 			return bias;
+-		else if (*a == aend || !isdigit((int)(unsigned char)**a))
++		else if (*a == aend || !isdigit((unsigned char)**a))
+ 			return -1;
+-		else if (*b == bend || !isdigit((int)(unsigned char)**b))
++		else if (*b == bend || !isdigit((unsigned char)**b))
+ 			return +1;
+ 		else if (**a < **b) {
+ 			if (!bias)
+@@ -80,12 +80,12 @@ compare_left(char const **a, char const *aend, char const **b, char const *bend)
+      /* Compare two left-aligned numbers: the first to have a
+         different value wins. */
+ 	for(;; (*a)++, (*b)++) {
+-		if ((*a == aend || !isdigit((int)(unsigned char)**a)) &&
+-			(*b == bend || !isdigit((int)(unsigned char)**b)))
++		if ((*a == aend || !isdigit((unsigned char)**a)) &&
++			(*b == bend || !isdigit((unsigned char)**b)))
+ 			return 0;
+-		else if (*a == aend || !isdigit((int)(unsigned char)**a))
++		else if (*a == aend || !isdigit((unsigned char)**a))
+ 			return -1;
+-		else if (*b == bend || !isdigit((int)(unsigned char)**b))
++		else if (*b == bend || !isdigit((unsigned char)**b))
+ 			return +1;
+ 		 else if (**a < **b)
+ 			 return -1;
+@@ -117,27 +117,27 @@ PHPAPI int strnatcmp_ex(char const *a, size_t a_len, char const *b, size_t b_len
+ 		ca = *ap; cb = *bp;
+ 
+ 		/* skip over leading zeros */
+-		while (leading && ca == '0' && (ap+1 < aend) && isdigit((int)(unsigned char)*(ap+1))) {
++		while (leading && ca == '0' && (ap+1 < aend) && isdigit((unsigned char)ap[1])) {
+ 			ca = *++ap;
+ 		}
+ 
+-		while (leading && cb == '0' && (bp+1 < bend) && isdigit((int)(unsigned char)*(bp+1))) {
++		while (leading && cb == '0' && (bp+1 < bend) && isdigit((unsigned char)bp[1])) {
+ 			cb = *++bp;
+ 		}
+ 
+ 		leading = 0;
+ 
+ 		/* Skip consecutive whitespace */
+-		while (isspace((int)(unsigned char)ca)) {
++		while (isspace(ca)) {
+ 			ca = *++ap;
+ 		}
+ 
+-		while (isspace((int)(unsigned char)cb)) {
++		while (isspace(cb)) {
+ 			cb = *++bp;
+ 		}
+ 
+ 		/* process run of digits */
+-		if (isdigit((int)(unsigned char)ca)  &&  isdigit((int)(unsigned char)cb)) {
++		if (isdigit(ca)  &&  isdigit(cb)) {
+ 			fractional = (ca == '0' || cb == '0');
+ 
+ 			if (fractional)
+@@ -157,8 +157,8 @@ PHPAPI int strnatcmp_ex(char const *a, size_t a_len, char const *b, size_t b_len
+ 		}
+ 
+ 		if (fold_case) {
+-			ca = toupper((int)(unsigned char)ca);
+-			cb = toupper((int)(unsigned char)cb);
++			ca = toupper(ca);
++			cb = toupper(cb);
+ 		}
+ 
+ 		if (ca < cb)
+diff --git a/ext/standard/tests/network/ghsa-3cr5-j632-f35r.phpt b/ext/standard/tests/network/ghsa-3cr5-j632-f35r.phpt
+new file mode 100644
+index 0000000000000000000000000000000000000000..4580bb6c1fbd10a092a441d4a6244a638e604f42
+--- /dev/null
++++ b/ext/standard/tests/network/ghsa-3cr5-j632-f35r.phpt
+@@ -0,0 +1,21 @@
++--TEST--
++GHSA-3cr5-j632-f35r: Null byte termination in fsockopen()
++--FILE--
++<?php
++
++$server = stream_socket_server("tcp://localhost:0");
++
++if (preg_match('/:(\d+)$/', stream_socket_get_name($server, false), $m)) {
++    $client = fsockopen("localhost\0.example.com", intval($m[1]));
++    var_dump($client);
++    if ($client) {
++        fclose($client);
++    }
++}
++fclose($server);
++
++?>
++--EXPECTF--
++
++Warning: fsockopen(): unable to connect to localhost:%d (The hostname must not contain null bytes) in %s
++bool(false)
+diff --git a/ext/standard/tests/streams/ghsa-3cr5-j632-f35r.phpt b/ext/standard/tests/streams/ghsa-3cr5-j632-f35r.phpt
+new file mode 100644
+index 0000000000000000000000000000000000000000..7ec578d103c647c76524535a60232d3148c66291
+--- /dev/null
++++ b/ext/standard/tests/streams/ghsa-3cr5-j632-f35r.phpt
+@@ -0,0 +1,26 @@
++--TEST--
++GHSA-3cr5-j632-f35r: Null byte termination in stream_socket_client()
++--FILE--
++<?php
++
++$server = stream_socket_server("tcp://localhost:0");
++$socket_name = stream_socket_get_name($server, false);
++
++if (preg_match('/:(\d+)$/', $socket_name, $m)) {
++    $port = $m[1];
++    $client = stream_socket_client("tcp://localhost\0.example.com:$port");
++    var_dump($client);
++    if ($client) {
++        fclose($client);
++    }
++} else {
++    echo "Could not extract port from socket name: $socket_name\n";
++}
++
++fclose($server);
++
++?>
++--EXPECTF--
++
++Warning: stream_socket_client(): unable to connect to tcp://localhost\0.example.com:%d (The hostname must not contain null bytes) in %s
++bool(false)
+diff --git a/ext/standard/url.c b/ext/standard/url.c
+index 0278bd47e85000612b1889b513a07fcf8c7c0049..545fec775ebaec6ec1b98ef7911296dcc1799a04 100644
+--- a/ext/standard/url.c
++++ b/ext/standard/url.c
+@@ -109,7 +109,7 @@ PHPAPI php_url *php_url_parse_ex(char const *str, int length)
+ 		p = s;
+ 		while (p < e) {
+ 			/* scheme = 1*[ lowalpha | digit | "+" | "-" | "." ] */
+-			if (!isalpha(*p) && !isdigit(*p) && *p != '+' && *p != '.' && *p != '-') {
++			if (!isalpha((unsigned char)*p) && !isdigit((unsigned char)*p) && *p != '+' && *p != '.' && *p != '-') {
+ 				if (e + 1 < ue) {
+ 					goto parse_port;
+ 				} else {
+@@ -134,7 +134,7 @@ PHPAPI php_url *php_url_parse_ex(char const *str, int length)
+ 			 * correctly parse things like a.com:80
+ 			 */
+ 			p = e + 1;
+-			while (p < ue && isdigit(*p)) {
++			while (p < ue && isdigit((unsigned char)*p)) {
+ 				p++;
+ 			}
+ 
+@@ -174,7 +174,7 @@ PHPAPI php_url *php_url_parse_ex(char const *str, int length)
+ 		p = e + 1;
+ 		pp = p;
+ 
+-		while (pp < ue && pp - p < 6 && isdigit(*pp)) {
++		while (pp < ue && pp - p < 6 && isdigit((unsigned char)*pp)) {
+ 			pp++;
+ 		}
+ 
+@@ -411,12 +411,12 @@ static int php_htoi(char *s)
+ 	int value;
+ 	int c;
+ 
+-	c = ((unsigned char *)s)[0];
++	c = (unsigned char)s[0];
+ 	if (isupper(c))
+ 		c = tolower(c);
+ 	value = (c >= '0' && c <= '9' ? c - '0' : c - 'a' + 10) * 16;
+ 
+-	c = ((unsigned char *)s)[1];
++	c = (unsigned char)s[1];
+ 	if (isupper(c))
+ 		c = tolower(c);
+ 	value += c >= '0' && c <= '9' ? c - '0' : c - 'a' + 10;
+@@ -540,8 +540,8 @@ PHPAPI int php_url_decode(char *str, int len)
+ 		if (*data == '+') {
+ 			*dest = ' ';
+ 		}
+-		else if (*data == '%' && len >= 2 && isxdigit((int) *(data + 1))
+-				 && isxdigit((int) *(data + 2))) {
++		else if (*data == '%' && len >= 2 && isxdigit((unsigned char)data[1])
++				 && isxdigit((unsigned char)data[2])) {
+ #ifndef CHARSET_EBCDIC
+ 			*dest = (char) php_htoi(data + 1);
+ #else
+@@ -642,8 +642,8 @@ PHPAPI int php_raw_url_decode(char *str, int len)
+ 	char *data = str;
+ 
+ 	while (len--) {
+-		if (*data == '%' && len >= 2 && isxdigit((int) *(data + 1))
+-			&& isxdigit((int) *(data + 2))) {
++		if (*data == '%' && len >= 2 && isxdigit((unsigned char)data[1])
++			&& isxdigit((unsigned char)data[2])) {
+ #ifndef CHARSET_EBCDIC
+ 			*dest = (char) php_htoi(data + 1);
+ #else
+@@ -720,7 +720,7 @@ no_name_header:
+ 				c = *p;
+ 				*p = '\0';
+ 				s = p + 1;
+-				while (isspace((int)*(unsigned char *)s)) {
++				while (isspace((unsigned char)*s)) {
+ 					s++;
+ 				}
+ 
+diff --git a/ext/standard/url_scanner_ex.c b/ext/standard/url_scanner_ex.c
+index 0719dae7c1038623181df1a2e28c0846d7132728..e0b4dd8bfeaff85b509815dac8db32f6fc2b1647 100644
+--- a/ext/standard/url_scanner_ex.c
++++ b/ext/standard/url_scanner_ex.c
+@@ -77,7 +77,7 @@ static PHP_INI_MH(OnUpdateTags)
+ 			
+ 			*val++ = '\0';
+ 			for (q = key; *q; q++)
+-				*q = tolower(*q);
++				*q = tolower((unsigned char)*q);
+ 			keylen = q - key;
+ 			/* key is stored withOUT NUL
+ 			   val is stored WITH    NUL */
+@@ -332,7 +332,7 @@ static inline void handle_tag(STD_PARA)
+ 	ctx->tag.len = 0;
+ 	smart_str_appendl(&ctx->tag, start, YYCURSOR - start);
+ 	for (i = 0; i < ctx->tag.len; i++)
+-		ctx->tag.c[i] = tolower((int)(unsigned char)ctx->tag.c[i]);
++		ctx->tag.c[i] = tolower((unsigned char)ctx->tag.c[i]);
+ 	if (zend_hash_find(ctx->tags, ctx->tag.c, ctx->tag.len, (void **) &ctx->lookup_data) == SUCCESS)
+ 		ok = 1;
+ 	STATE = ok ? STATE_NEXT_ARG : STATE_PLAIN;
+diff --git a/ext/standard/url_scanner_ex.re b/ext/standard/url_scanner_ex.re
+index 5ee7063c19efa7f2b86ae56e92f2ce5d132ac537..46a3c44444f322c48a8d9a7e0ac49cacd36fde98 100644
+--- a/ext/standard/url_scanner_ex.re
++++ b/ext/standard/url_scanner_ex.re
+@@ -76,7 +76,7 @@ static PHP_INI_MH(OnUpdateTags)
+ 			
+ 			*val++ = '\0';
+ 			for (q = key; *q; q++)
+-				*q = tolower(*q);
++				*q = tolower((unsigned char)*q);
+ 			keylen = q - key;
+ 			/* key is stored withOUT NUL
+ 			   val is stored WITH    NUL */
+@@ -280,7 +280,7 @@ static inline void handle_tag(STD_PARA)
+ 	ctx->tag.len = 0;
+ 	smart_str_appendl(&ctx->tag, start, YYCURSOR - start);
+ 	for (i = 0; i < ctx->tag.len; i++)
+-		ctx->tag.c[i] = tolower((int)(unsigned char)ctx->tag.c[i]);
++		ctx->tag.c[i] = tolower((unsigned char)ctx->tag.c[i]);
+ 	if (zend_hash_find(ctx->tags, ctx->tag.c, ctx->tag.len, (void **) &ctx->lookup_data) == SUCCESS)
+ 		ok = 1;
+ 	STATE = ok ? STATE_NEXT_ARG : STATE_PLAIN;
+diff --git a/ext/standard/versioning.c b/ext/standard/versioning.c
+index 828e36ac2c37e6cc63c90fd7b22bc4eaf0546eb0..2dd5605d9fd335ac747cdb353049110497123933 100644
+--- a/ext/standard/versioning.c
++++ b/ext/standard/versioning.c
+@@ -51,8 +51,8 @@ php_canonicalize_version(const char *version)
+  *  s/([^\d\.])([^\D\.])/$1.$2/g;
+  *  s/([^\D\.])([^\d\.])/$1.$2/g;
+  */
+-#define isdig(x) (isdigit(x)&&(x)!='.')
+-#define isndig(x) (!isdigit(x)&&(x)!='.')
++#define isdig(x) (isdigit((unsigned char)(x))&&(x)!='.')
++#define isndig(x) (!isdigit((unsigned char)(x))&&(x)!='.')
+ #define isspecialver(x) ((x)=='-'||(x)=='_'||(x)=='+')
+ 
+ 		lq = *(q - 1);
+@@ -65,7 +65,7 @@ php_canonicalize_version(const char *version)
+ 				*q++ = '.';
+ 			}
+ 			*q++ = *p;
+-		} else if (!isalnum(*p)) {
++		} else if (!isalnum((unsigned char)*p)) {
+ 			if (lq != '.') {
+ 				*q++ = '.';
+ 			}
+@@ -158,17 +158,17 @@ php_version_compare(const char *orig_ver1, const char *orig_ver2)
+ 		if ((n2 = strchr(p2, '.')) != NULL) {
+ 			*n2 = '\0';
+ 		}
+-		if (isdigit(*p1) && isdigit(*p2)) {
++		if (isdigit((unsigned char)*p1) && isdigit((unsigned char)*p2)) {
+ 			/* compare element numerically */
+ 			l1 = strtol(p1, NULL, 10);
+ 			l2 = strtol(p2, NULL, 10);
+ 			compare = sign(l1 - l2);
+-		} else if (!isdigit(*p1) && !isdigit(*p2)) {
++		} else if (!isdigit((unsigned char)*p1) && !isdigit((unsigned char)*p2)) {
+ 			/* compare element names */
+ 			compare = compare_special_version_forms(p1, p2);
+ 		} else {
+ 			/* mix of names and numbers */
+-			if (isdigit(*p1)) {
++			if (isdigit((unsigned char)*p1)) {
+ 				compare = compare_special_version_forms("#N#", p2);
+ 			} else {
+ 				compare = compare_special_version_forms(p1, "#N#");
+@@ -186,13 +186,13 @@ php_version_compare(const char *orig_ver1, const char *orig_ver2)
+ 	}
+ 	if (compare == 0) {
+ 		if (n1 != NULL) {
+-			if (isdigit(*p1)) {
++			if (isdigit((unsigned char)*p1)) {
+ 				compare = 1;
+ 			} else {
+ 				compare = php_version_compare(p1, "#N#");
+ 			}
+ 		} else if (n2 != NULL) {
+-			if (isdigit(*p2)) {
++			if (isdigit((unsigned char)*p2)) {
+ 				compare = -1;
+ 			} else {
+ 				compare = php_version_compare("#N#", p2);
+diff --git a/main/SAPI.c b/main/SAPI.c
+index a60ebb1362b176c09f775403ef582a0ff33ddf4e..39731db64bbbceb44d12a68174db0ca30f4e4033 100644
+--- a/main/SAPI.c
++++ b/main/SAPI.c
+@@ -212,7 +212,7 @@ static void sapi_read_post_data(TSRMLS_D)
+ 				*p = 0;
+ 				break;
+ 			default:
+-				*p = tolower(*p);
++				*p = tolower((unsigned char)*p);
+ 				break;
+ 		}
+ 	}
+@@ -732,10 +732,10 @@ SAPI_API int sapi_header_op(sapi_header_op_enum op, void *arg TSRMLS_DC)
+ 	header_line = estrndup(header_line, header_line_len);
+ 
+ 	/* cut off trailing spaces, linefeeds and carriage-returns */
+-	if (header_line_len && isspace(header_line[header_line_len-1])) {
++	if (header_line_len && isspace((unsigned char)header_line[header_line_len - 1])) {
+ 		do {
+ 			header_line_len--;
+-		} while(header_line_len && isspace(header_line[header_line_len-1]));
++		} while(header_line_len && isspace((unsigned char)header_line[header_line_len - 1]));
+ 		header_line[header_line_len]='\0';
+ 	}
+ 
+diff --git a/main/fopen_wrappers.c b/main/fopen_wrappers.c
+index 1554aaa1e67bcc944125da2807a2abebbf1b2a34..5927e5e0e81f8f4428cdff97701da669e4a5e1f5 100644
+--- a/main/fopen_wrappers.c
++++ b/main/fopen_wrappers.c
+@@ -483,7 +483,7 @@ PHPAPI char *php_resolve_path(const char *filename, int filename_length, const c
+ 	}
+ 
+ 	/* Don't resolve paths which contain protocol (except of file://) */
+-	for (p = filename; isalnum((int)*p) || *p == '+' || *p == '-' || *p == '.'; p++);
++	for (p = filename; isalnum((unsigned char)*p) || *p == '+' || *p == '-' || *p == '.'; p++);
+ 	if ((*p == ':') && (p - filename > 1) && (p[1] == '/') && (p[2] == '/')) {
+ 		wrapper = php_stream_locate_url_wrapper(filename, &actual_path, STREAM_OPEN_FOR_INCLUDE TSRMLS_CC);
+ 		if (wrapper == &php_plain_files_wrapper) {
+@@ -512,7 +512,7 @@ PHPAPI char *php_resolve_path(const char *filename, int filename_length, const c
+ 		/* Check for stream wrapper */
+ 		int is_stream_wrapper = 0;
+ 
+-		for (p = ptr; isalnum((int)*p) || *p == '+' || *p == '-' || *p == '.'; p++);
++		for (p = ptr; isalnum((unsigned char)*p) || *p == '+' || *p == '-' || *p == '.'; p++);
+ 		if ((*p == ':') && (p - ptr > 1) && (p[1] == '/') && (p[2] == '/')) {
+ 			/* .:// or ..:// is not a stream wrapper */
+ 			if (p[-1] != '.' || p[-2] != '.' || p - 2 != ptr) {
+@@ -578,7 +578,7 @@ PHPAPI char *php_resolve_path(const char *filename, int filename_length, const c
+ 			actual_path = trypath;
+ 
+ 			/* Check for stream wrapper */
+-			for (p = trypath; isalnum((int)*p) || *p == '+' || *p == '-' || *p == '.'; p++);
++			for (p = trypath; isalnum((unsigned char)*p) || *p == '+' || *p == '-' || *p == '.'; p++);
+ 			if ((*p == ':') && (p - trypath > 1) && (p[1] == '/') && (p[2] == '/')) {
+ 				wrapper = php_stream_locate_url_wrapper(trypath, &actual_path, STREAM_OPEN_FOR_INCLUDE TSRMLS_CC);
+ 				if (!wrapper) {
+diff --git a/main/php_ini.c b/main/php_ini.c
+index 7d27582f4fefb5fabc3bba1af5b220835e0cf42b..c837b24d00876a9be0169793acf58dc7303a1985 100644
+--- a/main/php_ini.c
++++ b/main/php_ini.c
+@@ -47,7 +47,7 @@
+ 		char *tmp = path; \
+ 		while (*tmp) { \
+ 			if (*tmp == '\\') *tmp = '/'; \
+-			else *tmp = tolower(*tmp); \
++			else *tmp = tolower((unsigned char)*tmp); \
+ 				tmp++; \
+ 		} \
+ 	}
+diff --git a/main/php_variables.c b/main/php_variables.c
+index 606a4b03d6a0e4f4374418469d3b352c71b4f909..f62777f6d4bf223a873afec88738371e16a3c679 100644
+--- a/main/php_variables.c
++++ b/main/php_variables.c
+@@ -167,7 +167,7 @@ PHPAPI void php_register_variable_ex(char *var_name, zval *val, zval *track_vars
+ 
+ 			ip++;
+ 			index_s = ip;
+-			if (isspace(*ip)) {
++			if (isspace((unsigned char)*ip)) {
+ 				ip++;
+ 			}
+ 			if (*ip==']') {
+@@ -481,7 +481,7 @@ SAPI_API SAPI_TREAT_DATA_FUNC(php_default_treat_data)
+ 
+ 		if (arg == PARSE_COOKIE) {
+ 			/* Remove leading spaces from cookie names, needed for multi-cookie header where ; can be followed by a space */
+-			while (isspace(*var)) {
++			while (isspace((unsigned char)*var)) {
+ 				var++;
+ 			}
+ 			if (var == val || *var == '\0') {
+diff --git a/main/rfc1867.c b/main/rfc1867.c
+index 1b59ca3206e527d35491acbf59bfbb0692979c7e..dd5ddbfd142e273363a399d61cf6e1c0d50b3291 100644
+--- a/main/rfc1867.c
++++ b/main/rfc1867.c
+@@ -433,7 +433,7 @@ static int multipart_buffer_headers(multipart_buffer *self, zend_llist *header T
+ 		}
+ 
+ 		/* space in the beginning means same header */
+-		if (!isspace(line[0])) {
++		if (!isspace((unsigned char)line[0])) {
+ 			value = strchr(line, ':');
+ 		}
+ 
+@@ -550,7 +550,7 @@ static char *substring_conf(char *start, size_t len, char quote)
+ 
+ static char *php_ap_getword_conf(const zend_encoding *encoding, char *str TSRMLS_DC)
+ {
+-	while (*str && isspace(*str)) {
++	while (*str && isspace((unsigned char)*str)) {
+ 		++str;
+ 	}
+ 
+@@ -566,7 +566,7 @@ static char *php_ap_getword_conf(const zend_encoding *encoding, char *str TSRMLS
+ 	} else {
+ 		char *strend = str;
+ 
+-		while (*strend && !isspace(*strend)) {
++		while (*strend && !isspace((unsigned char)*strend)) {
+ 			++strend;
+ 		}
+ 		return substring_conf(str, (size_t)(strend - str), 0);
+@@ -834,7 +834,7 @@ SAPI_API SAPI_POST_HANDLER_FUNC(rfc1867_post_handler) /* {{{ */
+ 				goto fileupload_done;
+ 			}
+ 
+-			while (isspace(*cd)) {
++			while (isspace((unsigned char)*cd)) {
+ 				++cd;
+ 			}
+ 
+@@ -842,7 +842,7 @@ SAPI_API SAPI_POST_HANDLER_FUNC(rfc1867_post_handler) /* {{{ */
+ 			{
+ 				char *key = NULL, *word = pair;
+ 
+-				while (isspace(*cd)) {
++				while (isspace((unsigned char)*cd)) {
+ 					++cd;
+ 				}
+ 
+diff --git a/main/snprintf.c b/main/snprintf.c
+index 794ee98c4f952c25bceb3cab1665ed80253c1fad..da9e78d88b797392144861ce1982853adf9cb9a3 100644
+--- a/main/snprintf.c
++++ b/main/snprintf.c
+@@ -394,7 +394,7 @@ PHPAPI char * php_conv_fp(register char format, register double num,
+ 	/*
+ 	 * Check for Infinity and NaN
+ 	 */
+-	if (isalpha((int)*p)) {
++	if (isalpha((unsigned char)*p)) {
+ 		*len = strlen(p);
+ 		memcpy(buf, p, *len + 1);
+ 		*is_negative = FALSE;
+@@ -541,11 +541,11 @@ typedef struct buf_area buffy;
+ #define NUM( c )			( c - '0' )
+ 
+ #define STR_TO_DEC( str, num )		\
+-    num = NUM( *str++ ) ;		\
+-    while ( isdigit((int)*str ) )		\
++    num = NUM( *(str)++ ) ;		\
++    while ( isdigit((unsigned char)*(str) ) )		\
+     {					\
+ 	num *= 10 ;			\
+-	num += NUM( *str++ ) ;		\
++	num += NUM( *(str)++ ) ;		\
+     }
+ 
+ /*
+@@ -650,7 +650,7 @@ static int format_converter(register buffy * odp, const char *fmt, va_list ap) /
+ 			/*
+ 			 * Try to avoid checking for flags, width or precision
+ 			 */
+-			if (isascii((int)*fmt) && !islower((int)*fmt)) {
++			if (isascii((unsigned char)*fmt) && !islower((unsigned char)*fmt)) {
+ 				/*
+ 				 * Recognize flags: -, #, BLANK, +
+ 				 */
+@@ -672,7 +672,7 @@ static int format_converter(register buffy * odp, const char *fmt, va_list ap) /
+ 				/*
+ 				 * Check if a width was specified
+ 				 */
+-				if (isdigit((int)*fmt)) {
++				if (isdigit((unsigned char)*fmt)) {
+ 					STR_TO_DEC(fmt, min_width);
+ 					adjust_width = YES;
+ 				} else if (*fmt == '*') {
+@@ -692,7 +692,7 @@ static int format_converter(register buffy * odp, const char *fmt, va_list ap) /
+ 				if (*fmt == '.') {
+ 					adjust_precision = YES;
+ 					fmt++;
+-					if (isdigit((int)*fmt)) {
++					if (isdigit((unsigned char)*fmt)) {
+ 						STR_TO_DEC(fmt, precision);
+ 					} else if (*fmt == '*') {
+ 						precision = va_arg(ap, int);
+diff --git a/main/spprintf.c b/main/spprintf.c
+index 3f108446b46259d0d1d31f381fa834cfb7b8cd12..4133955b2a96a9343ecc108cdcc9580328b3c984 100644
+--- a/main/spprintf.c
++++ b/main/spprintf.c
+@@ -162,12 +162,12 @@
+ #define NUM(c) (c - '0')
+ 
+ #define STR_TO_DEC(str, num) do {			\
+-	num = NUM(*str++);                  	\
+-	while (isdigit((int)*str)) {        	\
++	num = NUM(*(str)++);                  	\
++	while (isdigit((unsigned char)*(str))) {\
+ 		num *= 10;                      	\
+-		num += NUM(*str++);             	\
++		num += NUM(*(str)++);             	\
+ 		if (num >= INT_MAX / 10) {			\
+-			while (isdigit((int)*str++));	\
++			while (isdigit((unsigned char)*(str)++));	\
+ 			break;							\
+ 		}									\
+     }										\
+@@ -258,7 +258,7 @@ static void xbuf_format_converter(smart_str *xbuf, const char *fmt, va_list ap)
+ 			/*
+ 			 * Try to avoid checking for flags, width or precision
+ 			 */
+-			if (isascii((int)*fmt) && !islower((int)*fmt)) {
++			if (isascii((unsigned char)*fmt) && !islower((unsigned char)*fmt)) {
+ 				/*
+ 				 * Recognize flags: -, #, BLANK, +
+ 				 */
+@@ -280,7 +280,7 @@ static void xbuf_format_converter(smart_str *xbuf, const char *fmt, va_list ap)
+ 				/*
+ 				 * Check if a width was specified
+ 				 */
+-				if (isdigit((int)*fmt)) {
++				if (isdigit((unsigned char)*fmt)) {
+ 					STR_TO_DEC(fmt, min_width);
+ 					adjust_width = YES;
+ 				} else if (*fmt == '*') {
+@@ -300,7 +300,7 @@ static void xbuf_format_converter(smart_str *xbuf, const char *fmt, va_list ap)
+ 				if (*fmt == '.') {
+ 					adjust_precision = YES;
+ 					fmt++;
+-					if (isdigit((int)*fmt)) {
++					if (isdigit((unsigned char)*fmt)) {
+ 						STR_TO_DEC(fmt, precision);
+ 					} else if (*fmt == '*') {
+ 						precision = va_arg(ap, int);
+diff --git a/main/streams/streams.c b/main/streams/streams.c
+index 4e00cd1be390fe2baf2823e89dd4c15c0afc4845..de785d73dbc6ee054d53bea9fe675ed65215817d 100644
+--- a/main/streams/streams.c
++++ b/main/streams/streams.c
+@@ -1690,7 +1690,7 @@ static inline int php_stream_wrapper_scheme_validate(const char *protocol, unsig
+ 	unsigned int i;
+ 
+ 	for(i = 0; i < protocol_len; i++) {
+-		if (!isalnum((int)protocol[i]) &&
++		if (!isalnum((unsigned char)protocol[i]) &&
+ 			protocol[i] != '+' &&
+ 			protocol[i] != '-' &&
+ 			protocol[i] != '.') {
+@@ -1769,7 +1769,7 @@ PHPAPI php_stream_wrapper *php_stream_locate_url_wrapper(const char *path, const
+ 		return (options & STREAM_LOCATE_WRAPPERS_ONLY) ? NULL : &php_plain_files_wrapper;
+ 	}
+ 
+-	for (p = path; isalnum((int)*p) || *p == '+' || *p == '-' || *p == '.'; p++) {
++	for (p = path; isalnum((unsigned char)*p) || *p == '+' || *p == '-' || *p == '.'; p++) {
+ 		n++;
+ 	}
+ 
+diff --git a/main/streams/transports.c b/main/streams/transports.c
+index 4a1961fd65c3bba6f5f8d58f4afa451a599a994a..1066222ad33bda58b3434fceb3bcce535653b5aa 100644
+--- a/main/streams/transports.c
++++ b/main/streams/transports.c
+@@ -92,7 +92,7 @@ PHPAPI php_stream *_php_stream_xport_create(const char *name, size_t namelen, in
+ 		}
+ 	}
+ 
+-	for (p = name; isalnum((int)*p) || *p == '+' || *p == '-' || *p == '.'; p++) {
++	for (p = name; isalnum((unsigned char)*p) || *p == '+' || *p == '-' || *p == '.'; p++) {
+ 		n++;
+ 	}
+ 
+diff --git a/main/streams/xp_socket.c b/main/streams/xp_socket.c
+index 90c5df0b8aa9f80c98197783f258e3473404a471..b4b898130699f6371e49c281aeceff33649bd7fd 100644
+--- a/main/streams/xp_socket.c
++++ b/main/streams/xp_socket.c
+@@ -547,12 +547,15 @@ static inline char *parse_ip_address_ex(const char *str, size_t str_len, int *po
+ 	char *colon;
+ 	char *host = NULL;
+ 
+-#ifdef HAVE_IPV6
+-	char *p;
++	if (memchr(str, '\0', str_len)) {
++		*err = estrdup("The hostname must not contain null bytes");
++		return NULL;
++	}
+ 
++#ifdef HAVE_IPV6
+ 	if (*(str) == '[' && str_len > 1) {
+ 		/* IPV6 notation to specify raw address with port (i.e. [fe80::1]:80) */
+-		p = memchr(str + 1, ']', str_len - 2);
++		char *p = memchr(str + 1, ']', str_len - 2);
+ 		if (!p || *(p + 1) != ':') {
+ 			if (get_err) {
+ 				spprintf(err, 0, "Failed to parse IPv6 address \"%s\"", str);
+diff --git a/sapi/cli/php_cli_server.c b/sapi/cli/php_cli_server.c
+index 68c123e9e87c800a429fe3770014e18e90b89c5e..480e1e1b679684dea8d984ef5bad3b5310da1c0b 100644
+--- a/sapi/cli/php_cli_server.c
++++ b/sapi/cli/php_cli_server.c
+@@ -729,7 +729,7 @@ static int sapi_cli_server_register_entry_cb(char **entry TSRMLS_DC, int num_arg
+ 			if (key[i] == '-') {
+ 				key[i] = '_';
+ 			} else {
+-				key[i] = toupper(key[i]);
++				key[i] = toupper((unsigned char)key[i]);
+ 			}
+ 		}
+ 		spprintf(&real_key, 0, "%s_%s", "HTTP", key);
+diff --git a/sapi/fpm/fpm/fpm_conf.c b/sapi/fpm/fpm/fpm_conf.c
+index d77bf062f610a0b4ff73d9f54b9b1de3b0f2188f..704b51d4cf627e4c500f3b9d666516d1a9e1cc7f 100644
+--- a/sapi/fpm/fpm/fpm_conf.c
++++ b/sapi/fpm/fpm/fpm_conf.c
+@@ -873,7 +873,7 @@ static int fpm_conf_process_all_pools() /* {{{ */
+ 			}
+ 
+ 			for (i = 0; i < strlen(status); i++) {
+-				if (!isalnum(status[i]) && status[i] != '/' && status[i] != '-' && status[i] != '_' && status[i] != '.') {
++				if (!isalnum((unsigned char)status[i]) && status[i] != '/' && status[i] != '-' && status[i] != '_' && status[i] != '.') {
+ 					zlog(ZLOG_ERROR, "[pool %s] the status path '%s' must contain only the following characters '[alphanum]/_-.'", wp->config->name, status);
+ 					return -1;
+ 				}
+@@ -896,7 +896,7 @@ static int fpm_conf_process_all_pools() /* {{{ */
+ 			}
+ 
+ 			for (i = 0; i < strlen(ping); i++) {
+-				if (!isalnum(ping[i]) && ping[i] != '/' && ping[i] != '-' && ping[i] != '_' && ping[i] != '.') {
++				if (!isalnum((unsigned char)ping[i]) && ping[i] != '/' && ping[i] != '-' && ping[i] != '_' && ping[i] != '.') {
+ 					zlog(ZLOG_ERROR, "[pool %s] the ping path '%s' must containt only the following characters '[alphanum]/_-.'", wp->config->name, ping);
+ 					return -1;
+ 				}

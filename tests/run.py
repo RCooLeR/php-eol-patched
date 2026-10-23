@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Run focused PHP regressions against explicitly supplied local images."""
 import argparse
+import csv
 import datetime
 import json
 from pathlib import Path
@@ -15,7 +16,8 @@ sys.dont_write_bytecode = True
 import core
 
 TESTS = Path(__file__).resolve().parent
-VERSIONS = ("7.1.33", "7.2.34", "7.3.33", "7.4.33", "8.0.30", "8.1.34")
+LEGACY_VERSIONS = ("5.6.40", "7.0.33")
+VERSIONS = LEGACY_VERSIONS + ("7.1.33", "7.2.34", "7.3.33", "7.4.33", "8.0.30", "8.1.34")
 
 
 def command(args, data=None, timeout=30):
@@ -139,13 +141,29 @@ def runtime_suite(report, image, version):
         modules = {module.lower() for module in values.get("modules", "").split(",")}
         required = {"cgi-fcgi", "core", "date", "hash", "libxml", "openssl", "pcre", "phar", "reflection",
                     "session", "spl", "standard", "soap", "mysqlnd", "mysqli", "pdo", "pdo_mysql"}
-        if version.startswith("8."):
-            required.add("json")
-        if version.startswith("8.1."):
-            required.update(("exif", "mbstring", "zlib", "zend opcache"))
+        required.update(("gd", "intl", "curl", "zip", "bcmath", "mbstring", "xml", "dom",
+                         "simplexml", "xmlreader", "xmlwriter", "ctype", "fileinfo", "filter",
+                         "iconv", "tokenizer", "zend opcache", "exif", "sockets", "json",
+                         "pdo_sqlite", "sqlite3", "zlib", "redis", "apcu", "imagick",
+                         "memcached", "igbinary", "msgpack"))
+        if version == "5.6.40":
+            required.update(("ereg", "apc"))
         core.record(report, "Runtime extension set", modules == required,
                     {"loaded": sorted(modules), "missing": sorted(required - modules),
                      "unexpected": sorted(modules - required)})
+        inventory = {key.partition(":")[2]: value for key, value in values.items()
+                     if key.startswith("module_version:")}
+        report["extension_versions"] = dict(sorted(inventory.items()))
+        with (TESTS.parent / "extensions" / "pecl.tsv").open(encoding="utf-8", newline="") as pins:
+            expected_pecl = {row["package"]: row["version"] for row in csv.DictReader(pins, delimiter="\t")
+                             if row["php"] == version}
+        loaded_pecl = {name: inventory.get(name) for name in expected_pecl}
+        core.record(report, "Runtime PECL versions match locked releases",
+                    len(expected_pecl) == 6 and loaded_pecl == expected_pecl,
+                    {"loaded": loaded_pecl, "expected": expected_pecl})
+        smoke = {key.partition(":")[2]: value for key, value in values.items() if key.startswith("smoke:")}
+        core.record(report, "Runtime extension operations", len(smoke) == 17 and
+                    all(value == "ok" for value in smoke.values()), smoke)
         if version.startswith("8.1."):
             repeated, errors = runtime_request(name)
             core.record(report, "Cached PHP 8.1 union types and enum serialization",
@@ -171,16 +189,116 @@ def test_suite(report, image, version):
     core.record(report, "PHPT, native bounds and FPM controls", result.returncode == 0, decoded(result))
     if result.returncode:
         return
-    # These shared modules are confined to the test target.
+    # Match application modules and add the test target's helper modules.
     extension_probe = command(["docker", "run", "--rm"] + container_options() +
                          ["--entrypoint", "/bin/bash", image, "-c",
                           'source /tests/extensions.sh; printf "%s\\n" "${php_args[@]:1}"'])
     if extension_probe.returncode:
         raise RuntimeError(json.dumps(decoded(extension_probe)))
     core.EXTENSION_ARGS = [line for line in extension_probe.stdout.decode().splitlines() if line]
-    core.cli_suite(report, image, "patched")
-    core.fpm_suite(report, image, "patched")
+    if version in LEGACY_VERSIONS:
+        core.cli_suite(report, image, "patched")
+        ordinary_fpm_suite(report, image, version)
+    else:
+        core.cli_suite(report, image, "patched")
+        core.fpm_suite(report, image, "patched")
     soap_suite(report, image)
+
+
+def ordinary_fpm_suite(report, image, version):
+    """Compatibility checks without assuming the PHP 7.1+ mitigation profile."""
+    name = "php-ordinary-test-" + uuid.uuid4().hex
+    started = False
+    source_upload_controls = version in LEGACY_VERSIONS
+    try:
+        start = core.command(["docker", "run", "-d", "--name", name] + core.container_options() + [
+            "--entrypoint", "php-fpm", image, "-n", "-F", "-y", "/tests/fpm.conf",
+            "-d", "memory_limit=128M", "-d", "max_execution_time=10",
+            "-d", "post_max_size=2M", "-d", "upload_max_filesize=1M",
+            "-d", "session.save_handler=files", "-d", "session.save_path=/tmp",
+            "-d", "session.upload_progress.enabled=" + ("1" if source_upload_controls else "0"),
+            "-d", "session.upload_progress.cleanup=0", "-d", "session.upload_progress.freq=1",
+            "-d", "session.upload_progress.min_freq=0", "-d", "log_errors=1",
+            "-d", "error_log=/proc/self/fd/2"])
+        started = start["exit"] == 0
+        if not started:
+            raise RuntimeError(json.dumps(start))
+        last_error = None
+        for _ in range(40):
+            try:
+                ping = core.fastcgi(name, "ping")
+                break
+            except (RuntimeError, ValueError) as error:
+                last_error = str(error)
+                time.sleep(0.25)
+        else:
+            raise RuntimeError("Ordinary FPM unavailable: " + str(last_error))
+        session_id = "phpordinary" + uuid.uuid4().hex
+        first = core.fastcgi(name, "session", cookie=session_id)
+        second = core.fastcgi(name, "session", cookie=session_id)
+        core.record(report, "Normal sessions persist between requests",
+                    first["body"].get("counter") == 1 and second["body"].get("counter") == 2,
+                    {"first": first, "second": second})
+        payload = b"ordinary-upload\x00payload\r\n" * 4096
+        fields = [("plain", "value"), ("nested[x]", "one")]
+        expected_post = {"plain": "value", "nested": {"x": "one"}}
+        if source_upload_controls:
+            fields.insert(0, ("PHP_SESSION_UPLOAD_PROGRESS", "probe"))
+            expected_post["PHP_SESSION_UPLOAD_PROGRESS"] = "probe"
+        body, content_type = core.multipart(fields, payload)
+        upload = core.fastcgi(name, "upload", body, {"CONTENT_TYPE": content_type}, session_id)
+        uploaded = upload["body"].get("file") or {}
+        ok = (uploaded.get("error") == 0 and uploaded.get("is_uploaded_file") is True
+              and uploaded.get("size") == len(payload)
+              and uploaded.get("sha256") == core.hashlib.sha256(payload).hexdigest()
+              and upload["body"].get("post") == expected_post
+              and upload["body"].get("counter") == 2
+              and upload["body"].get("pid") == ping["body"].get("pid"))
+        core.record(report, "Ordinary multipart upload and session compatibility", ok, upload)
+        # GHSA-9pqp-7h25-4f32's published CGI payload, sent through the built FPM SAPI.
+        boundaries = []
+        for length in (5115, 5116, 5117):
+            boundary = "A" * length
+            value = "BBB\r\n--" + boundary[:-1] + "CCC"
+            body = ("--" + boundary + '\r\nContent-Disposition: form-data; name="koko"\r\n\r\n'
+                    + value + "\r\n--" + boundary + "--\r\n").encode("ascii")
+            response = core.fastcgi(name, "fields", body,
+                                    {"CONTENT_TYPE": "multipart/form-data; boundary=" + boundary})
+            fields = response["body"].get("post", {})
+            actual = fields.get("koko") if isinstance(fields, dict) else None
+            error = response["body"].get("early_error") or {}
+            valid = actual == value if length < 5117 else (
+                fields in ([], {}) and "Boundary too large" in error.get("message", ""))
+            boundaries.append({"boundary_length": length, "pass": valid,
+                               "error": error,
+                               "field_length": len(actual) if isinstance(actual, str) else None})
+        core.record(report, "Published multipart boundary-buffer cases through FPM",
+                    all(case["pass"] for case in boundaries), boundaries)
+        cookies = []
+        for fixture in json.loads((TESTS / "legacy" / "cookie-controls.json").read_text(encoding="utf-8")):
+            response = core.fastcgi(name, "cookies", extra={"HTTP_COOKIE": fixture["cookie"]})
+            cookies.append({"source": fixture["source"],
+                            "pass": response["body"].get("cookies") == fixture["expected"],
+                            "actual": response["body"].get("cookies"), "expected": fixture["expected"]})
+        core.record(report, "Published cookie-prefix cases through FPM",
+                    all(case["pass"] for case in cookies), cookies)
+        if source_upload_controls:
+            core.record(report, "Source-disabled upload progress despite enabled INI",
+                        upload["body"].get("progress_present") is False
+                        and upload["body"].get("progress_ini_enabled") == "1", upload)
+            body, content_type = core.multipart([("field" + str(i), str(i)) for i in range(5)])
+            limited = core.fastcgi(name, "fields", body, {"CONTENT_TYPE": content_type,
+                                   "PHP_VALUE": "max_multipart_body_parts = 3"})
+            core.record(report, "Published multipart body-part limit",
+                        limited["body"].get("post") == {"field" + str(i): str(i) for i in range(3)},
+                        limited)
+    except (RuntimeError, ValueError, subprocess.TimeoutExpired) as error:
+        core.record(report, "Ordinary FPM verification", False, str(error))
+    finally:
+        if started:
+            report["ordinary_fpm_logs"] = core.command(["docker", "logs", name])
+            cleanup = core.command(["docker", "rm", "-f", name])
+            core.record(report, "Ordinary FPM test container removed", cleanup["exit"] == 0, cleanup)
 
 
 def soap_suite(report, image):

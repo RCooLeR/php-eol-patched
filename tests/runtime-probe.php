@@ -11,6 +11,11 @@ $result = array(
     'shell_present' => is_file('/bin/sh') ? 'yes' : 'no',
     'source_present' => is_dir('/usr/src/php') ? 'yes' : 'no'
 );
+foreach (get_loaded_extensions() as $extension) {
+    $version = phpversion($extension);
+    $result['module_version:' . $extension] = $version === false ? 'not reported' : $version;
+}
+require '/tests/extension-smoke.php';
 if (PHP_VERSION_ID >= 80100) {
     require '/tests/opcache-types.inc';
     $object = new OrdinaryCacheChild();

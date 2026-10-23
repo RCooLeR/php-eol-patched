@@ -19,7 +19,7 @@ try {
     while ($request !== '') {
         $written = fwrite($socket, $request);
         if ($written === false || $written === 0) throw new RuntimeException('FastCGI write failed');
-        $request = substr($request, $written);
+        $request = (string) substr($request, $written);
     }
     do {
         $header = read_exact($socket, 8);
@@ -27,6 +27,9 @@ try {
         echo $header, read_exact($socket, $record['length'] + $record['padding']);
     } while ($record['type'] !== 3);
     fclose($socket);
+} catch (Exception $error) {
+    fwrite(STDERR, $error->getMessage() . "\n");
+    exit(1);
 } catch (Throwable $error) {
     fwrite(STDERR, $error->getMessage() . "\n");
     exit(1);

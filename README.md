@@ -1,6 +1,6 @@
 # php-eol-patched
 
-Minimal PHP CLI/FPM images with selected published security backports for PHP 7.1–8.1.
+PHP CLI/FPM images with selected published security backports for PHP 5.6–8.1.
 
 **These PHP versions are unsupported. Upgrade your application to a [supported official PHP release](https://www.php.net/supported-versions.php) as soon as possible.** These patches are a temporary migration aid, not continued PHP support or a guarantee of security. The images also depend on old system libraries. No application compatibility or production-safety guarantee is provided.
 
@@ -10,6 +10,8 @@ This is an independent project, not an official PHP distribution. [PATCHES.md](P
 
 | Build target | Local image | PHP |
 | --- | --- | --- |
+| `php56` | `php-eol-patched:5.6.40` | 5.6.40 |
+| `php70` | `php-eol-patched:7.0.33` | 7.0.33 |
 | `php71` | `php-eol-patched:7.1.33` | 7.1.33 |
 | `php72` | `php-eol-patched:7.2.34` | 7.2.34 |
 | `php73` | `php-eol-patched:7.3.33` | 7.3.33 |
@@ -19,9 +21,11 @@ This is an independent project, not an official PHP distribution. [PATCHES.md](P
 
 Only Linux amd64 is supported. Builds start from pinned official PHP images, apply the patches once, and compile the selected modules. The runtime starts from `scratch` and contains PHP, its required shared libraries, CA certificates, configuration and license notices.
 
-All versions include the patched OpenSSL, Phar, session, SOAP and mysqlnd components, plus the PHP engine and standard functions. mysqli and PDO MySQL provide access to mysqlnd; PDO, libxml and hash supply required dependencies. PHP's mandatory core modules remain present.
+All eight targets use the shared Dockerfile. They include OpenSSL, Phar, session, SOAP and mysqlnd, plus mysqli and PDO MySQL. Application extensions such as GD, intl, curl, ZIP, bcmath, mbstring, XML, OPcache and the pinned PECL packages are enabled in every image. [EXTENSIONS.md](EXTENSIONS.md) gives the complete per-version map.
 
-PHP 8.1 additionally includes patched EXIF, mbstring, OPcache and zlib. JSON is built into PHP 8.0/8.1; it is omitted from the PHP 7 images. Other optional extensions, PECL packages, Composer, Node.js, mail tools, shells, package managers and compilers are not in the runtime. Test-only modules and tools remain in the test build stage.
+The optional extension installation sections are clearly marked after the core build. They are enabled by default. Removing a shared extension's section may require adjusting extensions that depend on it. Extensions already built into the patched core remain enabled, including mbstring, EXIF and zlib on PHP 8.1. Optional extensions and linked system libraries need their own security maintenance; the patch table describes only the included PHP fixes.
+
+Composer, Node.js, mail tools, shells, package managers and compilers are not in the runtime. Test-only modules and tools remain in the test stage.
 
 ## Build and run
 
@@ -32,7 +36,7 @@ docker buildx bake --load php71
 docker run --rm php-eol-patched:7.1.33 php -v
 ```
 
-Replace `php71` with another target, or omit the target to build all six. `BUILD_JOBS` controls compiler parallelism:
+Replace `php71` with another target, or omit the target to build all eight. `BUILD_JOBS` controls compiler parallelism:
 
 ```sh
 docker buildx bake --load --set php71.args.BUILD_JOBS=4 php71
@@ -63,7 +67,7 @@ See [tests/README.md](tests/README.md) for the selected regressions and resource
 
 ## Source and modified builds
 
-Export the complete patched PHP source and build inputs:
+Export the complete patched PHP source, PECL source archives and build inputs:
 
 ```sh
 docker buildx bake --allow fs.write=/tmp/php-eol-source \
@@ -89,4 +93,4 @@ Runtime images contain module lists, configure arguments, source and patch check
 
 ## License
 
-Original project files use the [MIT license](LICENSE). PHP, upstream patches, tests and libraries retain their own licenses. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and [LICENSES/](LICENSES/), particularly the LGPL terms for PHP 8.1's libmbfl. Preserve the notices and required corresponding source when redistributing binaries.
+Original project files use the [MIT license](LICENSE). PHP, upstream patches, tests and libraries retain their own licenses. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and [LICENSES/](LICENSES/), including the LGPL terms for libmbfl. Preserve the notices and required corresponding source when redistributing binaries.

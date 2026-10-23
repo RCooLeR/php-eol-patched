@@ -1,5 +1,29 @@
 group "default" {
-  targets = ["php71", "php72", "php73", "php74", "php80", "php81"]
+  targets = ["php56", "php70", "php71", "php72", "php73", "php74", "php80", "php81"]
+}
+
+target "php56" {
+  context = "."
+  dockerfile = "Dockerfile"
+  target = "runtime"
+  platforms = ["linux/amd64"]
+  tags = ["php-eol-patched:5.6.40"]
+  args = {
+    PHP_RELEASE = "5.6.40"
+    BASE_IMAGE = "php:5.6.40-fpm-stretch@sha256:4f070f1b7b93cc5ab364839b79a5b26f38d5f89461f7bc0cd4bab4a3ad7d67d7"
+  }
+}
+
+target "php70" {
+  context = "."
+  dockerfile = "Dockerfile"
+  target = "runtime"
+  platforms = ["linux/amd64"]
+  tags = ["php-eol-patched:7.0.33"]
+  args = {
+    PHP_RELEASE = "7.0.33"
+    BASE_IMAGE = "php:7.0.33-fpm-stretch@sha256:8e8644c0fd61424939fff072ca617469550bbb659158301a2dcadf334746a1c2"
+  }
 }
 
 target "php71" {

@@ -1,0 +1,75 @@
+From: Nikita Popov <nikita.ppv@gmail.com>
+Subject: [PATCH] Preserve result ownership for mysqlnd error cleanup
+Origin: https://github.com/php/php-src/commit/f365d0e00ed93b1c33e984ff3b4cc8677cbca193
+
+Prerequisite for the CVE-2025-1218 error paths. Move result/reference
+release to free_result_contents, retain only metadata cleanup at the
+metadata-read failure site, and remove the corresponding caller frees.
+Use PHP7.0's mnd_pefree allocation API instead of the newer memory pool.
+
+--- a/ext/mysqlnd/mysqlnd_ps.c
++++ b/ext/mysqlnd/mysqlnd_ps.c
+@@ -129,7 +129,6 @@
+ 	} else {
+ 		COPY_CLIENT_ERROR(*conn->error_info, result->stored_data->error_info);
+ 		stmt->result->m.free_result_contents(stmt->result);
+-		mnd_pefree(stmt->result, stmt->result->persistent);
+ 		stmt->result = NULL;
+ 		stmt->state = MYSQLND_STMT_PREPARED;
+ 	}
+@@ -356,7 +355,6 @@
+ 		if (FAIL == (ret = PACKET_READ(fields_eof, stmt->conn))) {
+ 			if (stmt->result) {
+ 				stmt->result->m.free_result_contents(stmt->result);
+-				mnd_pefree(stmt->result, stmt->result->persistent);
+ 				/* The memset() below resets the statement, so release what it still owns first. */
+ 				stmt->conn->m->free_reference(stmt->conn);
+ 				mnd_efree(stmt->execute_cmd_buffer.buffer);
+--- a/ext/mysqlnd/mysqlnd_result.c
++++ b/ext/mysqlnd/mysqlnd_result.c
+@@ -325,6 +325,13 @@
+ 		result->meta = NULL;
+ 	}
+ 
++	if (result->conn) {
++		result->conn->m->free_reference(result->conn);
++		result->conn = NULL;
++	}
++
++	mnd_pefree(result, result->persistent);
++
+ 	DBG_VOID_RETURN;
+ }
+ /* }}} */
+@@ -338,13 +345,6 @@
+ 	result->m.skip_result(result);
+ 
+ 	result->m.free_result_contents(result);
+-
+-	if (result->conn) {
+-		result->conn->m->free_reference(result->conn);
+-		result->conn = NULL;
+-	}
+-
+-	mnd_pefree(result, result->persistent);
+ 
+ 	DBG_VOID_RETURN;
+ }
+@@ -378,7 +378,8 @@
+ 
+ 	/* It's safe to reread without freeing */
+ 	if (FAIL == result->meta->m->read_metadata(result->meta, conn)) {
+-		result->m.free_result_contents(result);
++		result->meta->m->free_metadata(result->meta);
++		result->meta = NULL;
+ 		DBG_RETURN(FAIL);
+ 	}
+ 	/* COM_FIELD_LIST is broken and has premature EOF, thus we need to hack here and in mysqlnd_res_meta.c */
+@@ -550,7 +551,6 @@
+ 				if (FAIL == (ret = PACKET_READ(fields_eof, conn))) {
+ 					DBG_ERR("Error occurred while reading the EOF packet");
+ 					result->m.free_result_contents(result);
+-					mnd_efree(result);
+ 					if (!stmt) {
+ 						conn->current_result = NULL;
+ 					} else {

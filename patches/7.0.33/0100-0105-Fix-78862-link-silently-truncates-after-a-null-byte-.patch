@@ -1,0 +1,39 @@
+Published-source: https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz
+Published-patch: 0105-Fix-78862-link-silently-truncates-after-a-null-byte-.patch
+Scope: selected PHP runtime components and their tests; packaging and unrelated extensions omitted.
+
+From: "Christoph M. Becker" <cmbecker69@gmx.de>
+Date: Tue, 17 Dec 2019 10:53:47 +0100
+Subject: Fix #78862: link() silently truncates after a null byte on Windows
+
+Since link() is supposed to accepts paths (i.e. strings without NUL
+bytes), we must not accept arbitrary strings.
+
+(cherry picked from commit 0e6c0654ed06751ced134515f7629c40bd979d7f)
+---
+ NEWS                                                |  4 ++++
+ ext/standard/link_win32.c                           |  2 +-
+ ext/standard/tests/file/windows_links/bug78862.phpt | 17 +++++++++++++++++
+ 3 files changed, 22 insertions(+), 1 deletion(-)
+ create mode 100644 ext/standard/tests/file/windows_links/bug78862.phpt
+
+--- /dev/null
++++ b/ext/standard/tests/file/windows_links/bug78862.phpt
+@@ -0,0 +1,17 @@
++--TEST--
++Bug #78862 (link() silently truncates after a null byte on Windows)
++--FILE--
++<?php
++file_put_contents(__DIR__ . '/bug78862.target', 'foo');
++var_dump(link(__DIR__ . "/bug78862.target\0more", __DIR__ . "/bug78862.link\0more"));
++var_dump(file_exists(__DIR__ . '/bug78862.link'));
++?>
++--EXPECTF--
++Warning: link() expects parameter 1 to be a valid path, string given in %s on line %d
++NULL
++bool(false)
++--CLEAN--
++<?php
++unlink(__DIR__ . '/bug78862.target');
++unlink(__DIR__ . '/bug78862.link');
++?>

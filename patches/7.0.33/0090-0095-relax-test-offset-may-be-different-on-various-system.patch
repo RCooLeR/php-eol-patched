@@ -1,0 +1,21 @@
+Published-source: https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz
+Published-patch: 0095-relax-test-offset-may-be-different-on-various-system.patch
+Scope: selected PHP runtime components and their tests; packaging and unrelated extensions omitted.
+
+From: Remi Collet <remi@remirepo.net>
+Date: Wed, 28 Aug 2019 14:34:48 +0200
+Subject: relax test, offset may be different on various system lib versions
+
+---
+ ext/pcre/tests/bug75457.phpt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/ext/pcre/tests/bug75457.phpt
++++ b/ext/pcre/tests/bug75457.phpt
+@@ -6,5 +6,5 @@ $pattern = "/(((?(?C)0?=))(?!()0|.(?0)0)())/";
+ var_dump(preg_match($pattern, "hello"));
+ ?>
+ --EXPECTF--
+-Warning: preg_match(): Compilation failed: assertion expected after (?( or (?(?C) at offset 4 in %sbug75457.php on line %d
++Warning: preg_match(): Compilation failed: assertion expected after (?( or (?(?C) at offset %d in %sbug75457.php on line %d
+ bool(false)

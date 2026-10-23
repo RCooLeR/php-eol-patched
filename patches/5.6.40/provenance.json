@@ -1,0 +1,141 @@
+{
+  "php": "5.6.40",
+  "base_archive_sha256": "1369a51eee3995d7fbd1c5342e5cc917760e276d561595b6052b21ace2656d1c",
+  "published_base": {
+    "repository": "https://github.com/shivammathur/php-src-backports",
+    "commit": "989262e3e9dcca7642b644a75d209c5b7740e294",
+    "scope": "Enabled PHP components and tests; system SQLite replaces bundled SQLite."
+  },
+  "maintenance_sources": [
+    {
+      "url": "https://deb.freexian.com/extended-lts/pool/main/p/php5/php5_5.6.40%2Bdfsg-0%2Bdeb8u23.debian.tar.xz",
+      "sha256": "a9bb07558803ef70ea0f860cfdefd2006ad35fc99735dd2ef111bc6d10b9952e"
+    },
+    {
+      "url": "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz",
+      "sha256": "3db890cadb4debb154e9fb85aea6b10389cab36d7b52a46d7be47e5e4d4a7d08"
+    }
+  ],
+  "series": [
+    "001-published-base.patch",
+    "010-mysqlnd.patch",
+    "020-http-server-8.0.patch",
+    "021-openssl-server-8.1.patch",
+    "022-CVE-2025-1217-01-1c157d3fa2e.patch",
+    "023-CVE-2025-1217-02-51e2015af3f.patch",
+    "024-CVE-2025-1217-03-d20b4c97a9f.patch",
+    "025-0124-Fixed-compilation-warnings.patch",
+    "027-CVE-2025-1219-01-f901bec494a.patch",
+    "028-CVE-2025-1219-02-b6004a043c1.patch",
+    "029-CVE-2025-1734.patch",
+    "030-CVE-2025-1736-01-d0d60503b54.patch",
+    "031-CVE-2025-1736-02-3d9c02364db.patch",
+    "032-CVE-2025-1736-03-56cdbe63c24.patch",
+    "033-CVE-2025-1736-04-41d49abbd99.patch",
+    "034-CVE-2025-1861.patch",
+    "040-soap.patch",
+    "050-http-tls-phar-fpm.patch",
+    "060-additional-published.patch"
+  ],
+  "native_http_patches": [
+    {
+      "file": "020-http-server-8.0.patch",
+      "published_patch": "http-server-8.0.patch",
+      "published_sha256": "ec610d40ba145ac267eaf1b5da968109ede2bb4e593583d3e3b79df5a4fd1576"
+    },
+    {
+      "file": "021-openssl-server-8.1.patch",
+      "published_patch": "openssl-server-8.1.patch",
+      "published_sha256": "ebf311fd68226b321fb7ecac2bd71a9ac4134af2d367ea7c58da81c978771804"
+    },
+    {
+      "file": "022-CVE-2025-1217-01-1c157d3fa2e.patch",
+      "published_patch": "CVE-2025-1217/01-1c157d3fa2e.patch",
+      "published_sha256": "dc19ef5c9e84945908f8f18e120f795cb0f5221c243bdb335a1df76fe38281cc"
+    },
+    {
+      "file": "023-CVE-2025-1217-02-51e2015af3f.patch",
+      "published_patch": "CVE-2025-1217/02-51e2015af3f.patch",
+      "published_sha256": "c81ff6e2d03d922730a8f13f386ea7187b586eb9d8cfb2ef5ecaff40d3e0a993"
+    },
+    {
+      "file": "024-CVE-2025-1217-03-d20b4c97a9f.patch",
+      "published_patch": "CVE-2025-1217/03-d20b4c97a9f.patch",
+      "published_sha256": "7e3f2d644d1cd0b84a7d3dae7363e091f7cb8d5693f76a997646fd27c1fecd7b"
+    },
+    {
+      "file": "025-0124-Fixed-compilation-warnings.patch",
+      "published_patch": "0124-Fixed-compilation-warnings.patch",
+      "published_sha256": "fac7a3f3f9cecbdca72ea41d6505cf7b3d7e7bb4910689b8b7f5bb436e78d5f0"
+    },
+    {
+      "file": "027-CVE-2025-1219-01-f901bec494a.patch",
+      "published_patch": "CVE-2025-1219/01-f901bec494a.patch",
+      "published_sha256": "81f1723211a4c9ccf5700816920d5c079268db6ad7705c1866cc7d36694fd3ac"
+    },
+    {
+      "file": "028-CVE-2025-1219-02-b6004a043c1.patch",
+      "published_patch": "CVE-2025-1219/02-b6004a043c1.patch",
+      "published_sha256": "3c5e72a7a389e63b37306a29adb75a86813246625ee9d110c135cfd5d8517a92"
+    },
+    {
+      "file": "029-CVE-2025-1734.patch",
+      "published_patch": "CVE-2025-1734.patch",
+      "published_sha256": "4328f1da124d61c45763be4e1762a1138770468fcea9aaff974b3eb22343c44c"
+    },
+    {
+      "file": "030-CVE-2025-1736-01-d0d60503b54.patch",
+      "published_patch": "CVE-2025-1736/01-d0d60503b54.patch",
+      "published_sha256": "ddd2a4196cf3e929f6577a09e43bc4699e7ef3b7445f6e84d9945571ccf80e77"
+    },
+    {
+      "file": "031-CVE-2025-1736-02-3d9c02364db.patch",
+      "published_patch": "CVE-2025-1736/02-3d9c02364db.patch",
+      "published_sha256": "410fbae287f7ad2f29ec286e1c8d92aac31dec3be225e10a799b69546b4779ee"
+    },
+    {
+      "file": "032-CVE-2025-1736-03-56cdbe63c24.patch",
+      "published_patch": "CVE-2025-1736/03-56cdbe63c24.patch",
+      "published_sha256": "798482ca395217af29badd826679d42ee461bf6e251aaaf1592824e9502cf9a6"
+    },
+    {
+      "file": "033-CVE-2025-1736-04-41d49abbd99.patch",
+      "published_patch": "CVE-2025-1736/04-41d49abbd99.patch",
+      "published_sha256": "17a57206e8a517acf92ccabf71223067845c215242e1e50c915c39226f94caaf"
+    },
+    {
+      "file": "034-CVE-2025-1861.patch",
+      "published_patch": "CVE-2025-1861.patch",
+      "published_sha256": "c92945afa6db4f9f6cda1f4c626061e35e2be8c5d1d8f635e1907ada252128cd"
+    }
+  ],
+  "adaptations": [
+    "PHP 5.6 mysqlnd native packet, value and connection ownership APIs.",
+    "SOAP decoding value ownership is separate from serialization XML-node references.",
+    "SOAP client single-value returns use refcounted ZVAL_ZVAL transfer so the owning decoding map retains a valid zval.",
+    "SOAP response bounds use the native signed int string length limit.",
+    "HTTP context access and TLS/Phar TSRMLS arguments retain native APIs.",
+    "IPv6 comparison changes the FPM-local FastCGI implementation.",
+    "Published regression tests use PHP 5.6-compatible syntax.",
+    "The mysqlnd fake-server helper defaults to port 33305 for existing single-argument published tests.",
+    "Socket formatting uses long ports and char-pointer diagnostics; Phar cycle detection uses native hash lookups and TSRMLS arguments.",
+    "Published ctype casts retain native buffer members and update the matching generated PDO and URL scanner sources."
+  ],
+  "limits": [
+    "Selected published changes; not complete coverage of all post-EOL vulnerabilities.",
+    "Allocation failure exits the process; session upload progress is disabled in source.",
+    "Modern deferred allocation-failure recovery and PHP 7 zend_string/early-RINIT guards are not present."
+  ],
+  "additional_published_patch": {
+    "file": "060-additional-published.patch",
+    "sha256": "ece172462984d1dfc1bb66017ce0197cda773987564d136c387efbaf91531760",
+    "cves": {
+      "CVE-2025-1220": "https://github.com/php/php-src/commit/cac8f7f1cf4939f55f06b68120040f057682d89c",
+      "CVE-2026-7260": "https://github.com/php/php-src/commit/2e0fa0a44441d74bf8cc4e1ce1c8af9cd4209f52",
+      "CVE-2026-9672": "https://github.com/php/php-src/commit/fcd691b377d02285740744bee17c0f298be227d5",
+      "CVE-2026-7258": "https://github.com/php/php-src/commit/8bdee7e4c6f4e92f9e89841d53855d9ffbdbfe54"
+    },
+    "fixtures": "Three published PHPTs and three byte-identical Phar tar fixtures; encoded as Git binary patch records.",
+    "scope": "Core, CLI, FPM and enabled extensions; disabled extension/SAPI and standalone Windows changes are omitted."
+  }
+}

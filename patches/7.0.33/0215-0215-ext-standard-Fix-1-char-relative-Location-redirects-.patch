@@ -1,0 +1,75 @@
+Published-source: https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz
+Published-patch: 0215-ext-standard-Fix-1-char-relative-Location-redirects-.patch
+Scope: selected PHP runtime components and their tests; packaging and unrelated extensions omitted.
+
+From: Jordi Kroon <jkroon@onyourmarks.agency>
+Date: Mon, 31 Aug 2026 19:16:00 +0200
+Subject: ext/standard: Fix 1-char relative Location redirects after GH-23467
+
+8196275133e changed the relative-Location check from location_len > 1 to
+> 0, so a single-character Location began resolving against the request
+path instead of the host root as before.
+
+Origin: https://github.com/php/php-src/commit/64664758cd8ee5928acf25b3f9ae11c7571c1b39
+Bug: https://github.com/php/php-src/pull/23467
+Bug: https://github.com/php/php-src/pull/23521
+---
+ ext/standard/http_fopen_wrapper.c                  |  2 +-
+ .../http/http_single_char_location_redirect.phpt   | 40 ++++++++++++++++++++++
+ 2 files changed, 41 insertions(+), 1 deletion(-)
+ create mode 100644 ext/standard/tests/http/http_single_char_location_redirect.phpt
+
+--- a/ext/standard/http_fopen_wrapper.c
++++ b/ext/standard/http_fopen_wrapper.c
+@@ -1105,7 +1105,7 @@ finish:
+ 			{
+ 				char *loc_path = NULL;
+ 				if (*header_info.location != '/') {
+-					if (header_info.location_len > 0 && resource->path) {
++					if (header_info.location_len > 1 && resource->path) {
+ 						char *s = strrchr(resource->path, '/');
+ 						if (!s) {
+ 							s = resource->path;
+--- /dev/null
++++ b/ext/standard/tests/http/http_single_char_location_redirect.phpt
+@@ -0,0 +1,40 @@
++--TEST--
++Single-char relative Location header keeps resolving against the host root (pre-GH-23467 behavior)
++--DESCRIPTION--
++Not RFC 3986 compliant ("x" against "/a/b" gives "/a/x"), but matches
++PHP's long-standing behavior of resolving against the host root. See GH-23521.
++--FILE--
++<?php
++$serverCode = <<<'CODE'
++$server = stream_socket_server("tcp://127.0.0.1:12342", $errno, $errstr);
++phpt_notify();
++
++for ($n = 0; $n < 2; $n++) {
++    $conn = stream_socket_accept($server, 10);
++    if (!$conn) {
++        break;
++    }
++    $req = fgets($conn);
++    while (trim(fgets($conn)) !== '') {}
++    $uri = explode(' ', $req)[1];
++    if ($n < 1) {
++        fwrite($conn, "HTTP/1.1 302 Found\r\nLocation: x\r\nContent-Length: 0\r\n\r\n");
++    } else {
++        $body = "uri=$uri";
++        fwrite($conn, "HTTP/1.1 200 OK\r\nContent-Length: " . strlen($body) . "\r\n\r\n$body");
++    }
++    fclose($conn);
++}
++CODE;
++
++$clientCode = <<<'CODE'
++$ctx = stream_context_create(['http' => ['follow_location' => 1]]);
++phpt_wait();
++echo @file_get_contents("http://127.0.0.1:12342/a/b", false, $ctx), "\n";
++CODE;
++
++include sprintf("%s/../../../openssl/tests/ServerClientTestCase.inc", __DIR__);
++ServerClientTestCase::getInstance()->run($clientCode, $serverCode);
++?>
++--EXPECT--
++uri=/x

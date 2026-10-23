@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 version=${1:?PHP version required}
+case "$version" in
+    5.6.40|7.0.33) exec /bin/bash /tests/legacy-phpt.sh "$version" ;;
+esac
 test_dir="/tests/versions/$version"
 test -d "$test_dir"
 test "$(php -n -r 'echo PHP_VERSION;')" = "$version"

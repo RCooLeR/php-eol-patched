@@ -1,0 +1,939 @@
+Subject: Backport published SOAP ownership, recursion and response length fixes to PHP 5.6
+CVE: CVE-2026-6722, CVE-2026-91765, CVE-2025-14181
+Origin: https://github.com/php/php-src/commit/84e3004d25c2ce90f198eb39507489ba73c580aa
+Origin: https://github.com/php/php-src/commit/3655b79c7bfa90db004d75a3b282ed0f538f4836
+Origin: https://github.com/php/php-src/commit/f7c43b8c72822a4722bd7404c6f65e15b2b912c1
+Origin: https://github.com/php/php-src/commit/b11bd1d9390bb203684e3d4aa5e1104ea842de6f
+Origin: https://github.com/php/php-src/commit/3aedde06bc329f139de811dc66244ec26c96820c
+
+Based on the published Freexian PHP 7.0 backports. PHP 5.6 stores both XML
+serialization nodes and decoded zval pointers in its original reference map.
+Keep decoded values in a separate owning map with native addref/destructor APIs;
+the serialization map retains its XML node ownership. Keep the published 2048
+XML depth and 4096 decoder depth limits. Response bounds use INT_MAX because
+PHP 5.6 string lengths and the get_http_body output parameter are int, with
+size_t counters and native safe_erealloc. Published tests use PHP 5.6 syntax.
+Single-value client responses use refcounted ZVAL_ZVAL transfer because the
+new decoding map can retain the temporary zval beyond response unwrapping.
+
+diff --git a/ext/soap/php_encoding.c b/ext/soap/php_encoding.c
+index f4a2d48f..e0f248df 100644
+--- a/ext/soap/php_encoding.c
++++ b/ext/soap/php_encoding.c
+@@ -360,8 +360,8 @@ static zval* soap_find_xml_ref(xmlNodePtr node TSRMLS_DC)
+ {
+ 	zval **data_ptr;
+ 
+-	if (SOAP_GLOBAL(ref_map) && 
+-	    zend_hash_index_find(SOAP_GLOBAL(ref_map), (ulong)node, (void**)&data_ptr) == SUCCESS) {
++	if (SOAP_GLOBAL(decoded_ref_map) &&
++	    zend_hash_index_find(SOAP_GLOBAL(decoded_ref_map), (ulong)node, (void**)&data_ptr) == SUCCESS) {
+ 		Z_SET_ISREF_PP(data_ptr);
+ 		Z_ADDREF_PP(data_ptr);
+ 		return *data_ptr;
+@@ -373,8 +373,8 @@ static zend_bool soap_check_xml_ref(zval **data, xmlNodePtr node TSRMLS_DC)
+ {
+ 	zval **data_ptr;
+ 
+-	if (SOAP_GLOBAL(ref_map)) {
+-		if (zend_hash_index_find(SOAP_GLOBAL(ref_map), (ulong)node, (void**)&data_ptr) == SUCCESS) {
++	if (SOAP_GLOBAL(decoded_ref_map)) {
++		if (zend_hash_index_find(SOAP_GLOBAL(decoded_ref_map), (ulong)node, (void**)&data_ptr) == SUCCESS) {
+ 			if (*data != *data_ptr) {
+ 				zval_ptr_dtor(data);
+ 				*data = *data_ptr;
+@@ -383,7 +383,8 @@ static zend_bool soap_check_xml_ref(zval **data, xmlNodePtr node TSRMLS_DC)
+ 				return 1;
+ 			}
+ 		} else {
+-			zend_hash_index_update(SOAP_GLOBAL(ref_map), (ulong)node, (void**)data, sizeof(zval*), NULL);
++			Z_ADDREF_PP(data);
++			zend_hash_index_update(SOAP_GLOBAL(decoded_ref_map), (ulong)node, (void**)data, sizeof(zval*), NULL);
+ 		}
+ 	}
+ 	return 0;
+@@ -583,7 +584,12 @@ static zval *master_to_zval_int(encodePtr encode, xmlNodePtr data TSRMLS_DC)
+ 		}
+ 	}
+ 	if (encode->to_zval) {
++		if (SOAP_GLOBAL(decode_depth) >= SOAP_MAX_DECODE_DEPTH) {
++			soap_error0(E_ERROR, "Encoding: Nesting level too deep");
++		}
++		SOAP_GLOBAL(decode_depth)++;
+ 		ret = encode->to_zval(&encode->details, data TSRMLS_CC);
++		SOAP_GLOBAL(decode_depth)--;
+ 	}
+ 	return ret;
+ }
+@@ -3577,12 +3583,20 @@ void encode_reset_ns()
+ 	TSRMLS_FETCH();
+ 	SOAP_GLOBAL(cur_uniq_ns) = 0;
+ 	SOAP_GLOBAL(cur_uniq_ref) = 0;
++	SOAP_GLOBAL(decode_depth) = 0;
+ 	if (SOAP_GLOBAL(ref_map)) {
+ 		zend_hash_destroy(SOAP_GLOBAL(ref_map));
+ 	} else {
+ 		SOAP_GLOBAL(ref_map) = emalloc(sizeof(HashTable));
+ 	}
+ 	zend_hash_init(SOAP_GLOBAL(ref_map), 0, NULL, NULL, 0);
++	/* Decoded values own zvals; the serialization map above holds XML nodes. */
++	if (SOAP_GLOBAL(decoded_ref_map)) {
++		zend_hash_destroy(SOAP_GLOBAL(decoded_ref_map));
++	} else {
++		SOAP_GLOBAL(decoded_ref_map) = emalloc(sizeof(HashTable));
++	}
++	zend_hash_init(SOAP_GLOBAL(decoded_ref_map), 0, NULL, ZVAL_PTR_DTOR, 0);
+ }
+ 
+ void encode_finish()
+@@ -3590,11 +3604,17 @@ void encode_finish()
+ 	TSRMLS_FETCH();
+ 	SOAP_GLOBAL(cur_uniq_ns) = 0;
+ 	SOAP_GLOBAL(cur_uniq_ref) = 0;
++	SOAP_GLOBAL(decode_depth) = 0;
+ 	if (SOAP_GLOBAL(ref_map)) {
+ 		zend_hash_destroy(SOAP_GLOBAL(ref_map));
+ 		efree(SOAP_GLOBAL(ref_map));
+ 		SOAP_GLOBAL(ref_map) = NULL;
+ 	}
++	if (SOAP_GLOBAL(decoded_ref_map)) {
++		zend_hash_destroy(SOAP_GLOBAL(decoded_ref_map));
++		efree(SOAP_GLOBAL(decoded_ref_map));
++		SOAP_GLOBAL(decoded_ref_map) = NULL;
++	}
+ }
+ 
+ encodePtr get_conversion(int encode)
+diff --git a/ext/soap/php_http.c b/ext/soap/php_http.c
+index f3935cb1..a0067fa8 100644
+--- a/ext/soap/php_http.c
++++ b/ext/soap/php_http.c
+@@ -1111,7 +1111,7 @@ try_again:
+ 							char *t = phpurl->path;
+ 							char *p = strrchr(t, '/');
+ 							if (p) {
+-								char *s = emalloc((p - t) + strlen(new_url->path) + 2);
++								char *s = safe_emalloc(1, p - t, strlen(new_url->path) + 2);
+ 								strncpy(s, t, (p - t) + 1);
+ 								s[(p - t) + 1] = 0;
+ 								strcat(s, new_url->path);
+@@ -1352,11 +1352,24 @@ static char *get_http_header_value(char *headers, char *type)
+ 
+ 			/* match */
+ 			tmp = pos + typelen;
++
++			/* strip leading whitespace */
++			while (*tmp == ' ' || *tmp == '\t') {
++				tmp++;
++			}
++
+ 			eol = strchr(tmp, '\n');
+ 			if (eol == NULL) {
+ 				eol = headers + headerslen;
+-			} else if (eol > tmp && *(eol-1) == '\r') {
+-				eol--;
++			} else if (eol > tmp) {
++				if (*(eol-1) == '\r') {
++					eol--;
++				}
++
++				/* strip trailing whitespace */
++				while (eol > tmp && (*(eol-1) == ' ' || *(eol-1) == '\t')) {
++					eol--;
++				}
+ 			}
+ 			return estrndup(tmp, eol - tmp);
+ 		}
+@@ -1375,7 +1388,8 @@ static char *get_http_header_value(char *headers, char *type)
+ static int get_http_body(php_stream *stream, int close, char *headers,  char **response, int *out_size TSRMLS_DC)
+ {
+ 	char *header, *http_buf = NULL;
+-	int header_close = close, header_chunked = 0, header_length = 0, http_buf_size = 0;
++	int header_close = close, header_chunked = 0, header_length = 0;
++	size_t http_buf_size = 0;
+ 
+ 	if (!close) {
+ 		header = get_http_header_value(headers, "Connection: ");
+@@ -1409,21 +1423,22 @@ static int get_http_body(php_stream *stream, int close, char *headers,  char **r
+ 		done = FALSE;
+ 
+ 		while (!done) {
+-			int buf_size = 0;
++			unsigned int buf_size = 0;
+ 
+ 			php_stream_gets(stream, headerbuf, sizeof(headerbuf));
+ 			if (sscanf(headerbuf, "%x", &buf_size) > 0 ) {
+ 				if (buf_size > 0) {
+-					int len_size = 0;
++					size_t len_size = 0;
+ 
+-					if (http_buf_size + buf_size + 1 < 0) {
++					/* The native response length and PHP 5 strings are limited to int. */
++					if (buf_size >= INT_MAX - http_buf_size) {
+ 						efree(http_buf);
+ 						return FALSE;
+ 					}
+-					http_buf = erealloc(http_buf, http_buf_size + buf_size + 1);
++					http_buf = safe_erealloc(http_buf, 1, http_buf_size, (size_t)buf_size + 1);
+ 
+ 					while (len_size < buf_size) {
+-						int len_read = php_stream_read(stream, http_buf + http_buf_size, buf_size - len_size);
++						size_t len_read = php_stream_read(stream, http_buf + http_buf_size, buf_size - len_size);
+ 						if (len_read <= 0) {
+ 							/* Error or EOF */
+ 							done = TRUE;
+@@ -1481,7 +1496,7 @@ static int get_http_body(php_stream *stream, int close, char *headers,  char **r
+ 		}
+ 		http_buf = safe_emalloc(1, header_length, 1);
+ 		while (http_buf_size < header_length) {
+-			int len_read = php_stream_read(stream, http_buf + http_buf_size, header_length - http_buf_size);
++			size_t len_read = php_stream_read(stream, http_buf + http_buf_size, header_length - http_buf_size);
+ 			if (len_read <= 0) {
+ 				break;
+ 			}
+@@ -1489,8 +1504,14 @@ static int get_http_body(php_stream *stream, int close, char *headers,  char **r
+ 		}
+ 	} else if (header_close) {
+ 		do {
+-			int len_read;
+-			http_buf = erealloc(http_buf, http_buf_size + 4096 + 1);
++			size_t len_read;
++			if (UNEXPECTED(http_buf_size >= INT_MAX - 4096)) {
++				if (http_buf) {
++					efree(http_buf);
++				}
++				return FALSE;
++			}
++			http_buf = safe_erealloc(http_buf, 1, http_buf_size, 4096 + 1);
+ 			len_read = php_stream_read(stream, http_buf + http_buf_size, 4096);
+ 			if (len_read > 0) {
+ 				http_buf_size += len_read;
+@@ -1502,7 +1523,7 @@ static int get_http_body(php_stream *stream, int close, char *headers,  char **r
+ 
+ 	http_buf[http_buf_size] = '\0';
+ 	(*response) = http_buf;
+-	(*out_size) = http_buf_size;
++	(*out_size) = (int)http_buf_size;
+ 	return TRUE;
+ }
+ 
+diff --git a/ext/soap/php_soap.h b/ext/soap/php_soap.h
+index a146633c..1be81831 100644
+--- a/ext/soap/php_soap.h
++++ b/ext/soap/php_soap.h
+@@ -155,6 +155,8 @@ struct _soapService {
+ #define SOAP_SSL_METHOD_SSLv3   2
+ #define SOAP_SSL_METHOD_SSLv23  3
+ 
++#define SOAP_MAX_XML_DEPTH 2048
++#define SOAP_MAX_DECODE_DEPTH (SOAP_MAX_XML_DEPTH * 2)
+ 
+ ZEND_BEGIN_MODULE_GLOBALS(soap)
+ 	HashTable  defEncNs;     /* mapping of default namespaces to prefixes */
+@@ -180,6 +182,8 @@ ZEND_BEGIN_MODULE_GLOBALS(soap)
+ 	HashTable  wsdl_cache;
+ 	int        cur_uniq_ref;
+ 	HashTable *ref_map;
++	HashTable *decoded_ref_map;
++	unsigned int decode_depth;
+ ZEND_END_MODULE_GLOBALS(soap)
+ 
+ #ifdef ZTS
+diff --git a/ext/soap/php_xml.c b/ext/soap/php_xml.c
+index c726bc3f..5ed885bb 100644
+--- a/ext/soap/php_xml.c
++++ b/ext/soap/php_xml.c
+@@ -38,36 +38,72 @@ static int is_blank(const xmlChar* str)
+ 	return 1;
+ }
+ 
+-/* removes all empty text, comments and other insignoficant nodes */
++/* removes all empty text, comments and other insignoficant nodes.
++ * Iterative because recursion overflows the stack on a deep document. */
+ static void cleanup_xml_node(xmlNodePtr node)
+ {
+-	xmlNodePtr trav;
+-	xmlNodePtr del = NULL;
++	xmlNodePtr parent = node;
++	xmlNodePtr trav = node->children;
+ 
+-	trav = node->children;
+ 	while (trav != NULL) {
+-		if (del != NULL) {
+-			xmlUnlinkNode(del);
+-			xmlFreeNode(del);
+-			del = NULL;
+-		}
++		xmlNodePtr next = trav->next;
++
+ 		if (trav->type == XML_TEXT_NODE) {
+ 			if (is_blank(trav->content)) {
+-				del = trav;
++				xmlUnlinkNode(trav);
++				xmlFreeNode(trav);
+ 			}
+ 		} else if ((trav->type != XML_ELEMENT_NODE) &&
+ 		           (trav->type != XML_CDATA_SECTION_NODE)) {
+-			del = trav;
++			xmlUnlinkNode(trav);
++			xmlFreeNode(trav);
+ 		} else if (trav->children != NULL) {
+-			cleanup_xml_node(trav);
++			parent = trav;
++			trav = trav->children;
++			continue;
+ 		}
+-		trav = trav->next;
++
++		while (next == NULL) {
++			if (parent == node) {
++				return;
++			}
++			next = parent->next;
++			parent = parent->parent;
++		}
++		trav = next;
+ 	}
+-	if (del != NULL) {
+-		xmlUnlinkNode(del);
+-		xmlFreeNode(del);
++}
++
++#if LIBXML_VERSION < 21300
++static int is_nesting_too_deep(xmlNodePtr node)
++{
++	xmlNodePtr trav = node->children;
++	unsigned int depth = 0;
++
++	while (trav != NULL) {
++		/* An entity reference borrows its declaration as child list, and that
++		 * declaration hangs off the DTD, so descending leaves the document. */
++		if (trav->children != NULL &&
++		    trav->type != XML_ENTITY_REF_NODE &&
++		    trav->type != XML_DTD_NODE) {
++			if (++depth > SOAP_MAX_XML_DEPTH) {
++				return TRUE;
++			}
++			trav = trav->children;
++			continue;
++		}
++		while (trav->next == NULL) {
++			trav = trav->parent;
++			if (trav == node) {
++				return FALSE;
++			}
++			depth--;
++		}
++		trav = trav->next;
+ 	}
++	return FALSE;
+ }
++#endif
+ 
+ static void soap_ignorableWhitespace(void *ctx, const xmlChar *ch, int len)
+ {
+@@ -126,6 +162,15 @@ xmlDocPtr soap_xmlParseFile(const char *filename TSRMLS_DC)
+ */
+ 
+ 	if (ret) {
++#if LIBXML_VERSION < 21300
++		if (is_nesting_too_deep((xmlNodePtr)ret)) {
++			/* php_sdl.c reports xmlGetLastError() as the reason, and libxml2 did
++			 * not fail here, so drop the error an earlier parse left behind. */
++			xmlResetLastError();
++			xmlFreeDoc(ret);
++			return NULL;
++		}
++#endif
+ 		cleanup_xml_node((xmlNodePtr)ret);
+ 	}
+ 	return ret;
+@@ -175,6 +220,13 @@ xmlDocPtr soap_xmlParseMemory(const void *buf, size_t buf_size)
+ 	xmlCleanupParser();
+ */
+ 
++#if LIBXML_VERSION < 21300
++	if (ret && is_nesting_too_deep((xmlNodePtr)ret)) {
++		xmlFreeDoc(ret);
++		ret = NULL;
++	}
++#endif
++
+ /*
+ 	if (ret) {
+ 		cleanup_xml_node((xmlNodePtr)ret);
+@@ -297,6 +349,8 @@ xmlNodePtr get_node_with_attribute_ex(xmlNodePtr node, char *name, char *name_ns
+ 
+ xmlNodePtr get_node_with_attribute_recursive_ex(xmlNodePtr node, char *name, char *name_ns, char *attribute, char *value, char *attr_ns)
+ {
++	unsigned int depth = 0;
++
+ 	while (node != NULL) {
+ 		if (node_is_equal_ex(node, name, name_ns)) {
+ 			xmlAttrPtr attr = get_attribute_ex(node->properties, attribute, attr_ns);
+@@ -304,11 +358,19 @@ xmlNodePtr get_node_with_attribute_recursive_ex(xmlNodePtr node, char *name, cha
+ 				return node;
+ 			}
+ 		}
+-		if (node->children != NULL) {
+-			xmlNodePtr tmp = get_node_with_attribute_recursive_ex(node->children, name, name_ns, attribute, value, attr_ns);
+-			if (tmp) {
+-				return tmp;
++		if (node->children != NULL &&
++		    node->type != XML_ENTITY_REF_NODE &&
++		    node->type != XML_DTD_NODE) {
++			node = node->children;
++			depth++;
++			continue;
++		}
++		while (node->next == NULL) {
++			if (depth == 0) {
++				return NULL;
+ 			}
++			node = node->parent;
++			depth--;
+ 		}
+ 		node = node->next;
+ 	}
+diff --git a/ext/soap/soap.c b/ext/soap/soap.c
+index 21f11be7..ba9ed891 100644
+--- a/ext/soap/soap.c
++++ b/ext/soap/soap.c
+@@ -584,6 +584,8 @@ static void php_soap_init_globals(zend_soap_globals *soap_globals TSRMLS_DC)
+ 	soap_globals->soap_version = SOAP_1_1;
+ 	soap_globals->mem_cache = NULL;
+ 	soap_globals->ref_map = NULL;
++	soap_globals->decoded_ref_map = NULL;
++	soap_globals->decode_depth = 0;
+ }
+ 
+ PHP_MSHUTDOWN_FUNCTION(soap)
+@@ -612,6 +614,8 @@ PHP_RINIT_FUNCTION(soap)
+ 	SOAP_GLOBAL(class_map) = NULL;
+ 	SOAP_GLOBAL(features) = 0;
+ 	SOAP_GLOBAL(ref_map) = NULL;
++	SOAP_GLOBAL(decoded_ref_map) = NULL;
++	SOAP_GLOBAL(decode_depth) = 0;
+ 	return SUCCESS;
+ }
+ 
+diff --git a/ext/soap/tests/GHSA-85c2-q967-79q5.phpt b/ext/soap/tests/GHSA-85c2-q967-79q5.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/soap/tests/GHSA-85c2-q967-79q5.phpt
+@@ -0,0 +1,61 @@
++--TEST--
++GHSA-85c2-q967-79q5: Stale SOAP_GLOBAL(ref_map) pointer with Apache Map
++--CREDITS--
++brettgervasoni
++--SKIPIF--
++<?php if (!extension_loaded("soap")) die("skip soap extension not available"); ?>
++--FILE--
++<?php
++
++class Handler {
++    public function test(...$args) {
++        $GLOBALS['result'] = $args;
++    }
++}
++
++$envelope = <<<'XML'
++<?xml version="1.0" encoding="UTF-8"?>
++<soapenv:Envelope
++    xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
++    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
++    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
++
++    <soapenv:Body>
++        <test>
++            <map xsi:type="apache:Map" xmlns:apache="http://xml.apache.org/xml-soap">
++                <item>
++                    <key>foo</key>
++                    <value id="stale"><object>bar</object></value>
++                </item>
++                <item>
++                    <key>foo</key>
++                    <value>baz</value>
++                </item>
++            </map>
++            <stale href="#stale"/>
++        </test>
++    </soapenv:Body>
++</soapenv:Envelope>
++XML;
++
++$s = new SoapServer(null, ['uri' => 'urn:a']);
++$s->setClass(Handler::class);
++$s->handle($envelope);
++var_dump($result);
++
++?>
++--EXPECTF--
++<?xml version="1.0" encoding="UTF-8"?>
++<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="urn:a" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:testResponse><return xsi:nil="true"/></ns1:testResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>
++array(2) {
++  [0]=>
++  array(1) {
++    ["foo"]=>
++    string(3) "baz"
++  }
++  [1]=>
++  object(stdClass)#%d (1) {
++    ["object"]=>
++    string(3) "bar"
++  }
++}
+diff --git a/ext/soap/tests/GHSA-rgrp-mwpx-f6rm.phpt b/ext/soap/tests/GHSA-rgrp-mwpx-f6rm.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/soap/tests/GHSA-rgrp-mwpx-f6rm.phpt
+@@ -0,0 +1,89 @@
++--TEST--
++GHSA-rgrp-mwpx-f6rm: Stack overflow on deeply nested XML
++--INI--
++soap.wsdl_cache_enabled=0
++--SKIPIF--
++<?php if (!extension_loaded("soap")) die("skip soap extension not available"); ?>
++--FILE--
++<?php
++
++function envelope($depth)
++{
++    return '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"><s:Body><test>'
++        . str_repeat('<a>', $depth) . 'leaf' . str_repeat('</a>', $depth)
++        . '</test></s:Body></s:Envelope>';
++}
++
++function test($arg)
++{
++    $depth = 0;
++    while (is_object($arg)) {
++        $depth++;
++        $arg = $arg->a;
++    }
++    $GLOBALS['decoded'] = [$depth, $arg];
++
++    return 'ok';
++}
++
++$server = new SoapServer(null, ['uri' => 'urn:test']);
++$server->addFunction('test');
++
++$server->handle(envelope(200));
++var_dump($GLOBALS['decoded']);
++
++/* libxml2 2.13 rejects past 2048 despite XML_PARSE_HUGE, older ones do not. */
++$wsdl = __DIR__ . '/GHSA-rgrp-mwpx-f6rm.wsdl';
++foreach ([1000, 2100] as $depth) {
++    file_put_contents($wsdl, '<r>' . str_repeat('<a>', $depth) . 'leaf' . str_repeat('</a>', $depth) . '</r>');
++    try {
++        new SoapClient($wsdl);
++    } catch (SoapFault $e) {
++        echo rtrim($e->getMessage()), "\n";
++    }
++}
++
++/* A WSDL reached through an entity reference still loads. Its replacement tree cannot
++   be built deeper than the 2048 libxml2 2.13 enforces, so this pins the entity skip
++   rather than the limit. */
++$entity = __DIR__ . '/GHSA-rgrp-mwpx-f6rm-entity.wsdl';
++$desc = str_repeat('&#60;p&#62;', 300) . 'A test service.' . str_repeat('&#60;/p&#62;', 300);
++file_put_contents($entity, '<?xml version="1.0"?>
++<!DOCTYPE definitions [<!ENTITY desc "' . $desc . '">]>
++<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="urn:test" targetNamespace="urn:test" name="T">
++  <documentation>&desc;</documentation>
++  <message name="inMsg"/>
++  <portType name="pt"><operation name="op"><input message="tns:inMsg"/></operation></portType>
++  <binding name="b" type="tns:pt">
++    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
++    <operation name="op"><soap:operation soapAction="op"/><input><soap:body use="encoded" namespace="urn:test" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input></operation>
++  </binding>
++  <service name="s"><port name="p" binding="tns:b"><soap:address location="http://example.org/"/></port></service>
++</definitions>');
++var_dump((new SoapClient($entity))->__getFunctions());
++
++$server->handle(envelope(3000));
++
++?>
++--CLEAN--
++<?php
++@unlink(__DIR__ . '/GHSA-rgrp-mwpx-f6rm.wsdl');
++@unlink(__DIR__ . '/GHSA-rgrp-mwpx-f6rm-entity.wsdl');
++?>
++--EXPECTF--
++<?xml version="1.0" encoding="UTF-8"?>
++<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="urn:test" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:testResponse><return xsi:type="xsd:string">ok</return></ns1:testResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>
++array(2) {
++  [0]=>
++  int(199)
++  [1]=>
++  string(4) "leaf"
++}
++SOAP-ERROR: Parsing WSDL: Couldn't find <definitions> in '%sGHSA-rgrp-mwpx-f6rm.wsdl'
++SOAP-ERROR: Parsing WSDL: Couldn't load from '%sGHSA-rgrp-mwpx-f6rm.wsdl'%S
++array(1) {
++  [0]=>
++  string(9) "void op()"
++}
++<?xml version="1.0" encoding="UTF-8"?>
++<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"><SOAP-ENV:Body><SOAP-ENV:Fault><faultcode>SOAP-ENV:Client</faultcode><faultstring>Bad Request</faultstring></SOAP-ENV:Fault></SOAP-ENV:Body></SOAP-ENV:Envelope>
+diff --git a/ext/soap/tests/GHSA-rgrp-mwpx-f6rm-href-chain.phpt b/ext/soap/tests/GHSA-rgrp-mwpx-f6rm-href-chain.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/soap/tests/GHSA-rgrp-mwpx-f6rm-href-chain.phpt
+@@ -0,0 +1,47 @@
++--TEST--
++GHSA-rgrp-mwpx-f6rm: Stack overflow on a chain of href references
++--SKIPIF--
++<?php if (!extension_loaded("soap")) die("skip soap extension not available"); ?>
++--FILE--
++<?php
++
++/* The body stays four deep whatever $n is: the decoder walks the href chain. */
++function chain($n)
++{
++    $links = '';
++    for ($i = 1; $i <= $n; $i++) {
++        $links .= '<x id="i' . $i . '">' . ($i < $n ? '<q href="#i' . ($i + 1) . '"/>' : 'leaf') . '</x>';
++    }
++
++    return '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"><s:Body><test><p href="#i1"/>'
++        . $links . '</test></s:Body></s:Envelope>';
++}
++
++function test($arg)
++{
++    $GLOBALS['decoded'] = $arg;
++
++    return 'ok';
++}
++
++$server = new SoapServer(null, ['uri' => 'urn:test']);
++$server->addFunction('test');
++
++$server->handle(chain(3));
++var_dump($GLOBALS['decoded']);
++
++$server->handle(chain(12000));
++
++?>
++--EXPECTF--
++<?xml version="1.0" encoding="UTF-8"?>
++<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="urn:test" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:testResponse><return xsi:type="xsd:string">ok</return></ns1:testResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>
++object(stdClass)#%d (1) {
++  ["q"]=>
++  object(stdClass)#%d (1) {
++    ["q"]=>
++    string(4) "leaf"
++  }
++}
++<?xml version="1.0" encoding="UTF-8"?>
++<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"><SOAP-ENV:Body><SOAP-ENV:Fault><faultcode>SOAP-ENV:Server</faultcode><faultstring>SOAP-ERROR: Encoding: Nesting level too deep</faultstring></SOAP-ENV:Fault></SOAP-ENV:Body></SOAP-ENV:Envelope>
+diff --git a/ext/soap/tests/GHSA-rgrp-mwpx-f6rm-href-cycle.phpt b/ext/soap/tests/GHSA-rgrp-mwpx-f6rm-href-cycle.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/soap/tests/GHSA-rgrp-mwpx-f6rm-href-cycle.phpt
+@@ -0,0 +1,43 @@
++--TEST--
++GHSA-rgrp-mwpx-f6rm: Stack overflow on an array element referencing its own array
++--SKIPIF--
++<?php if (!extension_loaded("soap")) die("skip soap extension not available"); ?>
++--FILE--
++<?php
++
++function envelope($param)
++{
++    return '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"'
++        . ' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"'
++        . ' xmlns:e="http://schemas.xmlsoap.org/soap/encoding/"'
++        . ' s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">'
++        . '<s:Body><test>' . $param . '</test></s:Body></s:Envelope>';
++}
++
++function test($arg)
++{
++    $GLOBALS['decoded'] = $arg;
++
++    return 'ok';
++}
++
++$server = new SoapServer(null, ['uri' => 'urn:test']);
++$server->addFunction('test');
++
++$server->handle(envelope('<param xsi:type="e:Array" e:arrayType="xsi:string[2]"><i>a</i><i>b</i></param>'));
++var_dump($GLOBALS['decoded']);
++
++$server->handle(envelope('<param xsi:type="e:Array" e:arrayType="xsi:anyType[1]" id="x"><i href="#x"/></param>'));
++
++?>
++--EXPECTF--
++<?xml version="1.0" encoding="UTF-8"?>
++<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="urn:test" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:testResponse><return xsi:type="xsd:string">ok</return></ns1:testResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>
++array(2) {
++  [0]=>
++  string(1) "a"
++  [1]=>
++  string(1) "b"
++}
++<?xml version="1.0" encoding="UTF-8"?>
++<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"><SOAP-ENV:Body><SOAP-ENV:Fault><faultcode>SOAP-ENV:Server</faultcode><faultstring>SOAP-ERROR: Encoding: Nesting level too deep</faultstring></SOAP-ENV:Fault></SOAP-ENV:Body></SOAP-ENV:Envelope>
+diff --git a/ext/soap/tests/bug47021.phpt b/ext/soap/tests/bug47021.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/soap/tests/bug47021.phpt
+@@ -0,0 +1,81 @@
++--TEST--
++Bug #47021 SoapClient (SoapClient stumbles over WSDL delivered with "Transfer-Encoding: chunked")
++--INI--
++soap.wsdl_cache_enabled=0
++--SKIPIF--
++<?php
++if (!extension_loaded("soap")) die("skip soap extension not available");
++
++require 'skipif.inc';
++
++require __DIR__.'/../../standard/tests/http/server.inc'; http_server_skipif('tcp://127.0.0.1:12342');
++
++?>
++--FILE--
++<?php
++require __DIR__.'/../../standard/tests/http/server.inc';
++
++function chunk_body($body, $n)
++{
++    $chunks = str_split($body, $n);
++    $chunks[] = '';
++
++    foreach ($chunks as $k => $v) {
++        $chunks[$k] = sprintf("%08x\r\n%s\r\n", strlen($v), $v);
++    }
++
++    return join('', $chunks);
++}
++
++$wsdl = file_get_contents(__DIR__.'/server030.wsdl');
++
++$soap = <<<EOF
++<?xml version="1.0" encoding="UTF-8"?>
++<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://testuri.org" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:getItemsResponse><getItemsReturn SOAP-ENC:arrayType="ns1:Item[10]" xsi:type="ns1:ItemArray"><item xsi:type="ns1:Item"><text xsi:type="xsd:string">text0</text></item><item xsi:type="ns1:Item"><text xsi:type="xsd:string">text1</text></item><item xsi:type="ns1:Item"><text xsi:type="xsd:string">text2</text></item><item xsi:type="ns1:Item"><text xsi:type="xsd:string">text3</text></item><item xsi:type="ns1:Item"><text xsi:type="xsd:string">text4</text></item><item xsi:type="ns1:Item"><text xsi:type="xsd:string">text5</text></item><item xsi:type="ns1:Item"><text xsi:type="xsd:string">text6</text></item><item xsi:type="ns1:Item"><text xsi:type="xsd:string">text7</text></item><item xsi:type="ns1:Item"><text xsi:type="xsd:string">text8</text></item><item xsi:type="ns1:Item"><text xsi:type="xsd:string">text9</text></item></getItemsReturn></ns1:getItemsResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>
++EOF;
++
++$responses = [
++    "data://text/plain,HTTP/1.1 200 OK\r\n".
++    "Content-Type: text/xml;charset=utf-8\r\n".
++    "Transfer-Encoding: \t  chunked\t \r\n".
++    "Connection: close\r\n".
++    "\r\n".
++    chunk_body($wsdl, 64),
++    "data://text/plain,HTTP/1.1 200 OK\r\n".
++    "Content-Type: text/xml;charset=utf-8\r\n".
++    "Transfer-Encoding: \t  chunked\t \r\n".
++    "Connection: close\r\n".
++    "\r\n".
++    chunk_body($soap, 156),
++];
++
++
++$pid = http_server('tcp://127.0.0.1:12342', $responses);
++
++$options = [
++    'trace' => true,
++    'location' => 'http://127.0.0.1:12342/',
++];
++
++class BugSoapClient extends SoapClient
++{
++    public function __doRequest($request, $location, $action, $version, $one_way = null)
++    {
++        $response = parent::__doRequest($request, $location, $action, $version, $one_way);
++
++        var_dump(strlen($response));
++
++        return $response;
++    }
++}
++
++$client = new BugSoapClient('http://127.0.0.1:12342/', $options);
++
++var_dump(count($client->getItems()));
++
++http_server_kill($pid);
++
++?>
++--EXPECT--
++int(1291)
++int(10)
+diff --git a/ext/soap/tests/bugs/GHSA-cj93-vc83-wgqv.phpt b/ext/soap/tests/bugs/GHSA-cj93-vc83-wgqv.phpt
+new file mode 100644
+--- /dev/null
++++ b/ext/soap/tests/bugs/GHSA-cj93-vc83-wgqv.phpt
+@@ -0,0 +1,155 @@
++--TEST--
++GHSA-cj93-vc83-wgqv
++--INI--
++soap.wsdl_cache_enabled=0
++memory_limit=-1
++--CONFLICTS--
++all
++--SKIPIF--
++<?php
++if (!extension_loaded("soap")) die("skip soap extension not available");
++require __DIR__.'/../../../standard/tests/http/server-8.0.inc';
++http_server_skipif();
++if (getenv("SKIP_SLOW_TESTS")) die('skip slow test');
++if (!getenv("SOAP_RUN_RESOURCE_HEAVY_TESTS")) die("skip SOAP resource-heavy test");
++if (PHP_INT_SIZE == 4) die('skip not for 32-bit systems due to memory constraints');
++
++if (!file_exists('/proc/meminfo')) {
++    die('skip Cannot check free RAM from /proc/meminfo on this platform');
++}
++
++/* The client allocates a ~4 GiB response buffer (a 2 GiB chunk plus the
++ * oversized realloc for the second chunk), so require real headroom to avoid
++ * swapping, which is what makes this test time out on constrained machines. */
++$free_ram = 0;
++if ($f = fopen("/proc/meminfo","r")) {
++    while (!feof($f)) {
++        if (preg_match('/MemFree[^\d]*(\d+)/i', fgets($f), $m)) {
++            $free_ram = max($free_ram, $m[1]/1024/1024);
++            if ($free_ram > 6) {
++                $enough_free_ram = true;
++            }
++        }
++    }
++}
++
++if (empty($enough_free_ram)) {
++    die(sprintf("skip need +4G free RAM, but only %01.2f available", $free_ram));
++}
++--FILE--
++<?php
++require __DIR__.'/../../../standard/tests/http/server-8.0.inc';
++
++function chunk_body($body, $n)
++{
++    $chunks = str_split($body, $n);
++    $chunks[] = '';
++
++    foreach ($chunks as $k => $v) {
++        $chunks[$k] = sprintf("%08x\r\n%s\r\n", strlen($v), $v);
++    }
++
++    return join('', $chunks);
++}
++
++$wsdl = file_get_contents(__DIR__.'/../server030.wsdl');
++
++$headers =
++    "HTTP/1.1 200 OK\r\n".
++    "Content-Type: text/xml;charset=utf-8\r\n".
++    "Transfer-Encoding: \t  chunked\t \r\n".
++    "Connection: close\r\n".
++    "\r\n";
++
++/* Custom minimal server. Unlike the generic http_server() helper it streams the
++ * 2 GiB filler in bounded blocks instead of materialising it (and a data://
++ * copy of it) in memory. That keeps the sender's footprint tiny: only the
++ * client needs to hold the large buffers, so total memory and run time stay far
++ * lower and the test no longer thrashes on slower machines. */
++function heavy_soap_server($wsdl, $headers)
++{
++    $server = stream_socket_server('tcp://127.0.0.1:0', $errno, $errstr);
++    if (!$server) {
++        return false;
++    }
++    $uri = 'http://' . stream_socket_get_name($server, false);
++
++    $pid = pcntl_fork();
++    if ($pid == -1) {
++        die('could not fork');
++    } else if ($pid) {
++        return ['pid' => $pid, 'uri' => $uri];
++    }
++
++    /* Child: streaming 2 GiB can exceed the 60s alarm the helper would use, so
++     * match the run-tests per-test timeout instead. */
++    pcntl_alarm(120);
++
++    $drain = static function ($sock) {
++        stream_set_blocking($sock, false);
++        while (!feof($sock)) {
++            $r = [$sock]; $w = $e = null;
++            if (!stream_select($r, $w, $e, 1)) continue;
++            $line = stream_get_line($sock, 8192, "\r\n");
++            if ($line === '') break;
++        }
++        stream_set_blocking($sock, true);
++    };
++
++    /* Response 1: the WSDL, chunked. */
++    $sock = stream_socket_accept($server, 60);
++    if ($sock) {
++        $drain($sock);
++        fwrite($sock, $headers . chunk_body($wsdl, 64));
++        fclose($sock);
++    }
++
++    /* Response 2: an oversized chunk. Only the size header of the second chunk
++     * is needed: the reallocation for it happens before its body is read, so on
++     * the unfixed code the overflow triggers on the first read into the
++     * undersized buffer. The 2 GiB first-chunk body is streamed in 8 MiB blocks
++     * rather than built as one string. */
++    $sock = stream_socket_accept($server, 60);
++    if ($sock) {
++        $drain($sock);
++        fwrite($sock, $headers);
++        fwrite($sock, sprintf("%08x\r\n", 0x7fffffff));
++
++        $remaining = 0x7fffffff;
++        $block = str_repeat('x', 1 << 23); // 8 MiB
++        $block_len = strlen($block);
++        while ($remaining > 0) {
++            $n = $remaining < $block_len ? $remaining : $block_len;
++            fwrite($sock, $n === $block_len ? $block : substr($block, 0, $n));
++            $remaining -= $n;
++        }
++
++        fwrite($sock, "\r\n");
++        fwrite($sock, sprintf("%08x\r\n", 0x7fffffff));
++        fwrite($sock, "xxxx");
++        fclose($sock);
++    }
++
++    exit(0);
++}
++
++$srv = heavy_soap_server($wsdl, $headers);
++
++$options = [
++    'trace' => false,
++    'location' => $srv['uri'],
++];
++
++$client = new SoapClient($srv['uri'], $options);
++
++$client->getItems();
++
++http_server_kill($srv['pid']);
++
++--EXPECTF--
++Fatal error: Uncaught SoapFault exception: [HTTP] Error Fetching http body, No Content-Length, connection closed or chunked data in %s:%d
++Stack trace:
++#0 [internal function]: SoapClient->__doRequest('<?xml version="...', '%s', 'http://testuri....', 1, 0)
++#1 %s(%d): SoapClient->__call('getItems', Array)
++#2 {main}
++  thrown in %s on line %d
+diff --git a/ext/soap/php_packet_soap.c b/ext/soap/php_packet_soap.c
+index 2bcb042c691edec590f47477852ae859fee7fb02..a71304e12e60c2579f6b0c43f10fab260ed1463e 100644
+--- a/ext/soap/php_packet_soap.c
++++ b/ext/soap/php_packet_soap.c
+@@ -387,8 +387,7 @@
+ 			tmp = *(zval**)tmp;
+ 			Z_ADDREF_P(tmp);
+ 			zval_dtor(return_value);
+-			*return_value = *tmp;
+-			FREE_ZVAL(tmp);
++			ZVAL_ZVAL(return_value, tmp, 1, 1);
+ 		}
+ 	}
+ 

@@ -3,7 +3,7 @@ set -euo pipefail
 
 mkdir -p /test-support
 for module in pcntl posix dom json; do
-  if php -n -r "exit(extension_loaded('$module') ? 0 : 1);"; then
+  if php -r "exit(extension_loaded('$module') ? 0 : 1);"; then
     continue
   fi
   cd "/usr/src/php/ext/$module"

@@ -1,0 +1,33 @@
+Published-source: https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz
+Published-patch: 0127-Fix-bug-79465-use-unsigneds-as-indexes.patch
+Scope: selected PHP runtime components and their tests; packaging and unrelated extensions omitted.
+
+From: Stanislav Malyshev <stas@php.net>
+Date: Mon, 13 Apr 2020 21:07:04 -0700
+Subject: Fix bug #79465 - use unsigneds as indexes.
+
+(cherry picked from commit 9d6bf8221b05f86ce5875832f0f646c4c1f218be)
+---
+ ext/standard/url.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/ext/standard/url.c
++++ b/ext/standard/url.c
+@@ -540,7 +540,7 @@ PHPAPI size_t php_url_decode(char *str, size_t len)
+ #ifndef CHARSET_EBCDIC
+ 			*dest = (char) php_htoi(data + 1);
+ #else
+-			*dest = os_toebcdic[(char) php_htoi(data + 1)];
++			*dest = os_toebcdic[(unsigned char) php_htoi(data + 1)];
+ #endif
+ 			data += 2;
+ 			len -= 2;
+@@ -632,7 +632,7 @@ PHPAPI size_t php_raw_url_decode(char *str, size_t len)
+ #ifndef CHARSET_EBCDIC
+ 			*dest = (char) php_htoi(data + 1);
+ #else
+-			*dest = os_toebcdic[(char) php_htoi(data + 1)];
++			*dest = os_toebcdic[(unsigned char) php_htoi(data + 1)];
+ #endif
+ 			data += 2;
+ 			len -= 2;
