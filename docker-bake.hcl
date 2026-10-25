@@ -6,12 +6,8 @@ group "minimal" {
   targets = ["php56", "php70", "php71", "php72", "php73", "php74", "php80", "php81"]
 }
 
-group "debian" {
-  targets = ["php56-debian", "php70-debian", "php71-debian", "php72-debian", "php73-debian", "php74-debian", "php80-debian", "php81-debian"]
-}
-
 group "all" {
-  targets = ["php56", "php70", "php71", "php72", "php73", "php74", "php80", "php81", "php56-debian", "php70-debian", "php71-debian", "php72-debian", "php73-debian", "php74-debian", "php80-debian", "php81-debian"]
+  targets = ["php56", "php70", "php71", "php72", "php73", "php74", "php80", "php81"]
 }
 
 target "php56" {
@@ -108,52 +104,4 @@ target "php81" {
     PHP_RELEASE = "8.1.34"
     BASE_IMAGE = "php:8.1.34-fpm-bookworm@sha256:e3893eeb8f6fb719b6efa7e011e76a65cb1322054226250cedac1138b406aba4"
   }
-}
-
-target "php56-debian" {
-  inherits = ["php56"]
-  target = "debian"
-  tags = ["php-eol-patched:5.6.40-debian"]
-}
-
-target "php70-debian" {
-  inherits = ["php70"]
-  target = "debian"
-  tags = ["php-eol-patched:7.0.33-debian"]
-}
-
-target "php71-debian" {
-  inherits = ["php71"]
-  target = "debian"
-  tags = ["php-eol-patched:7.1.33-debian"]
-}
-
-target "php72-debian" {
-  inherits = ["php72"]
-  target = "debian"
-  tags = ["php-eol-patched:7.2.34-debian"]
-}
-
-target "php73-debian" {
-  inherits = ["php73"]
-  target = "debian"
-  tags = ["php-eol-patched:7.3.33-debian"]
-}
-
-target "php74-debian" {
-  inherits = ["php74"]
-  target = "debian"
-  tags = ["php-eol-patched:7.4.33-debian"]
-}
-
-target "php80-debian" {
-  inherits = ["php80"]
-  target = "debian"
-  tags = ["php-eol-patched:8.0.30-debian"]
-}
-
-target "php81-debian" {
-  inherits = ["php81"]
-  target = "debian"
-  tags = ["php-eol-patched:8.1.34-debian"]
 }

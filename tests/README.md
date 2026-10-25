@@ -20,30 +20,11 @@ The PostgreSQL service image must be available locally. `--postgres-image`
 overrides the pinned default with another compatible official PostgreSQL image.
 The report records its resolved image ID.
 
-Select `--variant debian` when testing the `:VERSION-debian` image. The default
-`--variant minimal` preserves the checks for the shell-free `:VERSION` image.
-Both profiles require the same production PHP defaults, extensions, pinned
-PECL releases and PostgreSQL CLI/FPM controls. They share the same matching
-`test` target for source regressions:
-
-```sh
-python tests/run.py --image php-eol-patched:7.1.33-debian --variant debian \
-  --test-image php-eol-patched:7.1.33-test --version 7.1.33
-```
-
-The Debian profile checks the official entrypoint's command and option forwarding,
-shell, package manager, development tools, PHP headers, `phpize`, `php-config`,
-and PECL. Requests must run in UID/GID 33 workers under a root master and
-inherit container environment variables. A second container exercises ordinary
-FPM requests with explicit `--user 1000:1000` and no Linux capabilities.
-The default master must stop its workers cleanly on the image's stop signal.
-
-A separate disposable, writable container verifies the packaged patched source
-archive and extracted file checksums, deletes and re-extracts it, and builds
-and enables `posix` using `docker-php-ext-install`. It then re-extracts and checks
-the source again. This container has no network access or Linux capabilities;
-it cannot fetch a replacement source or build dependencies. Build output is
-captured in the report. `posix` is installed only in this disposable container.
+This branch builds the shell-free `:VERSION` images and uses `--variant minimal`
+(the default). The shared test runner also retains a Debian profile for the
+[`debian` branch](https://github.com/RCooLeR/php-eol-patched/blob/debian/tests/README.md),
+but this branch does not build `:VERSION-debian` runtime images. CI builds and
+tests only the minimal images and their matching regression targets.
 
 The test target must contain the matching patched source at `/usr/src/php`,
 headers, a C compiler, Bash, and test-only `pcntl` and `posix` modules. Modules
@@ -53,11 +34,10 @@ local protocol fixture and do not need a database server. Redis checks cover
 client construction and compiled serializer constants; Memcached checks cover
 local client setup and serializer options. Neither check connects to a server.
 
-The Python runner requires Python 3 and Docker. Containers have no external
-network, no published ports, a read-only root filesystem and bounded writable
-tmpfs mounts, except for the Debian profile's disposable extension-build container.
-The root FPM master receives only `SETUID`, `SETGID` and `KILL` capabilities;
-other PHP containers drop all capabilities. Test files are mounted read-only. PostgreSQL uses a dedicated
+The Python runner requires Python 3 and Docker. Minimal-profile containers have
+no external network, no published ports, a read-only root filesystem and bounded
+writable tmpfs mounts. PHP containers drop all Linux capabilities. Test files
+are mounted read-only. PostgreSQL uses a dedicated
 internal Docker network and a tmpfs database; other checks use no network.
 The runner removes only its own containers, anonymous volumes and network.
 
