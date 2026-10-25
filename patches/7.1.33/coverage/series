@@ -1,3 +1,7 @@
 gd-CVE-2026-9672.patch
 openssl-CVE-2026-14355.patch
 phar-CVE-2026-7260.patch
+standard-CVE-2020-7059.patch
+standard-CVE-2020-7059-followup.patch
+mbstring-CVE-2020-7060.patch
+pdo-sqlite-CVE-2022-31631.patch

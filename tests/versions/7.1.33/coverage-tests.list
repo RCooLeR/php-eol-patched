@@ -1,3 +1,6 @@
 ext/phar/tests/tar/coverage-symlink-controls.phpt
 ext/phar/tests/tar/ghsa-vc5h-9ppw-p5f3-symlink-circular.phpt
 ext/gd/tests/gif.phpt
+ext/standard/tests/file/bug79099.phpt
+ext/mbstring/tests/bug79037.phpt
+critical-controls.phpt

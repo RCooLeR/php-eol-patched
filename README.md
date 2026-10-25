@@ -96,6 +96,11 @@ The image uses PHP's `php.ini-production`, with UTC as the timezone and session 
 
 ## Test
 
+The [test documentation](tests/README.md) includes the separate resource-heavy
+SQLite and Keccak regressions. The normal suite checks their bounded cases and
+compatibility controls. See [PATCHES.md](PATCHES.md#gd-exif-string-sqlite-and-sha-3-coverage)
+for the affected releases and the remaining SHA-3 input-length limitation.
+
 The test stage contains the same PHP build plus the compiler, matching source and test-only modules. Tests use local fake servers and a disposable PostgreSQL server on an isolated Docker network. Database credentials are generated for each run; no existing database is used.
 
 ```sh

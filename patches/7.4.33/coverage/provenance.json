@@ -43,11 +43,24 @@
         "ext/phar/tests/tar/ghsa-vc5h-9ppw-p5f3-symlink-circular.phpt",
         "ext/phar/util.c"
       ]
+    },
+    {
+      "file": "pdo-sqlite-CVE-2022-31631.patch",
+      "sha256": "616fe4bee0c1991af24742def3a08130d406256d63c90de3097376767d6d01da",
+      "sources": [
+        "https://github.com/php/php-src/commit/921b6813da3237a83e908998483f46ae3d8bacba"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/pdo_sqlite/sqlite_driver.c",
+        "ext/pdo_sqlite/tests/bug81740.phpt"
+      ]
     }
   ],
   "verification_limits": {
     "gd": "The published CVE-2026-9672 commit contains no regression fixture. Existing gif.phpt is an ordinary compatibility control, not an exploit reproduction.",
     "openssl": "Run the unchanged upstream gh22186.phpt only where its actual cipher probe succeeds; an unsupported-cipher skip is not a passing regression.",
-    "phar": "The three circular-symlink tar fixtures and their PHPT are byte-identical to upstream. The additional ordinary-link control checks the published path-separator adaptation."
+    "phar": "The three circular-symlink tar fixtures and their PHPT are byte-identical to upstream. The additional ordinary-link control checks the published path-separator adaptation.",
+    "pdo_sqlite": "The published bug81740.phpt allocates 2 GiB and runs separately with an 8 GiB container limit. Normal quoting and a native argument-width boundary check run in the default suite."
   }
 }

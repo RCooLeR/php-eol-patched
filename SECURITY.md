@@ -6,4 +6,8 @@ Only the changes listed in [PATCHES.md](PATCHES.md) are included. The project do
 
 The allocation-failure mitigations deliberately terminate affected workers. Session upload progress is disabled in source. Test application behavior, failure handling and resource limits before use.
 
+PHP 7.2 and 7.3 include the published Keccak memory-safety fix, but their PHP
+wrappers still truncate very large SHA-3 input lengths and can return incorrect
+digests. See the [coverage details](PATCHES.md#gd-exif-string-sqlite-and-sha-3-coverage).
+
 For a problem with a published patch or this build, provide the exact image/version, a small reproducible example and the expected behavior. Do not put credentials, customer data or an undisclosed vulnerability's exploit details in a public issue. New vulnerabilities in supported PHP should follow the [PHP security reporting process](https://www.php.net/security/).
