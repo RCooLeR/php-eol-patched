@@ -5,11 +5,12 @@ extensions and pinned PECL versions, and exercise local extension operations.
 PostgreSQL controls also use a disposable server to exercise real database
 connections through CLI and the runtime's production FPM configuration.
 The regression suite runs against a matching `test` build target, which adds
-test modules and build tools without adding them to the minimal runtime image.
+matching source, test modules and regression tools. These test-only modules are
+not enabled in the Debian runtime image.
 
 ```sh
 docker pull postgres:18-bookworm@sha256:bbf83594798e144bff365a9c191c5d779f181fb3135902064ab8ff11918020fc
-python tests/run.py --image php-eol-patched:7.1.33 \
+python tests/run.py --variant debian --image php-eol-patched:7.1.33-debian \
   --test-image php-eol-patched:7.1.33-test --version 7.1.33
 ```
 
@@ -20,16 +21,7 @@ The PostgreSQL service image must be available locally. `--postgres-image`
 overrides the pinned default with another compatible official PostgreSQL image.
 The report records its resolved image ID.
 
-Select `--variant debian` when testing the `:VERSION-debian` image. The default
-`--variant minimal` preserves the checks for the shell-free `:VERSION` image.
-Both profiles require the same production PHP defaults, extensions, pinned
-PECL releases and PostgreSQL CLI/FPM controls. They share the same matching
-`test` target for source regressions:
-
-```sh
-python tests/run.py --image php-eol-patched:7.1.33-debian --variant debian \
-  --test-image php-eol-patched:7.1.33-test --version 7.1.33
-```
+Pass `--variant debian` for every runtime image built by this branch. The runner also retains the minimal profile for the [minimal branch](https://github.com/RCooLeR/php-eol-patched/tree/minimal); it is not the default image type here. Both variants use the same source-regression `test` target for each release.
 
 The Debian profile checks the official entrypoint's command and option forwarding,
 shell, package manager, development tools, PHP headers, `phpize`, `php-config`,

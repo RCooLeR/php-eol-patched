@@ -233,19 +233,5 @@ COPY tests/ /build/tests/
 COPY examples/ /build/examples/
 COPY LICENSE THIRD_PARTY_NOTICES.md README.md PATCHES.md EXTENSIONS.md CUSTOMIZING.md SECURITY.md compose.example.yaml /build/
 
-FROM scratch AS runtime
-ARG PHP_RELEASE=8.1.34
-LABEL org.opencontainers.image.title="php-eol-patched" \
-      org.opencontainers.image.version="${PHP_RELEASE}" \
-      org.opencontainers.image.source="https://github.com/RCooLeR/php-eol-patched" \
-      org.opencontainers.image.description="Selected PHP security backports for temporary migration use. Upgrade to supported PHP."
-COPY --from=assembled /runtime-rootfs/ /
-ENV PATH=/usr/local/bin:/usr/local/sbin
-USER 33:33
-WORKDIR /var/www/html
-EXPOSE 9000
-STOPSIGNAL SIGQUIT
-CMD ["/usr/local/sbin/php-fpm", "--nodaemonize"]
-
-# A plain docker build produces the runtime image.
-FROM runtime AS final
+# A plain docker build produces the Debian runtime image.
+FROM debian AS final

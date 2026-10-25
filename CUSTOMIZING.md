@@ -11,7 +11,7 @@ docker run --rm php-eol-patched:7.1.33-debian sh -c 'php -v && php --ini'
 
 The Debian variants keep the matching pinned Debian base and official `docker-php-entrypoint`, `docker-php-source`, `docker-php-ext-configure`, `docker-php-ext-install` and `docker-php-ext-enable` scripts. They include `phpize`, `php-config` and PECL. They use this project's patched PHP and [extension profile](EXTENSIONS.md), rather than the official image's module defaults. The minimal tags without `-debian` contain no shell, `apt`, PECL or compiler.
 
-All examples use local tags. The repository's default build still produces the eight minimal images. `docker buildx bake --load debian` builds the eight Debian variants; `docker buildx bake --load all` builds both variants for every release. Only Linux amd64 is supported.
+All examples use local tags. On this branch, the `default`, `debian` and `all` build groups each produce the eight Debian images. Only Linux amd64 is supported.
 
 ## Extra extensions on PHP 7.1
 
@@ -169,25 +169,16 @@ The sample INI sets `memory_limit = 256M`, `upload_max_filesize = 16M` and `post
 
 ### Compose with the Debian variant
 
-[compose.example.yaml](compose.example.yaml) uses the minimal image and drops all Linux capabilities. To use a Debian variant with its root master, save this override as `compose.debian.yaml` beside it:
+[compose.example.yaml](compose.example.yaml) uses the Debian image with a root FPM master. It drops all Linux capabilities, then adds `SETUID`, `SETGID` and `KILL` so the master can change worker identity and signal its workers. The root filesystem is read-only, `/tmp` is writable tmpfs, and the host port binds to loopback.
 
-```yaml
-services:
-  php:
-    build:
-      target: debian
-    image: php-eol-patched:8.1.34-debian
-    cap_add: [SETUID, SETGID, KILL]
-```
-
-These capabilities let the master change worker identity and signal its workers. The merged configuration retains `cap_drop: [ALL]`, the read-only filesystem, `/tmp` tmpfs and the other settings in the base file. Alternatively, replace `cap_add` in the override with `user: "33:33"` to run the master and workers as UID/GID 33 with all capabilities dropped. Ensure application writes are directed to writable mounts.
-
-Set the base file's application bind mount before starting the service. Review and run the merged configuration explicitly:
+Set its application bind mount before starting the service:
 
 ```sh
-docker compose -f compose.example.yaml -f compose.debian.yaml config
-docker compose -f compose.example.yaml -f compose.debian.yaml up --build -d
+docker compose -f compose.example.yaml config
+docker compose -f compose.example.yaml up --build -d
 ```
+
+To run the master and workers as UID/GID 33, add `user: "33:33"` and remove `cap_add` from the service. Keep `cap_drop: [ALL]` and direct application writes to writable mounts.
 
 ## Framework and maintenance commands
 
@@ -222,49 +213,6 @@ For WordPress, run WP-CLI and Composer in a maintenance or dependency-build imag
 
 For SQL Server on PHP 8.0, select a compatible `sqlsrv`/`pdo_sqlsrv` release such as the 5.11 line and a supported Microsoft ODBC driver. Both the PHP compatibility table and the Debian distribution/ODBC combination matter; newer driver lines can drop PHP 8.0. Follow the [Microsoft PHP driver support matrix](https://learn.microsoft.com/en-us/sql/connect/php/microsoft-php-drivers-for-sql-server-support-matrix) and [Linux installation guidance](https://learn.microsoft.com/en-us/sql/connect/php/installation-tutorial-linux-mac), pin the reviewed versions and checksums, and preserve their license notices. There is no tested SQL Server installation recipe in this repository. Validate encrypted database connectivity with your chosen server and driver configuration.
 
-## Advanced: a customized minimal image
+## Customized minimal images
 
-Use the Debian variant for normal downstream Dockerfiles. A minimal image requires a build stage that collects the extension's INI, transitive shared libraries, dynamically loaded data and license notices. Copying just a `.so` from another PHP image is insufficient, even if its directory name looks compatible.
-
-The repository has an internal `debian-prepared` stage that includes the assembled minimal filesystem and a helper-compatible patched source archive. Build and tag it locally; it is not a separately published image:
-
-```sh
-docker buildx bake --load php71 \
-  --set php71.target=debian-prepared \
-  --set php71.tags=php-eol-patched:7.1.33-extension-builder
-```
-
-For a bundled extension such as GMP, a downstream Dockerfile can add the extension and rerun the assembler:
-
-```dockerfile
-FROM php-eol-patched:7.1.33-extension-builder AS application
-
-# Keep helper re-extraction on the same patched source as the PHP binary.
-RUN cp /debian-files/usr/src/php.tar.xz /usr/src/php.tar.xz
-
-# Start extension gmp installation
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends libgmp-dev \
-    && docker-php-ext-configure gmp --with-gmp=/usr \
-        --with-libdir="lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)" \
-    && docker-php-ext-install -j2 gmp \
-    && rm -rf /var/lib/apt/lists/*
-# End extension gmp installation
-
-RUN /bin/bash /build/scripts/assemble-runtime.sh 7.1.33
-
-FROM scratch
-COPY --from=application /runtime-rootfs/ /
-ENV PATH=/usr/local/bin:/usr/local/sbin
-USER 33:33
-WORKDIR /var/www/html
-EXPOSE 9000
-STOPSIGNAL SIGQUIT
-CMD ["/usr/local/sbin/php-fpm", "--nodaemonize"]
-```
-
-The archive in `/debian-files` has the top-level directory expected by `docker-php-source`. The source export's `php-VERSION-patched.tar.xz` has a different layout and cannot directly replace `/usr/src/php.tar.xz`.
-
-The assembler obtains the extension directory from `php-config`, includes loaded modules and INI files, resolves linked libraries, and copies Debian package copyright notices. Modules that load plugins or data dynamically may need additional packaging rules; newly added PECL packages also need their own source archives, pins and notices. Preserve the full project notices and meet the corresponding-source obligations of added libraries. The repository's source export covers its base build, so retain the source and license material required for downstream additions separately. Apply application configuration to `/runtime-rootfs` after assembly, because the assembler installs the repository's defaults.
-
-Build and test against the same repository revision and exact PHP release. Verify loaded modules, FPM configuration, writable paths and application behavior in the final image. A successful extension build alone does not establish that its runtime dependencies or application behavior are correct.
+Use the [minimal branch's build-stage recipe](https://github.com/RCooLeR/php-eol-patched/blob/minimal/CUSTOMIZING.md) when the final image must have no shell or package manager. That recipe collects extension configuration, shared libraries, dynamically loaded data and license notices. A copied extension module alone does not supply its runtime dependencies.

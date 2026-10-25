@@ -1,6 +1,6 @@
 # Extension map
 
-Both image variants for each of the eight PHP releases enable the extensions below: the minimal `:VERSION` tag and extensible `:VERSION-debian` tag have the same PHP module set. The optional installation sections in the shared [Dockerfile](Dockerfile) are enabled by default and have a start/end comment for each extension. [docker-bake.hcl](docker-bake.hcl) selects the base image and PHP release for each target.
+The eight Debian images on this branch enable the extensions below. The [minimal branch](https://github.com/RCooLeR/php-eol-patched/tree/minimal) has the same PHP module set for each release. The optional installation sections in the shared [Dockerfile](Dockerfile) are enabled by default and have a start/end comment for each extension. [docker-bake.hcl](docker-bake.hcl) selects the base image and PHP release for each target.
 
 A check mark means the extension is included. It does not mean that the extension or its system libraries have complete security backport coverage; see [PATCHES.md](PATCHES.md).
 
@@ -77,12 +77,12 @@ Redis and Memcached are client extensions; their servers are not included. The b
 
 ```sh
 docker buildx bake --load
-docker run --rm php-eol-patched:5.6.40 php -m
-docker run --rm php-eol-patched:8.1.34 php --ri redis
+docker run --rm php-eol-patched:5.6.40-debian php -m
+docker run --rm php-eol-patched:8.1.34-debian php --ri redis
 ```
 
 Replace the tag with any PHP release in the tables. Each image also contains its module list, PECL pins and libpq manifest under `/usr/share/php-eol-patched/`. Tests compare loaded modules and dependency versions with this build profile and exercise extension functions through FPM. PostgreSQL controls connect to a disposable server using SCRAM and verified TLS, exercising both native pgsql and PDO with native and emulated prepared statements.
 
-Both variants contain PHP and the libraries/data needed by these extensions. Composer, Node.js, database servers and mail tools are not included. The minimal variant also excludes a shell, package manager and compiler. The Debian variant retains Debian tools and the official `docker-php-*` extension helpers; its `/usr/src/php.tar.xz` contains the patched source used to build PHP.
+These images contain PHP, the libraries/data needed by its extensions, Debian tools and the official `docker-php-*` extension helpers. `/usr/src/php.tar.xz` contains the patched source used to build PHP. Composer, Node.js, database servers and mail tools are not included.
 
 `pcntl`, `posix`, `gmp`, `ftp`, `mcrypt`, `sodium` and Xdebug are not enabled by this default profile. `pcntl` and `posix` are installed in the test stage only. [CUSTOMIZING.md](CUSTOMIZING.md) explains how to add application-specific modules to a Debian variant, including keeping `pcntl` restricted to CLI workers and Xdebug restricted to development.

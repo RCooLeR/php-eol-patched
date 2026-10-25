@@ -17,21 +17,21 @@ jobs:
       max-parallel: 2
       matrix:
         include:
-          - target: php56
+          - target: php56-debian
             version: 5.6.40
-          - target: php70
+          - target: php70-debian
             version: 7.0.33
-          - target: php71
+          - target: php71-debian
             version: 7.1.33
-          - target: php72
+          - target: php72-debian
             version: 7.2.34
-          - target: php73
+          - target: php73-debian
             version: 7.3.33
-          - target: php74
+          - target: php74-debian
             version: 7.4.33
-          - target: php80
+          - target: php80-debian
             version: 8.0.30
-          - target: php81
+          - target: php81-debian
             version: 8.1.34
     env:
       TARGET: ${{ matrix.target }}
@@ -43,11 +43,11 @@ jobs:
       - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
       - name: Check Dockerfile and Compose
         run: |
-          docker buildx bake --check "$TARGET" "$TARGET-debian"
+          docker buildx bake --check "$TARGET"
           docker compose -f compose.example.yaml config --quiet
       - name: Build runtime and test images
         run: |
-          docker buildx bake --load "$TARGET" "$TARGET-debian"
+          docker buildx bake --load "$TARGET"
           docker buildx bake --load "$TARGET" \
             --set "$TARGET.target=test" \
             --set "$TARGET.tags=php-eol-patched:$PHP_RELEASE-test"
@@ -55,17 +55,13 @@ jobs:
         run: |
           docker pull "$(python3 -B -c "import sys; sys.path.insert(0, 'tests'); import postgresql; print(postgresql.DEFAULT_IMAGE)")"
           python3 tests/run.py \
-            --image "php-eol-patched:$PHP_RELEASE" \
-            --test-image "php-eol-patched:$PHP_RELEASE-test" \
-            --version "$PHP_RELEASE" \
-            --output "$RUNNER_TEMP/php-tests.json"
-          python3 tests/run.py \
             --variant debian \
             --image "php-eol-patched:$PHP_RELEASE-debian" \
+            --test-image "php-eol-patched:$PHP_RELEASE-test" \
             --version "$PHP_RELEASE" \
             --output "$RUNNER_TEMP/php-debian-tests.json"
       - name: Test PHP 7.1 application example
-        if: matrix.target == 'php71'
+        if: matrix.target == 'php71-debian'
         run: |
           docker build --pull=false -t php71-app:local examples/php71-app
           docker run --rm php71-app:local php --ri gmp
@@ -73,7 +69,7 @@ jobs:
           docker run --rm php71-app:local php --ri posix
           docker run --rm php71-app:local php-fpm -t
       - name: Test PHP 8.1 sodium example
-        if: matrix.target == 'php81'
+        if: matrix.target == 'php81-debian'
         run: |
           docker build --pull=false -t php81-sodium:local examples/php81-sodium
           docker run --rm php81-sodium:local php --ri sodium

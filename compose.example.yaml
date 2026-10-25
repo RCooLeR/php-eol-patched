@@ -4,12 +4,13 @@ services:
   php:
     build:
       context: .
-      target: runtime
-    image: php-eol-patched:8.1.34
+      target: debian
+    image: php-eol-patched:8.1.34-debian
     restart: unless-stopped
     stop_grace_period: 60s
     read_only: true
     cap_drop: [ALL]
+    cap_add: [SETUID, SETGID, KILL]
     security_opt:
       - no-new-privileges:true
     ports:
