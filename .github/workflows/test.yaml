@@ -8,7 +8,7 @@ on:
 permissions:
   contents: read
 
-# Publishing runs only on main; queue main runs so tags move in commit order.
+# Serialize runs for each ref. Moving tags also require the current main commit.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
@@ -85,21 +85,33 @@ jobs:
         run: |
           docker build --pull=false -t php81-sodium:local examples/php81-sodium
           docker run --rm php81-sodium:local php --ri sodium
-      # Push exactly the images tested above, plus the matching source export.
+      # Publish the matching source before making the tested runtimes available.
       - name: Publish to GitHub Container Registry
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: bash
         env:
           REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           image="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/php-eol-patched"
+          build_id="$GITHUB_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
           docker buildx bake --load "$TARGET" \
             --set "$TARGET.target=source" \
             --set "$TARGET.tags=php-eol-patched:$PHP_RELEASE-source"
+          trap 'docker logout ghcr.io >/dev/null 2>&1 || true' EXIT
           printf '%s\n' "$REGISTRY_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
-          for variant in "" -debian -source; do
-            for tag in "$PHP_RELEASE$variant" "$PHP_RELEASE$variant-${GITHUB_SHA::7}"; do
+          for variant in -source "" -debian; do
+            tag="$PHP_RELEASE$variant-$build_id"
+            docker tag "php-eol-patched:$PHP_RELEASE$variant" "$image:$tag"
+            docker push "$image:$tag"
+          done
+          # Rerunning an older commit must not replace the current release tags.
+          current_main=$(git ls-remote origin refs/heads/main | cut -f1)
+          if [ "$current_main" = "$GITHUB_SHA" ]; then
+            for variant in -source "" -debian; do
+              tag="$PHP_RELEASE$variant"
               docker tag "php-eol-patched:$PHP_RELEASE$variant" "$image:$tag"
               docker push "$image:$tag"
             done
-          done
-          docker logout ghcr.io
+          else
+            printf '%s\n' 'Published run-specific tags; main has advanced, so release tags were left unchanged.'
+          fi
