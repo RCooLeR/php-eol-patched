@@ -39,7 +39,7 @@ Use `--branch minimal` and target `php71` for the no-shell image. Use `main` whe
 | `php80-debian` | `php-eol-patched:8.0.30-debian` |
 | `php81-debian` | `php-eol-patched:8.1.34-debian` |
 
-Only Linux amd64 is supported. Builds start from pinned official PHP images, apply the patches once, and compile the selected modules. The tags above are built locally; these instructions do not pull a published project image or publish images.
+Only Linux amd64 is supported. Builds start from pinned official PHP images, apply the patches once, and compile the selected modules. Build the tags above locally, or pull the images CI publishes from `main` after its tests pass: `ghcr.io/rcooler/php-eol-patched` with the same tags, `<tag>-<commit>` as an immutable tag for each, and `<release>-source` with the release's source export. Pin a digest rather than a moving tag.
 
 The `:VERSION-debian` tags retain the matching Debian base, a shell, `apt`, `phpize`, `php-config`, PECL and the official image's `docker-php-*` helpers and entrypoint. Use them for application Dockerfiles that install packages or extensions. For the no-shell `:VERSION` tags, use the [minimal branch](https://github.com/RCooLeR/php-eol-patched/tree/minimal). Both variants use the same patched PHP build and extension set for each release; this project does not reproduce the official image's module defaults.
 
