@@ -1,5 +1,7 @@
 # Application images
 
+The [`debian` branch](https://github.com/RCooLeR/php-eol-patched/tree/debian) contains the extensible images used by these examples. The [`minimal` branch](https://github.com/RCooLeR/php-eol-patched/tree/minimal) contains only no-shell runtimes; use its build-stage recipe when adding extensions. [`main`](https://github.com/RCooLeR/php-eol-patched/tree/main) contains both variants. Check out the matching branch before running its build commands.
+
 Use a `:VERSION-debian` image when your application Dockerfile needs a shell, Debian packages, Composer or extra extensions. Build that image locally first:
 
 ```sh

@@ -2,6 +2,10 @@ group "default" {
   targets = ["php56", "php70", "php71", "php72", "php73", "php74", "php80", "php81"]
 }
 
+group "minimal" {
+  targets = ["php56", "php70", "php71", "php72", "php73", "php74", "php80", "php81"]
+}
+
 group "debian" {
   targets = ["php56-debian", "php70-debian", "php71-debian", "php72-debian", "php73-debian", "php74-debian", "php80-debian", "php81-debian"]
 }

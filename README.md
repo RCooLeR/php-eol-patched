@@ -8,6 +8,26 @@ This is an independent project, not an official PHP distribution. [PATCHES.md](P
 
 ## Images
 
+Choose a branch before building:
+
+| Branch | Images built by default | Available image targets |
+| --- | --- | --- |
+| [`main`](https://github.com/RCooLeR/php-eol-patched/tree/main) | Eight minimal images | Minimal and Debian variants for all eight releases |
+| [`debian`](https://github.com/RCooLeR/php-eol-patched/tree/debian) | Eight Debian images | `php56-debian` through `php81-debian` |
+| [`minimal`](https://github.com/RCooLeR/php-eol-patched/tree/minimal) | Eight no-shell images | `php56` through `php81` |
+
+Both variants run PHP CLI and FPM. The Debian images add a shell, package manager and extension build tools. The minimal images contain the PHP runtime and its required libraries. Image names stay the same across branches; a branch selects the available recipes, not a separate patch level.
+
+For example, clone only the recipes for Debian images:
+
+```sh
+git clone --branch debian --single-branch https://github.com/RCooLeR/php-eol-patched.git
+cd php-eol-patched
+docker buildx bake --load php71-debian
+```
+
+Use `--branch minimal` and target `php71` for the no-shell image. Use `main` when working on shared PHP patches or comparing both variants. Develop shared fixes on `main`, then port them to both variant branches while retaining their build defaults, CI and documentation.
+
 | Minimal target / local image | Debian target / local image |
 | --- | --- |
 | `php56` / `php-eol-patched:5.6.40` | `php56-debian` / `php-eol-patched:5.6.40-debian` |
@@ -48,6 +68,7 @@ Build an extensible Debian image or either group explicitly:
 
 ```sh
 docker buildx bake --load php71-debian
+docker buildx bake --load minimal  # All eight minimal images
 docker buildx bake --load debian  # All eight Debian variants
 docker buildx bake --load all  # All sixteen images
 docker run --rm php-eol-patched:7.1.33-debian sh -c 'php -v && phpize --version'
