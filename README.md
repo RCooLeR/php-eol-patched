@@ -27,7 +27,7 @@ docker buildx bake --load php71
 | `php80` | `php-eol-patched:8.0.30` |
 | `php81` | `php-eol-patched:8.1.34` |
 
-The `default`, `minimal` and `all` Bake groups each build these eight images. A plain `docker build` also produces a minimal runtime. Only Linux amd64 is supported. Builds start from pinned official PHP images, apply the patches once, and compile the selected modules. These tags are built locally; the commands do not pull or publish a project image.
+The `default`, `minimal` and `all` Bake groups each build these eight images. A plain `docker build` also produces a minimal runtime. Only Linux amd64 is supported. Builds start from pinned official PHP images, apply the patches once, and compile the selected modules. Build these tags locally, or pull the images CI publishes from `main` after its tests pass: `ghcr.io/rcooler/php-eol-patched` with the same tags, `<tag>-<commit>` as an immutable tag for each, and `<release>-source` with the release's source export. Pin a digest rather than a moving tag.
 
 The final images start from `scratch` and contain PHP CLI/FPM, required shared libraries, CA certificates, configuration and license notices. They have no shell, package manager, compiler, PECL or extension helpers. The Debian images on the other branch use the same PHP patches and extension profile for each release; choosing a branch selects the runtime packaging, not a separate patch level.
 
