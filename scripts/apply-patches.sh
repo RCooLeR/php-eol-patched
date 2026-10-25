@@ -54,6 +54,9 @@ case "$version" in
   5.6.40|7.0.33)
     sed -i '1i /* Modified 2026-10-23: apply the published Big5 conversion bounds fix (PHP bug 79037). */' ext/mbstring/libmbfl/filters/mbfilter_big5.c
     ;;
+  7.1.33)
+    sed -i '1i /* Modified 2026-10-26: apply the published CP950 conversion bounds fix (PHP bug 79037). */' ext/mbstring/libmbfl/filters/mbfilter_big5.c
+    ;;
   8.1.34)
     sed -i '1i /* Modified 2026-10-22: bound the initial mb_strcut allocation to input length. */' ext/mbstring/libmbfl/mbfl/mbfilter.c
     ;;

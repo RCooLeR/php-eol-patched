@@ -77,6 +77,31 @@ PHP 5.6 and 7.0 use their published native fixtures. The default lists omit
 payloads run through FPM because the images do not include CGI. PHP 5.6 also checks its
 native SOAP response-size limit with the published oversized chunk header.
 
+The additional critical-CVE checks run in the default test target. They include
+the published PHP 7.1 tag-stripping and CP950 fixtures, ordinary image resizing
+and SQLite quote round-trips, and native tests extracted from the actual patched
+source. The GD harness checks failed first/later weight allocations and size
+overflow. The tag-stripping harness places the input immediately after an
+inaccessible page, so a preceding-byte read fails even when PHP output would
+otherwise look correct. The SQLite harness checks its signed-int argument limit
+without allocating a large string. Both Keccak implementations compile and run
+a known-answer digest vector on the supported amd64 platform.
+
+Run the resource-heavy regressions separately after building the matching test
+image. Use this command for PHP 7.1.33, 7.2.34, 7.3.33 and 7.4.33, one at a time:
+
+```sh
+docker run --rm --network none --memory 8g --memory-swap 8g --cpus 2 \
+  --user 33:33 --entrypoint /bin/bash php-eol-patched:7.2.34-test \
+  /tests/critical-large.sh 7.2.34
+```
+
+The SQLite fixture allocates 2 GiB and must reject the quote. PHP 7.2/7.3 also
+run the published 4 GiB SHA-3 vector directly through the patched native Keccak
+implementation. Their PHP wrapper's separate large-input truncation remains;
+the native test does not claim to repair that behavior. These large tests are
+not part of the default 2 GiB regression container or the default CI run.
+
 Version overrides adapt handshake bytes, diagnostics and helpers to the older
 APIs while retaining the published rejection checks. PHP 5.6 and 7.0 HTTP fixtures read
 request headers before replying so that closing the server does not interrupt

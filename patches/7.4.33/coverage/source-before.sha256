@@ -1,3 +1,4 @@
 f7763a53ba18c75ebbdbf913a1fb39876e8d37e7dabea35f81b26d6800dc513d  ext/gd/libgd/gd_gif_in.c
 dbca4551598f2526e56685c8787ee394821b5b9f7c0df4705eeb8b09c8c872a9  ext/openssl/openssl.c
+ea3bc2f0671334490b6f75a8a4553c3799938c1ecf5bb1e64e5456336e2be546  ext/pdo_sqlite/sqlite_driver.c
 9725ce1bcc03192fd3aedbef555dbad12b33efe652d035125096987fb0400984  ext/phar/util.c
