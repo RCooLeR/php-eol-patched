@@ -27,7 +27,16 @@ docker buildx bake --load php71
 | `php80` | `php-eol-patched:8.0.30` |
 | `php81` | `php-eol-patched:8.1.34` |
 
-The `default`, `minimal` and `all` Bake groups each build these eight images. A plain `docker build` also produces a minimal runtime. Only Linux amd64 is supported. Builds start from pinned official PHP images, apply the patches once, and compile the selected modules. Build these tags locally, or pull the images CI publishes from `main` after its tests pass: `ghcr.io/rcooler/php-eol-patched` with the same tags, `<tag>-<commit>` as an immutable tag for each, and `<release>-source` with the release's source export. Pin a digest rather than a moving tag.
+The `default`, `minimal` and `all` Bake groups each build these eight images. A plain `docker build` also produces a minimal runtime. Only Linux amd64 is supported. Builds start from pinned official PHP images, apply the patches once, and compile the selected modules. After a release's tests pass on a push to `main`, CI publishes its images to `ghcr.io/rcooler/php-eol-patched`. Release tags match the local tags above. Each build also gets `<tag>-<full-commit>-<run-id>-<attempt>` tags, so reruns have separate references. Tags can be reassigned; pin a digest for an exact image:
+
+```sh
+docker pull ghcr.io/rcooler/php-eol-patched:7.1.33
+docker image inspect --format '{{index .RepoDigests 0}}' ghcr.io/rcooler/php-eol-patched:7.1.33
+```
+
+The matching source export is published first as `<release>-source-<full-commit>-<run-id>-<attempt>`. Use the same build suffix as the runtime when obtaining its source. `<release>-source` follows the current release. Only a run for the current `main` commit updates release tags; an older rerun publishes only its run-specific tags. Versions publish independently after their own checks, so a failed version does not prevent another version from publishing.
+
+For maintainers: [GHCR creates new packages as private](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#pushing-container-images), even for a public repository. After the first publication, set the package visibility to **Public** in its GitHub package settings and verify an anonymous pull. Until then, pulls require package access. Pull requests, other branches and manual test runs do not publish images.
 
 The final images start from `scratch` and contain PHP CLI/FPM, required shared libraries, CA certificates, configuration and license notices. They have no shell, package manager, compiler, PECL or extension helpers. The Debian images on the other branch use the same PHP patches and extension profile for each release; choosing a branch selects the runtime packaging, not a separate patch level.
 
