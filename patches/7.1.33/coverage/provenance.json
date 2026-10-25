@@ -43,11 +43,60 @@
         "ext/phar/tests/tar/ghsa-vc5h-9ppw-p5f3-symlink-circular.phpt",
         "ext/phar/util.c"
       ]
+    },
+    {
+      "file": "standard-CVE-2020-7059.patch",
+      "sha256": "8863d73d9c4cc03578f04a9cf9997b0c45a50ec7ac3443e91178f1f6a7a6d212",
+      "sources": [
+        "https://github.com/php/php-src/commit/0f79b1bf301f455967676b5129240140c5c45b09"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/standard/string.c",
+        "ext/standard/tests/file/bug79099.phpt"
+      ]
+    },
+    {
+      "file": "standard-CVE-2020-7059-followup.patch",
+      "sha256": "e35fb19e4132feb6b83e85ceec915046208ecdbd01a322371235c7f3a7eeb33b",
+      "sources": [
+        "https://github.com/php/php-src/commit/2dc170e25d86a725fefd4c08f2bd8378820b28f5"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/standard/string.c"
+      ]
+    },
+    {
+      "file": "mbstring-CVE-2020-7060.patch",
+      "sha256": "98c3d61fce4d43a8db926bed6ae2d5f335608749312c7ff4b480e754c0af049b",
+      "sources": [
+        "https://github.com/php/php-src/commit/2bcbc95f033c31b00595ed39f79c3a99b4ed0501"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/mbstring/libmbfl/filters/mbfilter_big5.c",
+        "ext/mbstring/tests/bug79037.phpt"
+      ]
+    },
+    {
+      "file": "pdo-sqlite-CVE-2022-31631.patch",
+      "sha256": "616fe4bee0c1991af24742def3a08130d406256d63c90de3097376767d6d01da",
+      "sources": [
+        "https://github.com/php/php-src/commit/921b6813da3237a83e908998483f46ae3d8bacba"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/pdo_sqlite/sqlite_driver.c",
+        "ext/pdo_sqlite/tests/bug81740.phpt"
+      ]
     }
   ],
   "verification_limits": {
     "gd": "The published CVE-2026-9672 commit contains no regression fixture. Existing gif.phpt is an ordinary compatibility control, not an exploit reproduction.",
     "openssl": "Run the unchanged upstream gh22186.phpt only where its actual cipher probe succeeds; an unsupported-cipher skip is not a passing regression.",
-    "phar": "The three circular-symlink tar fixtures and their PHPT are byte-identical to upstream. The additional ordinary-link control checks the published path-separator adaptation."
+    "phar": "The three circular-symlink tar fixtures and their PHPT are byte-identical to upstream. The additional ordinary-link control checks the published path-separator adaptation.",
+    "stateful_tag_stripping": "Include the published follow-up for the remaining preceding-byte reads. Ordinary output alone cannot detect an invalid read; the assessed candidates were checked with AddressSanitizer.",
+    "pdo_sqlite": "The published bug81740.phpt allocates 2 GiB and runs separately with an 8 GiB container limit. Normal quoting and a native argument-width boundary check run in the default suite."
   }
 }

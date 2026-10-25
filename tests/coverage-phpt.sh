@@ -40,6 +40,7 @@ run_coverage_group() {
 }
 
 if [ -f "$test_dir/coverage-tests.list" ]; then
+    cp /tests/critical-controls.phpt "$scratch/"
     mapfile -t coverage < "$test_dir/coverage-tests.list"
     test "${#coverage[@]}" -gt 0
     run_coverage_group coverage required "${coverage[@]}"

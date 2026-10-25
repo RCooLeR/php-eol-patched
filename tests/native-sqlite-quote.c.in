@@ -1,0 +1,53 @@
+#include <assert.h>
+#include <limits.h>
+#include <setjmp.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sqlite3.h>
+
+typedef void pdo_dbh_t;
+enum pdo_param_type { PDO_PARAM_STR };
+static jmp_buf allocation_boundary;
+static int observe_allocation;
+static size_t allocation_size;
+static void *safe_emalloc(size_t count, size_t size, size_t extra) {
+    assert(size == 0 || count <= (SIZE_MAX - extra) / size);
+    allocation_size = count * size + extra;
+    if (observe_allocation) longjmp(allocation_boundary, 1);
+    void *result = malloc(allocation_size);
+    assert(result != NULL);
+    return result;
+}
+
+@FUNCTION@
+
+int main(void) {
+    char *quoted = NULL;
+    size_t length = 0;
+    const size_t limit = (INT_MAX - 3) / 2;
+    const size_t rejected[] = {limit + 1, (size_t)INT_MAX, (size_t)UINT_MAX, SIZE_MAX};
+    for (size_t i = 0; i < sizeof(rejected) / sizeof(rejected[0]); i++) {
+        allocation_size = 0;
+        assert(sqlite_handle_quoter(NULL, "", rejected[i], &quoted, &length, PDO_PARAM_STR) == 0);
+        assert(allocation_size == 0 && quoted == NULL);
+    }
+    /* The exact limit must still reach allocation, without allocating gigabytes. */
+    observe_allocation = 1;
+    if (setjmp(allocation_boundary) == 0) {
+        sqlite_handle_quoter(NULL, "", limit, &quoted, &length, PDO_PARAM_STR);
+        abort();
+    }
+    assert(allocation_size == (size_t)INT_MAX);
+    observe_allocation = 0;
+    const char *inputs[] = {"", "ordinary", "O'Reilly"};
+    const char *expected[] = {"''", "'ordinary'", "'O''Reilly'"};
+    for (size_t i = 0; i < 3; i++) {
+        assert(sqlite_handle_quoter(NULL, inputs[i], strlen(inputs[i]), &quoted, &length, PDO_PARAM_STR) == 1);
+        assert(strcmp(quoted, expected[i]) == 0 && length == strlen(expected[i]));
+        free(quoted);
+    }
+    puts("PASS native PDO SQLite int-width boundary and ordinary quotes");
+    return 0;
+}

@@ -1,1 +1,2 @@
 ext/phar/tests/tar/coverage-symlink-controls.phpt
+critical-controls.phpt

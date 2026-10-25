@@ -3,6 +3,7 @@ set -euo pipefail
 version=${1:-$(php -n -r 'echo PHP_VERSION;')}
 source /tests/extensions.sh
 bash /tests/phpt.sh "$version"
+bash /tests/critical-native.sh "$version"
 php -n /tests/published-fpm-acl.php
 case "$version" in
     5.6.40|7.0.33) php -n /tests/published-fpm-status.php; exit 0 ;;

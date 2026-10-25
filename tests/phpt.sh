@@ -12,7 +12,7 @@ source_root=${PHP_SOURCE_ROOT:-/usr/src/php}
 scratch=$(mktemp -d /tmp/php-phpt.XXXXXX)
 cp "$source_root/run-tests.php" "$scratch/"
 mkdir -p "$scratch/ext" "$scratch/sapi/cli" "$scratch/Zend"
-for extension in openssl standard soap phar mysqli pdo_mysql gd; do
+for extension in openssl standard soap phar mysqli pdo_mysql gd mbstring hash; do
     mkdir -p "$scratch/ext/$extension"
     cp -a "$source_root/ext/$extension/tests" "$scratch/ext/$extension/"
 done

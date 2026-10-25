@@ -48,7 +48,7 @@ The extensions use [libpq 16.15](https://www.postgresql.org/docs/16/release-16-1
 
 ## Additional GD, OpenSSL and Phar fixes
 
-The following fixes were already included in the PHP 5.6 and 7.0 maintenance series and are also backported to PHP 7.1–8.1:
+The following fixes were already included in the PHP 5.6 and 7.0 maintenance series and are also backported to PHP 7.1вЂ“8.1:
 
 | CVE | Component | Published change | Verification scope |
 | --- | --- | --- | --- |
@@ -58,9 +58,42 @@ The following fixes were already included in the PHP 5.6 and 7.0 maintenance ser
 
 The Phar backports also retain the filename separator after resolving a nested link, following the [published native compatibility repair](https://repo.tuxcare.com/security/errata/els_alt_php/debian12/CLSA-2026-1786517269.html). This repair applies to all eight versions. Per-version `coverage/` directories contain the patch provenance and source hashes.
 
+## GD, EXIF, string, SQLite and SHA-3 coverage
+
+These rows distinguish included fixes from an advisory's version-only match.
+`B` and `U` retain their meanings above; `вЂ”` means the affected implementation
+is absent. Per-version `coverage/` directories record the additional patches,
+their published sources and the source checksums.
+
+| CVE | Component | 5.6.40 | 7.0.33 | 7.1.33 | 7.2.34 | 7.3.33 | 7.4.33 | 8.0.30 | 8.1.34 | Published change |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| CVE-2016-10166 | GD interpolation allocation | U | B | U | U | U | U | U | U | [a918020](https://github.com/php/php-src/commit/a918020c03880e12ac9f38e11a4a3789491a5f85) |
+| CVE-2019-9641 | EXIF TIFF offset checks | B | B | U | U | U | U | U | U | [5e824a8](https://github.com/php/php-src/commit/5e824a88d073d282c4f358f186cb87ddc284f83d) |
+| CVE-2020-7059 | Stateful tag stripping | B | B | B | U | U | U | вЂ” | вЂ” | [0f79b1b](https://github.com/php/php-src/commit/0f79b1bf301f455967676b5129240140c5c45b09), [follow-up](https://github.com/php/php-src/commit/2dc170e25d86a725fefd4c08f2bd8378820b28f5) |
+| CVE-2020-7060 | mbstring CP950 conversion | B | B | B | U | U | U | U | U | [2bcbc95](https://github.com/php/php-src/commit/2bcbc95f033c31b00595ed39f79c3a99b4ed0501) |
+| CVE-2022-31631 | PDO SQLite quoting | B | B | B | B | B | B | U | U | [921b681](https://github.com/php/php-src/commit/921b6813da3237a83e908998483f46ae3d8bacba) |
+| CVE-2022-37454 | SHA-3 Keccak sponge | вЂ” | вЂ” | вЂ” | B* | B* | U | U | U | [248f647](https://github.com/php/php-src/commit/248f647724e385bfb8d83aa5b5a5ca3c4ee2c7fd) |
+
+The EXIF fixes were already included in the PHP 5.6 and 7.0 maintenance series.
+The [original report](https://bugs.php.net/bug.php?id=77509) concerns 32-bit
+integer overflow; these images support amd64 only. No duplicate patch is added.
+
+`B*`: PHP 7.2 and 7.3 receive the native Keccak fix in both generic implementations.
+Their PHP wrappers already truncate very large input lengths before the reported
+native overflow condition. That separate truncation can produce incorrect SHA-3
+digests and is **not fixed here**. PHP 7.1 uses an earlier, different implementation.
+
+Regression tests cover GD allocation failure and overflow, stateful tag boundaries,
+CP950 conversion, SQLite argument-width limits and ordinary operations. The
+published multi-gigabyte SQLite test and native Keccak vector run separately;
+see [test instructions](tests/README.md). The upstream GD huge-image fixture is
+rejected by an earlier constructor check on PHP 7.0, so the default suite uses
+an exact-source allocator harness instead. These checks do not establish complete
+CVE coverage for the extensions or their linked libraries.
+
 ## EOL mitigations
 
-The first two rows use the published EOL approach: [PHP 7.4](https://github.com/php/php-src/commit/712e60f9edfd03f0960fc4fc3c2c375f42b90aa2), [PHP 8.0](https://github.com/php/php-src/commit/82f8f31b16a035c1b67cc253e79f7cc288f4cc20) and [PHP 8.1](https://github.com/php/php-src/commit/1d7dec178a094e6e75b229ce22754045f8c6070a). PHP 7.1–7.3 use local adaptations of the 7.4 change, not official releases for those branches.
+The first two rows use the published EOL approach: [PHP 7.4](https://github.com/php/php-src/commit/712e60f9edfd03f0960fc4fc3c2c375f42b90aa2), [PHP 8.0](https://github.com/php/php-src/commit/82f8f31b16a035c1b67cc253e79f7cc288f4cc20) and [PHP 8.1](https://github.com/php/php-src/commit/1d7dec178a094e6e75b229ce22754045f8c6070a). PHP 7.1вЂ“7.3 use local adaptations of the 7.4 change, not official releases for those branches.
 
 Handled allocation failure exits the process immediately, bypassing ordinary shutdown callbacks and destructors. In FPM, the master replaces the affected worker. Session upload progress is disabled in source. Ordinary sessions and uploads remain available. These changes do not implement the modern deferred out-of-memory recovery model.
 
@@ -105,7 +138,7 @@ PHP 5.6 release-note evidence is in the [frozen published NEWS](https://github.c
 | EXIF | CVE-2019-11034, CVE-2019-11035, CVE-2019-11036, CVE-2019-11040, CVE-2019-11041, CVE-2019-11042, CVE-2019-11047, CVE-2019-11050, CVE-2020-7064 | CVE-2019-11034, CVE-2019-11035, CVE-2019-11036, CVE-2019-11040, CVE-2019-11041, CVE-2019-11042, CVE-2019-11047, CVE-2019-11050, CVE-2020-7064 |
 | GD | CVE-2019-11038, CVE-2026-9672 | CVE-2019-11038, CVE-2026-9672 |
 | mbstring / Oniguruma | CVE-2019-13224, CVE-2020-7060 | CVE-2019-13224, CVE-2019-9023, CVE-2020-7060 |
-| Fileinfo | — | CVE-2019-18218 |
+| Fileinfo | вЂ” | CVE-2019-18218 |
 | Bcmath | CVE-2019-11046 | CVE-2019-11046 |
 | Iconv | CVE-2019-11039 | CVE-2019-11039 |
 | SPL | CVE-2019-11045 | CVE-2019-11045 |

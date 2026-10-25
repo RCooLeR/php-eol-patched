@@ -16,11 +16,24 @@
         "ext/phar/tests/tar/coverage-symlink-controls.phpt",
         "ext/phar/util.c"
       ]
+    },
+    {
+      "file": "gd-CVE-2016-10166.patch",
+      "sha256": "7d9be41dac67462466b6e925afa7e67bcafdd7602869e069b62fceae7e0bcb91",
+      "sources": [
+        "https://github.com/php/php-src/commit/a918020c03880e12ac9f38e11a4a3789491a5f85"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/gd/libgd/gd_interpolation.c",
+        "ext/gd/tests/bug77269.phpt"
+      ]
     }
   ],
   "verification_limits": {
     "gd": "The published CVE-2026-9672 commit contains no regression fixture. Existing gif.phpt is an ordinary compatibility control, not an exploit reproduction.",
     "openssl": "Run the unchanged upstream gh22186.phpt only where its actual cipher probe succeeds; an unsupported-cipher skip is not a passing regression.",
-    "phar": "The three circular-symlink tar fixtures and their PHPT are byte-identical to upstream. The additional ordinary-link control checks the published path-separator adaptation."
+    "phar": "The three circular-symlink tar fixtures and their PHPT are byte-identical to upstream. The additional ordinary-link control checks the published path-separator adaptation.",
+    "gd_interpolation": "The published huge-image PHPT is blocked by the older image constructor. An exact-source allocator harness checks first/later allocation failures and size overflow; ordinary imagescale checks compatibility."
   }
 }

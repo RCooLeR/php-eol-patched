@@ -1,0 +1,62 @@
+#include <assert.h>
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/mman.h>
+#include <unistd.h>
+
+#define PHPAPI
+#define PHP_TAG_BUF_SIZE 1024
+typedef unsigned char zend_bool;
+#define emalloc malloc
+#define erealloc realloc
+static char *guarded_buffer;
+static size_t page_size;
+static char *estrndup(const char *input, size_t length) {
+    assert(guarded_buffer == NULL && length < page_size);
+    char *pages = mmap(NULL, page_size * 2, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    assert(pages != MAP_FAILED);
+    guarded_buffer = pages + page_size;
+    assert(mprotect(guarded_buffer, page_size, PROT_READ | PROT_WRITE) == 0);
+    memcpy(guarded_buffer, input, length);
+    guarded_buffer[length] = '\0';
+    return guarded_buffer;
+}
+static void efree(void *pointer) {
+    if (pointer == guarded_buffer) {
+        assert(munmap(guarded_buffer - page_size, page_size * 2) == 0);
+        guarded_buffer = NULL;
+    } else {
+        free(pointer);
+    }
+}
+static char *zend_str_tolower_dup_ex(const char *input, size_t length) {
+    char *output = malloc(length + 1);
+    assert(output != NULL);
+    for (size_t i = 0; i < length; i++) output[i] = tolower((unsigned char)input[i]);
+    output[length] = '\0';
+    return output;
+}
+
+@FUNCTIONS@
+
+int main(void) {
+    page_size = (size_t)sysconf(_SC_PAGESIZE);
+    const char *first[] = {"<?\n", "<\0\n", "<\0\n", "<?\n"};
+    const char *second[] = {"\"\n", "!\n", "?\n", ">\n"};
+    for (size_t i = 0; i < 4; i++) {
+        char input[4];
+        int state = 0;
+        memcpy(input, first[i], 4);
+        assert(php_strip_tags_ex(input, 3, &state, NULL, 0, 0) == 0);
+        memcpy(input, second[i], 3);
+        assert(php_strip_tags_ex(input, 2, &state, NULL, 0, 0) == 0);
+    }
+    char ordinary[] = "<p>Hello <b>world</b></p>";
+    size_t length = php_strip_tags_ex(ordinary, strlen(ordinary), NULL, "<b>", 3, 0);
+    assert(length == strlen("Hello <b>world</b>"));
+    assert(strcmp(ordinary, "Hello <b>world</b>") == 0);
+    puts("PASS native stateful tag boundaries and allowed-tag control");
+    return 0;
+}

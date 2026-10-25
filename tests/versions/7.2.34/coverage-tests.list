@@ -1,3 +1,5 @@
 ext/phar/tests/tar/coverage-symlink-controls.phpt
 ext/phar/tests/tar/ghsa-vc5h-9ppw-p5f3-symlink-circular.phpt
 ext/gd/tests/gif.phpt
+ext/hash/tests/sha3.phpt
+critical-controls.phpt
