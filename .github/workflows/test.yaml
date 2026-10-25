@@ -8,6 +8,11 @@ on:
 permissions:
   contents: read
 
+# Publishing runs only on main; queue main runs so tags move in commit order.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   php:
     runs-on: ubuntu-24.04
@@ -33,6 +38,9 @@ jobs:
             version: 8.0.30
           - target: php81
             version: 8.1.34
+    permissions:
+      contents: read
+      packages: write
     env:
       TARGET: ${{ matrix.target }}
       PHP_RELEASE: ${{ matrix.version }}
@@ -77,3 +85,21 @@ jobs:
         run: |
           docker build --pull=false -t php81-sodium:local examples/php81-sodium
           docker run --rm php81-sodium:local php --ri sodium
+      # Push exactly the images tested above, plus the matching source export.
+      - name: Publish to GitHub Container Registry
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          image="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/php-eol-patched"
+          docker buildx bake --load "$TARGET" \
+            --set "$TARGET.target=source" \
+            --set "$TARGET.tags=php-eol-patched:$PHP_RELEASE-source"
+          printf '%s\n' "$REGISTRY_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+          for variant in "" -debian -source; do
+            for tag in "$PHP_RELEASE$variant" "$PHP_RELEASE$variant-${GITHUB_SHA::7}"; do
+              docker tag "php-eol-patched:$PHP_RELEASE$variant" "$image:$tag"
+              docker push "$image:$tag"
+            done
+          done
+          docker logout ghcr.io

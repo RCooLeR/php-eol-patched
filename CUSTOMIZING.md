@@ -11,7 +11,7 @@ docker run --rm php-eol-patched:7.1.33-debian sh -c 'php -v && php --ini'
 
 The Debian variants keep the matching pinned Debian base and official `docker-php-entrypoint`, `docker-php-source`, `docker-php-ext-configure`, `docker-php-ext-install` and `docker-php-ext-enable` scripts. They include `phpize`, `php-config` and PECL. They use this project's patched PHP and [extension profile](EXTENSIONS.md), rather than the official image's module defaults. The minimal tags without `-debian` contain no shell, `apt`, PECL or compiler.
 
-All examples use local tags. The repository's default build still produces the eight minimal images. `docker buildx bake --load debian` builds the eight Debian variants; `docker buildx bake --load all` builds both variants for every release. Only Linux amd64 is supported.
+All examples use local tags. To start from a published image instead, prefix `FROM` with `ghcr.io/rcooler/` (for example `ghcr.io/rcooler/php-eol-patched:7.1.33-debian`) and pin its digest. The repository's default build still produces the eight minimal images. `docker buildx bake --load debian` builds the eight Debian variants; `docker buildx bake --load all` builds both variants for every release. Only Linux amd64 is supported.
 
 ## Extra extensions on PHP 7.1
 

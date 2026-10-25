@@ -39,7 +39,12 @@ Use `--branch minimal` and target `php71` for the no-shell image. Use `main` whe
 | `php80` / `php-eol-patched:8.0.30` | `php80-debian` / `php-eol-patched:8.0.30-debian` |
 | `php81` / `php-eol-patched:8.1.34` | `php81-debian` / `php-eol-patched:8.1.34-debian` |
 
-Only Linux amd64 is supported. Builds start from pinned official PHP images, apply the patches once, and compile the selected modules. The tags above are built locally; these instructions do not pull a published project image or publish images.
+Only Linux amd64 is supported. Builds start from pinned official PHP images, apply the patches once, and compile the selected modules. Build the tags above locally, or pull the images CI publishes after the tests pass on `main`: `ghcr.io/rcooler/php-eol-patched` with the same tags, `<tag>-<commit>` as an immutable tag for each, and `<release>-source` with the release's source export. Pin a digest rather than a moving tag:
+
+```sh
+docker pull ghcr.io/rcooler/php-eol-patched:7.1.33-debian
+docker image inspect --format '{{index .RepoDigests 0}}' ghcr.io/rcooler/php-eol-patched:7.1.33-debian
+```
 
 The original `:VERSION` tags are minimal runtimes built from `scratch`. They contain PHP CLI/FPM, required shared libraries, CA certificates, configuration and license notices. The additional `:VERSION-debian` tags retain the matching Debian base, a shell, `apt`, `phpize`, `php-config`, PECL and the official image's `docker-php-*` helpers and entrypoint. Use them for application Dockerfiles that install packages or extensions. Both variants use the same patched PHP build and extension set; the Debian variant does not reproduce the official image's module defaults.
 
