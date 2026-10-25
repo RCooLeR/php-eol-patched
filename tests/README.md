@@ -5,7 +5,7 @@ extensions and pinned PECL versions, and exercise local extension operations.
 PostgreSQL controls also use a disposable server to exercise real database
 connections through CLI and the runtime's production FPM configuration.
 The regression suite runs against a matching `test` build target, which adds
-test modules and build tools without adding them to the runtime image.
+test modules and build tools without adding them to the minimal runtime image.
 
 ```sh
 docker pull postgres:18-bookworm@sha256:bbf83594798e144bff365a9c191c5d779f181fb3135902064ab8ff11918020fc
@@ -20,6 +20,31 @@ The PostgreSQL service image must be available locally. `--postgres-image`
 overrides the pinned default with another compatible official PostgreSQL image.
 The report records its resolved image ID.
 
+Select `--variant debian` when testing the `:VERSION-debian` image. The default
+`--variant minimal` preserves the checks for the shell-free `:VERSION` image.
+Both profiles require the same production PHP defaults, extensions, pinned
+PECL releases and PostgreSQL CLI/FPM controls. They share the same matching
+`test` target for source regressions:
+
+```sh
+python tests/run.py --image php-eol-patched:7.1.33-debian --variant debian \
+  --test-image php-eol-patched:7.1.33-test --version 7.1.33
+```
+
+The Debian profile checks the official entrypoint's command and option forwarding,
+shell, package manager, development tools, PHP headers, `phpize`, `php-config`,
+and PECL. Requests must run in UID/GID 33 workers under a root master and
+inherit container environment variables. A second container exercises ordinary
+FPM requests with explicit `--user 1000:1000` and no Linux capabilities.
+The default master must stop its workers cleanly on the image's stop signal.
+
+A separate disposable, writable container verifies the packaged patched source
+archive and extracted file checksums, deletes and re-extracts it, and builds
+and enables `posix` using `docker-php-ext-install`. It then re-extracts and checks
+the source again. This container has no network access or Linux capabilities;
+it cannot fetch a replacement source or build dependencies. Build output is
+captured in the report. `posix` is installed only in this disposable container.
+
 The test target must contain the matching patched source at `/usr/src/php`,
 headers, a C compiler, Bash, and test-only `pcntl` and `posix` modules. Modules
 may be installed in PHP's extension directory or `/test-support`. The suite
@@ -30,13 +55,17 @@ local client setup and serializer options. Neither check connects to a server.
 
 The Python runner requires Python 3 and Docker. Containers have no external
 network, no published ports, a read-only root filesystem and bounded writable
-tmpfs mounts. Test files are mounted read-only. PostgreSQL uses a dedicated
+tmpfs mounts, except for the Debian profile's disposable extension-build container.
+The root FPM master receives only `SETUID`, `SETGID` and `KILL` capabilities;
+other PHP containers drop all capabilities. Test files are mounted read-only. PostgreSQL uses a dedicated
 internal Docker network and a tmpfs database; other checks use no network.
 The runner removes only its own containers, anonymous volumes and network.
 
 The PostgreSQL suite generates temporary credentials and a temporary server
 certificate. It verifies SCRAM credentials, rejects an incorrect password and
 uses `sslmode=verify-full` with the generated certificate as its trust anchor.
+Reports include the client request times and certificate validity interval to
+help diagnose clock-related TLS failures without relaxing certificate checks.
 Native controls cover parameterized queries, prepared statements, literal
 escaping, `pg_insert`, `pg_select`, `pg_update`, `pg_delete` and transactions.
 PDO controls run native and emulated prepares, integer/string/null binding,

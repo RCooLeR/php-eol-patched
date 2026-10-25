@@ -184,6 +184,42 @@ WORKDIR /tmp
 ENTRYPOINT []
 CMD ["/bin/bash", "/tests/test-target.sh"]
 
+FROM assembled AS debian-prepared
+COPY scripts/prepare-debian.sh /build/scripts/prepare-debian.sh
+RUN /bin/bash /build/scripts/prepare-debian.sh "${PHP_RELEASE}"
+
+# Debian variant for applications that need a shell, apt and extension helpers.
+# Install matching runtime packages so dpkg records the libraries actually used.
+FROM ${BASE_IMAGE} AS debian
+ARG PHP_RELEASE=8.1.34
+COPY --from=dependencies /etc/apt/ /etc/apt/
+COPY --from=assembled /runtime-rootfs/usr/share/php-eol-patched/runtime-packages.tsv /tmp/runtime-packages.tsv
+RUN apt-get update \
+    && awk -F '\t' '$1 !~ /-dev(:[^:]+)?$/ { print $1 "=" $2 }' /tmp/runtime-packages.tsv \
+        | xargs apt-get install -y --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/* /usr/local /usr/src/php \
+    && rm -f /tmp/runtime-packages.tsv
+COPY --from=assembled /usr/local/ /usr/local/
+COPY --from=debian-prepared /debian-files/ /
+COPY config/www-debian.conf /usr/local/etc/php-fpm.d/www.conf
+RUN ldconfig \
+    && test "$(php -r 'echo PHP_VERSION;')" = "${PHP_RELEASE}" \
+    && mkdir -p /var/www/html \
+    && chown www-data:www-data /var/www/html \
+    && chmod 1777 /var/www/html
+# Upstream download metadata does not describe our patched source archive.
+ENV PHP_URL="" PHP_ASC_URL="" PHP_SHA256=""
+LABEL org.opencontainers.image.title="php-eol-patched Debian" \
+      org.opencontainers.image.version="${PHP_RELEASE}" \
+      org.opencontainers.image.source="https://github.com/RCooLeR/php-eol-patched" \
+      org.opencontainers.image.description="Debian PHP-FPM with selected security backports and extension build tools. Upgrade to supported PHP."
+USER 0:0
+WORKDIR /var/www/html
+EXPOSE 9000
+STOPSIGNAL SIGQUIT
+ENTRYPOINT ["docker-php-entrypoint"]
+CMD ["php-fpm"]
+
 FROM scratch AS source
 COPY --from=application-extensions /source/ /
 COPY Dockerfile docker-bake.hcl /build/
@@ -194,7 +230,8 @@ COPY patches/ /build/patches/
 COPY extensions/ /build/extensions/
 COPY LICENSES/ /build/LICENSES/
 COPY tests/ /build/tests/
-COPY LICENSE THIRD_PARTY_NOTICES.md README.md PATCHES.md EXTENSIONS.md SECURITY.md compose.example.yaml /build/
+COPY examples/ /build/examples/
+COPY LICENSE THIRD_PARTY_NOTICES.md README.md PATCHES.md EXTENSIONS.md CUSTOMIZING.md SECURITY.md compose.example.yaml /build/
 
 FROM scratch AS runtime
 ARG PHP_RELEASE=8.1.34

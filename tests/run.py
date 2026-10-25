@@ -14,6 +14,7 @@ import uuid
 
 sys.dont_write_bytecode = True
 import core
+import debian_variant
 import postgresql
 
 TESTS = Path(__file__).resolve().parent
@@ -46,6 +47,14 @@ def container_options(memory="512m", executable_tmp=False):
             "--memory", memory, "--cpus", "2",
             "--tmpfs", "/tmp:" + permissions + ",size=256m",
             "--mount", "type=bind,source=" + str(TESTS) + ",target=/tests,readonly"]
+
+
+def runtime_container_options(variant, memory="512m", executable_tmp=False):
+    options = container_options(memory, executable_tmp)
+    # The regression target runs as UID 33 and does not need master privileges.
+    if variant == "debian" and not executable_tmp:
+        options += ["--cap-add", "SETUID", "--cap-add", "SETGID", "--cap-add", "KILL"]
+    return options
 
 
 def fcgi_record(kind, content):
@@ -101,17 +110,21 @@ def runtime_request(container, script="/tests/runtime-probe.php", body=b"sample=
     return dict(urllib.parse.parse_qsl(payload.decode("utf-8"))), stderr.decode("utf-8", "replace")
 
 
-def runtime_suite(report, image, version):
+def runtime_suite(report, image, version, variant="minimal"):
     inspect = command(["docker", "image", "inspect", image, "--format", "{{.Config.User}}"])
+    expected_users = ("", "0", "0:0", "root", "root:root") if variant == "debian" else ("33:33",)
     core.record(report, "Runtime default user", inspect.returncode == 0 and
-                inspect.stdout.decode().strip() == "33:33", decoded(inspect))
+                inspect.stdout.decode().strip() in expected_users, decoded(inspect))
     cli = command(["docker", "run", "--rm"] + container_options() +
                   ["--entrypoint", "/usr/local/bin/php", image, "-n", "/tests/control.php"])
     core.record(report, "Runtime CLI controls", cli.returncode == 0, decoded(cli))
     name = "php-runtime-test-" + uuid.uuid4().hex
+    environment_probe = "inherited-" + uuid.uuid4().hex
     started = False
     try:
-        start = command(["docker", "run", "-d", "--name", name] + container_options() + [image])
+        start = command(["docker", "run", "-d", "--name", name] +
+                        runtime_container_options(variant) +
+                        ["--env", "PHP_EOL_FPM_PROBE=" + environment_probe, image])
         started = start.returncode == 0
         if not started:
             raise RuntimeError(json.dumps(decoded(start)))
@@ -130,7 +143,8 @@ def runtime_suite(report, image, version):
         else:
             raise RuntimeError("Runtime FPM unavailable: " + str(last_error))
         expected = {"version": version, "sapi": "fpm-fcgi", "memory_limit": "128M",
-                    "post_max_size": "8M", "sample": "ok", "shell_present": "no",
+                    "post_max_size": "8M", "sample": "ok",
+                    "shell_present": "yes" if variant == "debian" else "no",
                     "source_present": "no"}
         if version.startswith("8.1."):
             expected["cached_types"] = "ok"
@@ -138,6 +152,8 @@ def runtime_suite(report, image, version):
         ok = ok and values.get("upload_progress") in ("", "0") and not errors
         core.record(report, "Runtime FPM request and production defaults", ok,
                     {"values": values, "stderr": errors, "expected": expected})
+        if variant == "debian":
+            debian_variant.process_controls(report, values, environment_probe)
         modules = {module.lower() for module in values.get("modules", "").split(",")}
         required = {"cgi-fcgi", "core", "date", "hash", "libxml", "openssl", "pcre", "phar", "reflection",
                     "session", "spl", "standard", "soap", "mysqlnd", "mysqli", "pdo", "pdo_mysql"}
@@ -168,6 +184,12 @@ def runtime_suite(report, image, version):
             repeated, errors = runtime_request(name)
             core.record(report, "Cached PHP 8.1 union types and enum serialization",
                         repeated.get("cached_types") == "ok" and not errors, repeated)
+        if variant == "debian":
+            stopped = command(["docker", "stop", "--time", "10", name])
+            state = command(["docker", "inspect", name, "--format", "{{.State.ExitCode}}"])
+            core.record(report, "FPM root master stops its workers cleanly",
+                        stopped.returncode == 0 and state.returncode == 0 and
+                        state.stdout.strip() == b"0", {"stop": decoded(stopped), "state": decoded(state)})
     except (RuntimeError, ValueError, subprocess.TimeoutExpired) as error:
         core.record(report, "Runtime FPM verification", False, str(error))
     finally:
@@ -343,17 +365,23 @@ def main():
     parser.add_argument("--postgres-image", default=postgresql.DEFAULT_IMAGE,
                         help="Locally available PostgreSQL service image for database controls")
     parser.add_argument("--version", required=True, choices=VERSIONS)
+    parser.add_argument("--variant", choices=("minimal", "debian"), default="minimal",
+                        help="Runtime image profile (default: minimal)")
     parser.add_argument("--output", type=Path, help="Optional JSON report outside the source tree")
     options = parser.parse_args()
-    report = {"version": options.version,
+    report = {"version": options.version, "variant": options.variant,
               "utc": datetime.datetime.now(datetime.timezone.utc).isoformat(), "checks": []}
     try:
         runtime = image_id(options.image)
         report["runtime_image"] = runtime
         test_image = image_id(options.test_image) if options.test_image else None
-        runtime_suite(report, runtime, options.version)
+        runtime_suite(report, runtime, options.version, options.variant)
+        if options.variant == "debian":
+            debian_variant.suite(report, runtime, options.version, runtime_request, container_options)
         postgresql.suite(report, runtime, options.postgres_image, runtime_request,
-                         container_options, test_image, options.version)
+                         lambda memory="512m", executable_tmp=False:
+                         runtime_container_options(options.variant, memory, executable_tmp),
+                         test_image, options.version)
         if test_image:
             report["test_image"] = test_image
             test_suite(report, test_image, options.version)

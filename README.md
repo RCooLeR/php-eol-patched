@@ -8,24 +8,26 @@ This is an independent project, not an official PHP distribution. [PATCHES.md](P
 
 ## Images
 
-| Build target | Local image | PHP |
-| --- | --- | --- |
-| `php56` | `php-eol-patched:5.6.40` | 5.6.40 |
-| `php70` | `php-eol-patched:7.0.33` | 7.0.33 |
-| `php71` | `php-eol-patched:7.1.33` | 7.1.33 |
-| `php72` | `php-eol-patched:7.2.34` | 7.2.34 |
-| `php73` | `php-eol-patched:7.3.33` | 7.3.33 |
-| `php74` | `php-eol-patched:7.4.33` | 7.4.33 |
-| `php80` | `php-eol-patched:8.0.30` | 8.0.30 |
-| `php81` | `php-eol-patched:8.1.34` | 8.1.34 |
+| Minimal target / local image | Debian target / local image |
+| --- | --- |
+| `php56` / `php-eol-patched:5.6.40` | `php56-debian` / `php-eol-patched:5.6.40-debian` |
+| `php70` / `php-eol-patched:7.0.33` | `php70-debian` / `php-eol-patched:7.0.33-debian` |
+| `php71` / `php-eol-patched:7.1.33` | `php71-debian` / `php-eol-patched:7.1.33-debian` |
+| `php72` / `php-eol-patched:7.2.34` | `php72-debian` / `php-eol-patched:7.2.34-debian` |
+| `php73` / `php-eol-patched:7.3.33` | `php73-debian` / `php-eol-patched:7.3.33-debian` |
+| `php74` / `php-eol-patched:7.4.33` | `php74-debian` / `php-eol-patched:7.4.33-debian` |
+| `php80` / `php-eol-patched:8.0.30` | `php80-debian` / `php-eol-patched:8.0.30-debian` |
+| `php81` / `php-eol-patched:8.1.34` | `php81-debian` / `php-eol-patched:8.1.34-debian` |
 
-Only Linux amd64 is supported. Builds start from pinned official PHP images, apply the patches once, and compile the selected modules. The runtime starts from `scratch` and contains PHP, its required shared libraries, CA certificates, configuration and license notices.
+Only Linux amd64 is supported. Builds start from pinned official PHP images, apply the patches once, and compile the selected modules. The tags above are built locally; these instructions do not pull a published project image or publish images.
 
-All eight targets use the shared Dockerfile. They include OpenSSL, Phar, session, SOAP and mysqlnd, plus mysqli and PDO MySQL. PostgreSQL is available through pgsql and PDO PostgreSQL, linked to source-built libpq 16.15. Application extensions such as GD, intl, curl, ZIP, bcmath, mbstring, XML, OPcache and the pinned PECL packages are enabled in every image. [EXTENSIONS.md](EXTENSIONS.md) gives the complete per-version map.
+The original `:VERSION` tags are minimal runtimes built from `scratch`. They contain PHP CLI/FPM, required shared libraries, CA certificates, configuration and license notices. The additional `:VERSION-debian` tags retain the matching Debian base, a shell, `apt`, `phpize`, `php-config`, PECL and the official image's `docker-php-*` helpers and entrypoint. Use them for application Dockerfiles that install packages or extensions. Both variants use the same patched PHP build and extension set; the Debian variant does not reproduce the official image's module defaults.
+
+All targets use the shared Dockerfile. They include OpenSSL, Phar, session, SOAP and mysqlnd, plus mysqli and PDO MySQL. PostgreSQL is available through pgsql and PDO PostgreSQL, linked to source-built libpq 16.15. Application extensions such as GD, intl, curl, ZIP, bcmath, mbstring, XML, OPcache and the pinned PECL packages are enabled in every image. [EXTENSIONS.md](EXTENSIONS.md) gives the complete per-version map.
 
 The optional extension installation sections are clearly marked after the core build. They are enabled by default. Removing a shared extension's section may require adjusting extensions that depend on it. Extensions already built into the patched core remain enabled, including mbstring, EXIF and zlib on PHP 8.1. Optional extensions and linked system libraries need their own security maintenance; the patch table describes only the included PHP fixes.
 
-Composer, Node.js, mail tools, database servers, shells, package managers and compilers are not in the runtime. Test-only modules and tools remain in the test stage.
+Composer, Node.js, mail tools and database servers are not included. The minimal runtime also excludes shells, package managers and compilers. Test-only modules and tools remain in the test stage. See [CUSTOMIZING.md](CUSTOMIZING.md) for extension installation, Composer, application configuration and UID examples.
 
 ## Build and run
 
@@ -42,7 +44,16 @@ Replace `php71` with another target, or omit the target to build all eight. `BUI
 docker buildx bake --load --set php71.args.BUILD_JOBS=4 php71
 ```
 
-The default command runs FPM on port 9000 as UID/GID `33:33`. Mount application files at paths matching the web server's `SCRIPT_FILENAME`. Writable cache, log and upload directories must permit that UID. PHP CLI commands must be explicit because the runtime has no shell:
+Build an extensible Debian image or either group explicitly:
+
+```sh
+docker buildx bake --load php71-debian
+docker buildx bake --load debian  # All eight Debian variants
+docker buildx bake --load all  # All sixteen images
+docker run --rm php-eol-patched:7.1.33-debian sh -c 'php -v && phpize --version'
+```
+
+The default group remains the eight minimal images. The minimal image runs FPM on port 9000 as UID/GID `33:33`. The Debian variant starts a root master with `www-data` workers (`33:33`) and `clear_env = no`, as expected by application Dockerfiles that pass container environment variables to PHP. The minimal variant keeps `clear_env = yes`. Mount application files at paths matching the web server's `SCRIPT_FILENAME`. Writable cache, log and upload directories must permit the worker UID. PHP CLI commands must be explicit in the minimal image because it has no shell:
 
 ```sh
 docker run --rm php-eol-patched:7.1.33 php -m

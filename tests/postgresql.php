@@ -1,8 +1,15 @@
 <?php
 /* The runner supplies disposable credentials over stdin or a FastCGI request body. */
+$requestStarted = microtime(true);
 $config = PHP_SAPI === 'cli'
     ? json_decode(file_get_contents('php://stdin'), true) : $_POST;
-$results = array('sapi' => PHP_SAPI);
+$results = array('sapi' => PHP_SAPI,
+    'request_start_epoch' => sprintf('%.6f', $requestStarted));
+$parsedCertificate = openssl_x509_parse($config['certificate']);
+if ($parsedCertificate !== false) {
+    $results['certificate_not_before_epoch'] = $parsedCertificate['validFrom_time_t'];
+    $results['certificate_not_after_epoch'] = $parsedCertificate['validTo_time_t'];
+}
 $certificate = tempnam('/tmp', 'postgresql-ca-');
 file_put_contents($certificate, $config['certificate']);
 $connection = null;
@@ -105,6 +112,7 @@ $results['pass'] = isset($results['error']) ? 'no' : 'yes';
 foreach ($results as $name => $value) {
     if (strpos($name, 'check:') === 0 && $value !== 'ok') { $results['pass'] = 'no'; }
 }
+$results['request_end_epoch'] = sprintf('%.6f', microtime(true));
 header('Content-Type: application/x-www-form-urlencoded');
 echo http_build_query($results, '', '&');
 if (PHP_SAPI === 'cli' && $results['pass'] !== 'yes') { exit(1); }

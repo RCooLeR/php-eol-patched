@@ -30,8 +30,9 @@ printf '%s\n' ca-certificates > /tmp/php-runtime-packages.txt
 copy_package_file() {
   local file=$1 owner
   cp --parents --dereference "$file" "$root"
-  # This library is built from the locked upstream archive, not a Debian package.
-  case "$file" in /usr/local/lib/libpq.so*) return ;; esac
+  # The locked libpq build and generated Fontconfig cache setting are not Debian
+  # package files. The latter may already exist when assembling a derivative.
+  case "$file" in /usr/local/lib/libpq.so*|/etc/fonts/conf.d/99-runtime-cache.conf) return ;; esac
   owner=$(dpkg-query --search "$file" 2>/dev/null || dpkg-query --search "$(readlink -f "$file")")
   owner=${owner%%: /*}
   printf '%s\n' "$owner" >> /tmp/php-runtime-packages.txt
