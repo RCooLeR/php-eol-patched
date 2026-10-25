@@ -39,7 +39,16 @@ Use `--branch minimal` and target `php71` for the no-shell image. Use `main` whe
 | `php80-debian` | `php-eol-patched:8.0.30-debian` |
 | `php81-debian` | `php-eol-patched:8.1.34-debian` |
 
-Only Linux amd64 is supported. Builds start from pinned official PHP images, apply the patches once, and compile the selected modules. Build the tags above locally, or pull the images CI publishes from `main` after its tests pass: `ghcr.io/rcooler/php-eol-patched` with the same tags, `<tag>-<commit>` as an immutable tag for each, and `<release>-source` with the release's source export. Pin a digest rather than a moving tag.
+Only Linux amd64 is supported. Builds start from pinned official PHP images, apply the patches once, and compile the selected modules. After a release's tests pass on a push to `main`, CI publishes its images to `ghcr.io/rcooler/php-eol-patched`. Release tags match the local tags above. Each build also gets `<tag>-<full-commit>-<run-id>-<attempt>` tags, so reruns have separate references. Tags can be reassigned; pin a digest for an exact image:
+
+```sh
+docker pull ghcr.io/rcooler/php-eol-patched:7.1.33-debian
+docker image inspect --format '{{index .RepoDigests 0}}' ghcr.io/rcooler/php-eol-patched:7.1.33-debian
+```
+
+The matching source export is published first as `<release>-source-<full-commit>-<run-id>-<attempt>`. Use the same build suffix as the runtime when obtaining its source. `<release>-source` follows the current release. Only a run for the current `main` commit updates release tags; an older rerun publishes only its run-specific tags. Versions publish independently after their own checks, so a failed version does not prevent another version from publishing.
+
+For maintainers: [GHCR creates new packages as private](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#pushing-container-images), even for a public repository. After the first publication, set the package visibility to **Public** in its GitHub package settings and verify an anonymous pull. Until then, pulls require package access. Pull requests, other branches and manual test runs do not publish images.
 
 The `:VERSION-debian` tags retain the matching Debian base, a shell, `apt`, `phpize`, `php-config`, PECL and the official image's `docker-php-*` helpers and entrypoint. Use them for application Dockerfiles that install packages or extensions. For the no-shell `:VERSION` tags, use the [minimal branch](https://github.com/RCooLeR/php-eol-patched/tree/minimal). Both variants use the same patched PHP build and extension set for each release; this project does not reproduce the official image's module defaults.
 
