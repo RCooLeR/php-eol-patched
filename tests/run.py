@@ -277,33 +277,7 @@ def ordinary_fpm_suite(report, image, version):
               and upload["body"].get("counter") == 2
               and upload["body"].get("pid") == ping["body"].get("pid"))
         core.record(report, "Ordinary multipart upload and session compatibility", ok, upload)
-        # GHSA-9pqp-7h25-4f32's published CGI payload, sent through the built FPM SAPI.
-        boundaries = []
-        for length in (5115, 5116, 5117):
-            boundary = "A" * length
-            value = "BBB\r\n--" + boundary[:-1] + "CCC"
-            body = ("--" + boundary + '\r\nContent-Disposition: form-data; name="koko"\r\n\r\n'
-                    + value + "\r\n--" + boundary + "--\r\n").encode("ascii")
-            response = core.fastcgi(name, "fields", body,
-                                    {"CONTENT_TYPE": "multipart/form-data; boundary=" + boundary})
-            fields = response["body"].get("post", {})
-            actual = fields.get("koko") if isinstance(fields, dict) else None
-            error = response["body"].get("early_error") or {}
-            valid = actual == value if length < 5117 else (
-                fields in ([], {}) and "Boundary too large" in error.get("message", ""))
-            boundaries.append({"boundary_length": length, "pass": valid,
-                               "error": error,
-                               "field_length": len(actual) if isinstance(actual, str) else None})
-        core.record(report, "Published multipart boundary-buffer cases through FPM",
-                    all(case["pass"] for case in boundaries), boundaries)
-        cookies = []
-        for fixture in json.loads((TESTS / "legacy" / "cookie-controls.json").read_text(encoding="utf-8")):
-            response = core.fastcgi(name, "cookies", extra={"HTTP_COOKIE": fixture["cookie"]})
-            cookies.append({"source": fixture["source"],
-                            "pass": response["body"].get("cookies") == fixture["expected"],
-                            "actual": response["body"].get("cookies"), "expected": fixture["expected"]})
-        core.record(report, "Published cookie-prefix cases through FPM",
-                    all(case["pass"] for case in cookies), cookies)
+        core.published_input_controls(report, name)
         if source_upload_controls:
             core.record(report, "Source-disabled upload progress despite enabled INI",
                         upload["body"].get("progress_present") is False
@@ -314,6 +288,7 @@ def ordinary_fpm_suite(report, image, version):
             core.record(report, "Published multipart body-part limit",
                         limited["body"].get("post") == {"field" + str(i): str(i) for i in range(3)},
                         limited)
+        core.multipart_upload_limit(report, name)
     except (RuntimeError, ValueError, subprocess.TimeoutExpired) as error:
         core.record(report, "Ordinary FPM verification", False, str(error))
     finally:

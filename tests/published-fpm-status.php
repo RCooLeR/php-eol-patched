@@ -68,20 +68,23 @@ try {
         if (file_exists($dir . '/fpm.sock')) { break; }
         usleep(20000);
     }
-    $request = statusRequest($dir . '/fpm.sock', $dir . '/index.php',
-        '/<script>alert(1)</script>', '<script>alert(2)</script>');
-    for ($i = 0; $i < 100; $i++) {
-        if (is_file($dir . '/busy')) { break; }
-        usleep(10000);
+    foreach (array('html', 'xml') as $format) {
+        if (is_file($dir . '/busy')) { unlink($dir . '/busy'); }
+        $request = statusRequest($dir . '/fpm.sock', $dir . '/index.php',
+            '/<script>alert(1)</script>', '<script>alert(2)</script>');
+        for ($i = 0; $i < 100; $i++) {
+            if (is_file($dir . '/busy')) { break; }
+            usleep(10000);
+        }
+        if (!is_file($dir . '/busy')) { throw new RuntimeException('Test request did not start'); }
+        $status = statusResponse(statusRequest($dir . '/fpm.sock', $dir . '/index.php', '/status', 'full&' . $format));
+        $ordinary = statusResponse($request);
+        if (strpos($status, '/&lt;script&gt;alert(1)&lt;/script&gt;?&lt;script&gt;alert(2)&lt;/script&gt;') === false
+            || strpos($ordinary, 'ordinary response') === false) {
+            throw new RuntimeException('FPM full ' . $format . ' status did not escape the request URI');
+        }
+        echo "PASS FPM status " . $format . " escapes request URI\n";
     }
-    if (!is_file($dir . '/busy')) { throw new RuntimeException('Test request did not start'); }
-    $status = statusResponse(statusRequest($dir . '/fpm.sock', $dir . '/index.php', '/status', 'full&html'));
-    $ordinary = statusResponse($request);
-    if (strpos($status, '<script>') !== false || strpos($status, '&lt;script&gt;') === false
-        || strpos($ordinary, 'ordinary response') === false) {
-        throw new RuntimeException('FPM full HTML status did not escape the request URI');
-    }
-    echo "PASS FPM status HTML escapes request URI\n";
 } finally {
     proc_terminate($process);
     proc_close($process);

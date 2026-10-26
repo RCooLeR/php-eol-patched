@@ -1,10 +1,21 @@
 # php-eol-patched
 
+[![Build and test](https://github.com/RCooLeR/php-eol-patched/actions/workflows/test.yaml/badge.svg?branch=debian&event=push)](https://github.com/RCooLeR/php-eol-patched/actions/workflows/test.yaml?query=branch%3Adebian)
+
+> ⭐ **Help make the web a bit safer.** Please [star this repository](https://github.com/RCooLeR/php-eol-patched) to help more developers discover these temporary security patches while they upgrade their apps.
+
 PHP CLI/FPM images with selected published security backports for PHP 5.6–8.1.
 
-**These PHP versions are unsupported. Upgrade your application to a [supported official PHP release](https://www.php.net/supported-versions.php) as soon as possible.** These patches are a temporary migration aid, not continued PHP support or a guarantee of security. The images also depend on old system libraries. No application compatibility or production-safety guarantee is provided.
+The badge tracks builds and tests for all eight PHP releases on pushes to `debian`. Images are published by the `main` workflow after each release's checks pass.
 
-This is an independent project, not an official PHP distribution. [PATCHES.md](PATCHES.md) lists the included fixes, upstream sources and remaining limits. Two entries are EOL mitigations with different failure behavior from modern PHP.
+> [!CAUTION]
+> **Temporary migration aid**
+>
+> **These PHP versions are unsupported. Upgrade your application to a [supported official PHP release](https://www.php.net/supported-versions.php) as soon as possible.**
+>
+> These patches are not continued PHP support or a guarantee of security. The images also depend on old system libraries. No application compatibility or production-safety guarantee is provided.
+
+This is an independent project, not an official PHP distribution. [PATCHES.md](PATCHES.md) lists which reviewed CVEs are fixed, not fixed or not applicable to each PHP build, with published sources and remaining limits. Two critical entries are EOL mitigations with different failure behavior from modern PHP. This is selected CVE coverage, not a complete inventory of every published PHP vulnerability.
 
 ## Images
 
@@ -84,7 +95,8 @@ The image uses PHP's `php.ini-production`, with UTC as the timezone and session 
 ## Test
 
 The [test documentation](tests/README.md) includes the separate resource-heavy
-SQLite and Keccak regressions. The normal suite checks their bounded cases and
+SQLite, Keccak, SOAP, metaphone and upload regressions, which are outside the
+default CI run. The normal suite includes published regressions and ordinary
 compatibility controls. See [PATCHES.md](PATCHES.md#gd-exif-string-sqlite-and-sha-3-coverage)
 for the affected releases and the remaining SHA-3 input-length limitation.
 
@@ -97,7 +109,7 @@ docker pull "$(python3 -B -c "import sys; sys.path.insert(0, 'tests'); import po
 python3 tests/run.py --variant debian --image php-eol-patched:7.1.33-debian --test-image php-eol-patched:7.1.33-test --version 7.1.33
 ```
 
-See [tests/README.md](tests/README.md) for the selected regressions and resource limits. Passing them does not establish coverage of every vulnerability or application.
+See [tests/README.md](tests/README.md) for the selected regressions and resource limits. Passing them does not establish coverage of every vulnerability or application. Before replacing an application's image, run its own test suite and check its normal requests, jobs and integrations in staging.
 
 ## Source and modified builds
 

@@ -56,6 +56,7 @@ case "$version" in
     ;;
   7.1.33)
     sed -i '1i /* Modified 2026-10-26: apply the published CP950 conversion bounds fix (PHP bug 79037). */' ext/mbstring/libmbfl/filters/mbfilter_big5.c
+    sed -i '1i /* Modified 2026-10-26: restrict BCMath numeric input to ASCII digits (PHP bug 78878). */' ext/bcmath/libbcmath/src/str2num.c
     ;;
   8.1.34)
     sed -i '1i /* Modified 2026-10-22: bound the initial mb_strcut allocation to input length. */' ext/mbstring/libmbfl/mbfl/mbfilter.c

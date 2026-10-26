@@ -1,44 +1,65 @@
-# Included security changes
+# CVE fix status
 
-These builds contain selected published PHP security fixes and native backports. They are not a complete collection of fixes released after each branch reached end of life. Upgrade applications to a supported official PHP release as soon as possible.
+This page states which CVEs are fixed in this repository's PHP images. The same
+status applies to the minimal and Debian variants. Short version numbers refer
+to the pinned releases listed in [README.md](README.md).
 
-The table describes the patch contents. It does not claim that every affected code path, architecture or application has been tested.
+**Fixed** includes both repository backports and fixes already in the official
+PHP release. **Not fixed** means the fix is missing from the listed builds.
+**Not affected** means the reported issue does not apply to the listed version or build.
+**Mitigated** does not mean fully fixed. Versions not listed for a CVE are not
+assessed by that row. This is selected CVE coverage, not complete EOL support.
 
-- **B**: backported in this repository.
-- **U**: already present in that PHP release.
-- **M**: upstream EOL mitigation, with branch adaptations and related defensive changes.
+For low- and medium-severity CVEs, a backport that breaks normal application
+behavior is omitted and its gap documented. Compatibility takes priority during
+the migration period; passing repository tests cannot guarantee every application.
 
-| CVE | Component | 5.6.40 | 7.0.33 | 7.1.33 | 7.2.34 | 7.3.33 | 7.4.33 | 8.0.30 | 8.1.34 | Published change |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| [CVE-2026-109618](https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w) | Allocation failure and request cleanup | M | M | M | M | M | M | M | M | EOL changes below |
-| [CVE-2026-109619](https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp) | Stale request state | M | M | M | M | M | M | M | M | EOL changes below |
-| [CVE-2026-6722](https://github.com/php/php-src/security/advisories/GHSA-85c2-q967-79q5) | SOAP value ownership | B | B | B | B | B | B | B | B | [aee3b3ac](https://github.com/php/php-src/commit/aee3b3ac9b816b0def1c462695b483b49a83148e) |
-| [CVE-2026-91765](https://github.com/php/php-src/security/advisories/GHSA-rgrp-mwpx-f6rm) | SOAP recursion | B | B | B | B | B | B | B | B | [3655b79c](https://github.com/php/php-src/commit/3655b79c7bfa90db004d75a3b282ed0f538f4836) |
-| [CVE-2025-14181](https://github.com/php/php-src/security/advisories/GHSA-cj93-vc83-wgqv) | SOAP response length | B | B | B | B | B | B | B | B | [b11bd1d9](https://github.com/php/php-src/commit/b11bd1d9390bb203684e3d4aa5e1104ea842de6f) |
-| [CVE-2026-6103](https://github.com/php/php-src/security/advisories/GHSA-j3wh-g957-2m85) | Phar TAR entries | B | B | B | B | B | B | B | B | [0994e2e8](https://github.com/php/php-src/commit/0994e2e887cd993866b5e4d7dba2fade5caeefec) |
-| [CVE-2023-3824](https://github.com/php/php-src/security/advisories/GHSA-jqcx-ccgc-xwhv) | Phar directory reads | B | B | B | B | B | B | U | U | [80316123](https://github.com/php/php-src/commit/80316123f3e9dcce8ac419bd9dd43546e2ccb5ef) |
-| [CVE-2026-91766](https://github.com/php/php-src/security/advisories/GHSA-fpwc-w8rq-cr92) | HTTP redirect credentials | B | B | B | B | B | B | B | B | [5af9465c](https://github.com/php/php-src/commit/5af9465ca890be679033d5fb0dc89b6ea071326b) |
-| [CVE-2026-93682](https://github.com/php/php-src/security/advisories/GHSA-7875-c8px-7q5f) | Empty HTTP redirect location | B | B | B | B | B | B | B | B | [231f29fd](https://github.com/php/php-src/commit/231f29fdfd94a571b36c5f772367329c3af67ca7), [follow-up](https://github.com/php/php-src/pull/23521) |
-| [CVE-2025-1217](https://github.com/php/php-src/security/advisories/GHSA-v8xr-gpvj-cx9g) | Folded HTTP headers | B | B | B | B | B | B | B | U | [d20b4c97](https://github.com/php/php-src/commit/d20b4c97a9f883b62b65b82d939c5af9a2028ef1) |
-| [CVE-2025-1734](https://github.com/php/php-src/security/advisories/GHSA-pcmh-g36c-qc44) | Invalid HTTP headers | B | B | B | B | B | B | B | U | [0548c4c1](https://github.com/php/php-src/commit/0548c4c1756724a89ef8310709419b08aadb2b3b) |
-| [CVE-2025-1861](https://github.com/php/php-src/security/advisories/GHSA-52jp-hrpf-2jff) | HTTP redirect truncation | B | B | B | B | B | B | B | U | [ac1a054b](https://github.com/php/php-src/commit/ac1a054bb3eb5994a199e8b18cca28cbabf5943e) |
-| [CVE-2026-91767](https://github.com/php/php-src/security/advisories/GHSA-xr7j-rvgx-xq5p) | TLS wildcard bounds | B | B | B | B | B | B | B | B | [78cc82b3](https://github.com/php/php-src/commit/78cc82b37a340840c6fbff676f513eb4e3d96533) |
-| [CVE-2026-91769](https://github.com/php/php-src/security/advisories/GHSA-vvx9-73fr-5jjx) | TLS SAN/CN verification | B | B | B | B | B | B | B | B | [0bb308eb](https://github.com/php/php-src/commit/0bb308eb4cf699e707efbcf97ffb70e46a176be7) |
-| [CVE-2026-92842](https://github.com/php/php-src/security/advisories/GHSA-88hq-2827-7pg6) | Standard stream filters | B | B | B | B | B | B | B | B | [b4e3397e](https://github.com/php/php-src/commit/b4e3397ec8f4f647e6e019dbf79870fc2f14ba78) |
-| [CVE-2026-91768](https://github.com/php/php-src/security/advisories/GHSA-62xp-839h-2637) | FastCGI IPv6 client matching | B | B | B | B | B | B | B | B | [dcdfcf86](https://github.com/php/php-src/commit/dcdfcf86fcf7f42fa98dd3d000f310ebdad41965) |
-| [CVE-2024-8929](https://github.com/php/php-src/security/advisories/GHSA-h35g-vwh6-m678) | mysqlnd packet reads | B | B | B | B | B | B | B | U | [2f5aa9f9](https://github.com/php/php-src/commit/2f5aa9f9d150ca56e356f3ca9acf9d530108cb08), [32f905f1](https://github.com/php/php-src/commit/32f905f1d689aaa8eacd6331a18c0dd45972c3c1) |
-| [CVE-2025-1218](https://github.com/php/php-src/security/advisories/GHSA-r6x9-5r99-36j7) | mysqlnd packet reads | B | B | B | B | B | B | B | B | [114dbb74](https://github.com/php/php-src/commit/114dbb74368e6a6cd6e48ddb4a76dbe8728b84e2) |
-| [CVE-2021-21703](https://www.php.net/ChangeLog-7.php#7.3.31) | FPM scoreboard | B | B | B | B | U | U | U | U | [cb2021e5](https://github.com/php/php-src/commit/cb2021e5f69da5e2868130a05bb53db0f9f89e4b) |
+## CVEs with missing fixes
+
+| CVE | Not fixed in | Fixed in |
+| --- | --- | --- |
+| CVE-2023-3247 | **7.1–7.4** | Published fix included in 5.6, 7.0, 8.0, 8.1; residual nonce observation below |
+| CVE-2024-2408 | **5.6–8.0** | No dependency fix verified |
+| CVE-2025-1220 | **7.1–8.0; persistent-socket gap (see below)** | No complete fix claimed |
+| CVE-2026-7258 | **7.1–7.3** | 5.6, 7.0, 7.4–8.1 |
+
+These remaining gaps require a compatible backport, a dependency repair or a
+published follow-up that covers the remaining path. The two critical EOL
+mitigations are listed separately below and are not complete fixes.
+
+## Core, SOAP, Phar, HTTP, TLS and FPM
+
+| CVE | Status | PHP builds |
+| --- | --- | --- |
+| [CVE-2026-109618](https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w) | **Mitigated, not fully fixed** | All eight builds |
+| [CVE-2026-109619](https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp) | **Mitigated, not fully fixed** | All eight builds |
+| [CVE-2026-6722](https://github.com/php/php-src/security/advisories/GHSA-85c2-q967-79q5) | **Fixed** | All eight builds |
+| [CVE-2026-91765](https://github.com/php/php-src/security/advisories/GHSA-rgrp-mwpx-f6rm) | **Fixed** | All eight builds |
+| [CVE-2025-14181](https://github.com/php/php-src/security/advisories/GHSA-cj93-vc83-wgqv) | **Fixed** | All eight builds |
+| [CVE-2026-6103](https://github.com/php/php-src/security/advisories/GHSA-j3wh-g957-2m85) | **Fixed** | All eight builds |
+| [CVE-2023-3824](https://github.com/php/php-src/security/advisories/GHSA-jqcx-ccgc-xwhv) | **Fixed** | All eight builds |
+| [CVE-2026-91766](https://github.com/php/php-src/security/advisories/GHSA-fpwc-w8rq-cr92) | **Fixed** | All eight builds |
+| [CVE-2026-93682](https://github.com/php/php-src/security/advisories/GHSA-7875-c8px-7q5f) | **Fixed** | All eight builds |
+| [CVE-2025-1217](https://github.com/php/php-src/security/advisories/GHSA-v8xr-gpvj-cx9g) | **Fixed** | All eight builds |
+| [CVE-2025-1734](https://github.com/php/php-src/security/advisories/GHSA-pcmh-g36c-qc44) | **Fixed** | All eight builds |
+| [CVE-2025-1861](https://github.com/php/php-src/security/advisories/GHSA-52jp-hrpf-2jff) | **Fixed** | All eight builds |
+| [CVE-2026-91767](https://github.com/php/php-src/security/advisories/GHSA-xr7j-rvgx-xq5p) | **Fixed** | All eight builds |
+| [CVE-2026-91769](https://github.com/php/php-src/security/advisories/GHSA-vvx9-73fr-5jjx) | **Fixed** | All eight builds |
+| [CVE-2026-92842](https://github.com/php/php-src/security/advisories/GHSA-88hq-2827-7pg6) | **Fixed** | All eight builds |
+| [CVE-2026-91768](https://github.com/php/php-src/security/advisories/GHSA-62xp-839h-2637) | **Fixed** | All eight builds |
+| [CVE-2024-8929](https://github.com/php/php-src/security/advisories/GHSA-h35g-vwh6-m678) | **Fixed** | All eight builds |
+| [CVE-2025-1218](https://github.com/php/php-src/security/advisories/GHSA-r6x9-5r99-36j7) | **Fixed** | All eight builds |
+| [CVE-2021-21703](https://www.php.net/ChangeLog-7.php#7.3.31) | **Fixed** | All eight builds |
 
 ## PostgreSQL
 
 Both pgsql and PDO PostgreSQL are enabled in every image. These fixes cover selected published extension defects; they do not establish complete PostgreSQL-related CVE coverage.
 
-| CVE | Component | 5.6.40 | 7.0.33 | 7.1.33 | 7.2.34 | 7.3.33 | 7.4.33 | 8.0.30 | 8.1.34 | Published change |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CVE-2022-31625 | pgsql parameter cleanup | B | B | B | B | B | U | U | U | [55f6895f](https://github.com/php/php-src/commit/55f6895f4b4c677272fd4ee1113acdbd99c4b5ab) |
-| [CVE-2025-1735](https://github.com/php/php-src/security/advisories/GHSA-hrwm-9436-5mv3) | pgsql and PDO PostgreSQL escaping failures | B | B | B | B | B | B | B | U | [9376aeef](https://github.com/php/php-src/commit/9376aeef9f8ff81f2705b8016237ec3e30bdee44) |
-| [CVE-2026-17543](https://github.com/php/php-src/security/advisories/GHSA-7qpv-r5mr-78m4) | pgsql string literal escaping | B | B | B | B | B | B | B | B | [ab048bd8](https://github.com/php/php-src/commit/ab048bd83b578119cf81b456526d50498421d617) |
+| CVE | Status | PHP builds |
+| --- | --- | --- |
+| CVE-2022-31625 | **Fixed** | All eight builds |
+| [CVE-2025-1735](https://github.com/php/php-src/security/advisories/GHSA-hrwm-9436-5mv3) | **Fixed** | All eight builds |
+| [CVE-2026-17543](https://github.com/php/php-src/security/advisories/GHSA-7qpv-r5mr-78m4) | **Fixed** | All eight builds |
 
 [CVE-2025-14180](https://github.com/php/php-src/security/advisories/GHSA-8xr5-qppj-gvwj) is already fixed in PHP 8.1.34. The older branches retain their integer-returning PDO quoter ABI, which already propagates quote failure; they do not need the newer zend_string-returning fix. The published invalid-byte regression is included for all eight versions.
 
@@ -48,37 +69,44 @@ The extensions use [libpq 16.15](https://www.postgresql.org/docs/16/release-16-1
 
 ## Additional GD, OpenSSL and Phar fixes
 
-The following fixes were already included in the PHP 5.6 and 7.0 maintenance series and are also backported to PHP 7.1вЂ“8.1:
+The following fixes were already included in the PHP 5.6 and 7.0 maintenance series and are also backported to PHP 7.1–8.1:
 
-| CVE | Component | Published change | Verification scope |
-| --- | --- | --- | --- |
-| CVE-2026-9672 | GD GIF decoder | [fcd691b3](https://github.com/php/php-src/commit/fcd691b377d02285740744bee17c0f298be227d5) | Exact published changes, compilation and ordinary GIF decoding; no CVE-specific fixture was supplied upstream. |
-| CVE-2026-14355 | OpenSSL AES-WRAP-PAD allocation | [cbc04891](https://github.com/php/php-src/commit/cbc0489126a7682796aad1e5fb4e51de74af162c) | Published round-trip regression executes on PHP 8.1. The cipher is unavailable in the older builds; those skips are not passing exploit tests. |
-| CVE-2026-7260 | Phar circular symbolic links | [2e0fa0a4](https://github.com/php/php-src/commit/2e0fa0a44441d74bf8cc4e1ce1c8af9cd4209f52) | Published archive fixtures and ordinary nested symbolic links. |
+| CVE | Status | PHP builds |
+| --- | --- | --- |
+| CVE-2026-9672 | **Fixed** | All eight builds |
+| CVE-2026-14355 | **Fixed** | All eight builds |
+| CVE-2026-7260 | **Fixed** | All eight builds |
+
+<details>
+<summary>Test coverage and limitations</summary>
+
+- **CVE-2026-9672**: Exact published changes, compilation and ordinary GIF decoding; no CVE-specific fixture was supplied upstream.
+- **CVE-2026-14355**: Published round-trip regression executes on PHP 8.1. The cipher is unavailable in the older builds; those skips are not passing exploit tests.
+- **CVE-2026-7260**: Published archive fixtures and ordinary nested symbolic links.
+
+</details>
 
 The Phar backports also retain the filename separator after resolving a nested link, following the [published native compatibility repair](https://repo.tuxcare.com/security/errata/els_alt_php/debian12/CLSA-2026-1786517269.html). This repair applies to all eight versions. Per-version `coverage/` directories contain the patch provenance and source hashes.
 
 ## GD, EXIF, string, SQLite and SHA-3 coverage
 
-These rows distinguish included fixes from an advisory's version-only match.
-`B` and `U` retain their meanings above; `вЂ”` means the affected implementation
-is absent. Per-version `coverage/` directories record the additional patches,
-their published sources and the source checksums.
+Per-version `coverage/` directories record the patches, published sources and
+source checksums. Not-affected builds are identified explicitly below.
 
-| CVE | Component | 5.6.40 | 7.0.33 | 7.1.33 | 7.2.34 | 7.3.33 | 7.4.33 | 8.0.30 | 8.1.34 | Published change |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CVE-2016-10166 | GD interpolation allocation | U | B | U | U | U | U | U | U | [a918020](https://github.com/php/php-src/commit/a918020c03880e12ac9f38e11a4a3789491a5f85) |
-| CVE-2019-9641 | EXIF TIFF offset checks | B | B | U | U | U | U | U | U | [5e824a8](https://github.com/php/php-src/commit/5e824a88d073d282c4f358f186cb87ddc284f83d) |
-| CVE-2020-7059 | Stateful tag stripping | B | B | B | U | U | U | вЂ” | вЂ” | [0f79b1b](https://github.com/php/php-src/commit/0f79b1bf301f455967676b5129240140c5c45b09), [follow-up](https://github.com/php/php-src/commit/2dc170e25d86a725fefd4c08f2bd8378820b28f5) |
-| CVE-2020-7060 | mbstring CP950 conversion | B | B | B | U | U | U | U | U | [2bcbc95](https://github.com/php/php-src/commit/2bcbc95f033c31b00595ed39f79c3a99b4ed0501) |
-| CVE-2022-31631 | PDO SQLite quoting | B | B | B | B | B | B | U | U | [921b681](https://github.com/php/php-src/commit/921b6813da3237a83e908998483f46ae3d8bacba) |
-| CVE-2022-37454 | SHA-3 Keccak sponge | вЂ” | вЂ” | вЂ” | B* | B* | U | U | U | [248f647](https://github.com/php/php-src/commit/248f647724e385bfb8d83aa5b5a5ca3c4ee2c7fd) |
+| CVE | Status | PHP builds |
+| --- | --- | --- |
+| CVE-2016-10166 | **Fixed** | All eight builds |
+| CVE-2019-9641 | **Fixed** | All eight builds |
+| CVE-2020-7059 | **Fixed** | 5.6–7.4; not affected: 8.0, 8.1 |
+| CVE-2020-7060 | **Fixed** | All eight builds |
+| CVE-2022-31631 | **Fixed** | All eight builds |
+| CVE-2022-37454 | **Fixed (see note)** | 7.2–8.1; not affected: 5.6–7.1 |
 
 The EXIF fixes were already included in the PHP 5.6 and 7.0 maintenance series.
 The [original report](https://bugs.php.net/bug.php?id=77509) concerns 32-bit
 integer overflow; these images support amd64 only. No duplicate patch is added.
 
-`B*`: PHP 7.2 and 7.3 receive the native Keccak fix in both generic implementations.
+**SHA-3 limitation:** PHP 7.2 and 7.3 receive the native Keccak fix in both generic implementations.
 Their PHP wrappers already truncate very large input lengths before the reported
 native overflow condition. That separate truncation can produce incorrect SHA-3
 digests and is **not fixed here**. PHP 7.1 uses an earlier, different implementation.
@@ -91,9 +119,264 @@ rejected by an earlier constructor check on PHP 7.0, so the default suite uses
 an exact-source allocator harness instead. These checks do not establish complete
 CVE coverage for the extensions or their linked libraries.
 
+## Additional fixed CVEs
+
+| CVE | Status | PHP builds |
+| --- | --- | --- |
+| CVE-2019-6977 | **Fixed** | 7.0 |
+| CVE-2019-9637 | **Fixed** | 5.6, 7.0 |
+| CVE-2019-9638 | **Fixed** | 5.6, 7.0 |
+| CVE-2019-9639 | **Fixed** | 5.6, 7.0 |
+| CVE-2019-9640 | **Fixed** | 5.6, 7.0 |
+| CVE-2019-9675 | **Fixed** | 5.6, 7.0 |
+| CVE-2021-21702 | **Fixed** | 5.6–7.2 |
+| CVE-2023-0662 | **Fixed** | All eight builds |
+| CVE-2025-14178 | **Fixed** | 7.2–8.1; not affected: 5.6–7.1 |
+| CVE-2019-11048 | **Fixed** | 5.6, 7.0, 7.1 |
+| CVE-2020-7068 | **Fixed** | 7.1 |
+| CVE-2022-31626 | **Fixed** | 5.6–7.3 |
+| CVE-2023-0568 | **Fixed** | 5.6–7.4 |
+| CVE-2023-3823 | **Fixed** | 5.6–7.4 |
+| CVE-2024-11233 | **Fixed** | All eight builds |
+| CVE-2024-11234 | **Fixed** | All eight builds |
+| CVE-2024-9026 | **Fixed** | 7.4–8.1; not affected: 5.6–7.3 |
+| CVE-2026-6735 | **Fixed** | All eight builds |
+| CVE-2026-7259 | **Fixed** | 8.0, 8.1; not affected: 5.6–7.4 |
+| CVE-2026-7262 | **Fixed** | All eight builds |
+
+<details>
+<summary>Final-pass sources and verification</summary>
+
+The PHP 7.1/7.2 quoted-printable backports include the published
+[bug 74267 prerequisite](https://github.com/php/php-src/commit/12c59f6660706321f9d42c55421ff6864439c8b7),
+which fixes the flush-path crash seen in the earlier attempt. The HTTP header
+backports include the published parser prerequisites. Provenance files record
+the complete sequence and native context adjustments.
+
+The [upload-length fix](https://github.com/php/php-src/commit/3c8582ca4b8e84e5647220b647914876d2c3b124)
+has a separate PHP 7.1 test that streams a form field larger than 2 GiB after an
+uploaded file, then checks the field and temporary-file cleanup. It is outside
+the default CI memory limit; see [test instructions](tests/README.md).
+
+The [mysqlnd fix](https://github.com/php/php-src/commit/58006537fc5f133ae8549efe5118cde418b3ace9)
+is checked using the actual authentication writer with guarded buffers and
+ordinary PDO MySQL controls. The [path fix](https://github.com/php/php-src/commit/ec10b28d64decbc54aa1e585dce580f0bd7a5953)
+reserves the extra byte in all five published locations; maximum-length working
+directory and ordinary open_basedir tests check compatibility.
+
+The [libxml fix](https://github.com/php/php-src/commit/c283c3ab0ba45d21b2b8745c1f9c7cbfe771c975)
+uses the native maintenance backport and its follow-up. Published DOM, SimpleXML
+and XMLReader regressions use a test-only helper to alter library globals.
+Ordinary controls preserve explicit entity options, validation and the caller's
+global state. The helper is not included in runtime images.
+
+The [Phar ZIP fix](https://github.com/php/php-src/commit/7355ab81763a3d6a04ac11660e6a16d58838d187)
+retains the published binary archive fixture.
+The [FPM logging fix](https://github.com/php/php-src/commit/4580b8b3e1495df45a894ab928b23067159eedb8)
+checks both published split-marker cases and ordinary log bytes.
+The [SOAP map fix](https://github.com/php/php-src/commit/9992b81bcd0a4b94e8a2249e50cc37646725df93)
+checks missing values and an ordinary typed map.
+The [mbstring fix](https://github.com/php/php-src/commit/79a054eae016c56409432e69aebc8ca908a88838)
+checks unsupported encoding rejection and preservation of ordinary regex state.
+
+PHP 7.4/8.0/8.1 use the complete published branch-native CVE-2026-7258 changes,
+apart from an already-applied unsigned-character check. High-bit URL and string
+controls run on these Linux/glibc images. The reported platform-dependent crash
+is not reproduced here; no NetBSD validation is claimed. PHP 7.1–7.3 remain open.
+
+</details>
+
+## Further published fixes
+
+These are the additional branches covered by the published backports. Existing
+PHP 5.6/7.0 coverage is listed separately below; missing branches are listed at the top.
+
+| CVE | Status | PHP builds |
+| --- | --- | --- |
+| CVE-2019-11045 | **Fixed** | 7.1 |
+| CVE-2019-11046 | **Fixed** | 7.1 |
+| CVE-2019-11047 | **Fixed** | 7.1 |
+| CVE-2019-11050 | **Fixed** | 7.1 |
+| CVE-2020-7063 | **Fixed** | 7.1 |
+| CVE-2020-7064 | **Fixed** | 7.1 |
+| CVE-2020-7066 | **Fixed** | 7.1 |
+| CVE-2020-7069 | **Fixed** | 7.1 |
+| CVE-2020-7070 | **Fixed** | 7.1 |
+| CVE-2020-7071 | **Fixed** | 7.1, 7.2 |
+| CVE-2021-21705 | **Fixed** | 7.1, 7.2 |
+| CVE-2021-21707 | **Fixed** | 7.1, 7.2 |
+| CVE-2022-31628 | **Fixed** | 7.1–7.3 |
+| CVE-2022-31629 | **Fixed** | 7.1–7.3 |
+| CVE-2022-4900 | **Fixed** | 7.4 |
+| CVE-2023-0567 | **Fixed** | 7.1–7.4 |
+| CVE-2024-2756 | **Fixed** | 7.1–8.0 |
+| CVE-2024-3096 | **Fixed** | 7.1–8.0 |
+| CVE-2024-5458 | **Fixed** | 7.1–8.0 |
+| CVE-2024-8925 | **Fixed** | 7.1–8.0 |
+| CVE-2025-1219 | **Fixed** | 7.1–8.0 |
+| CVE-2025-1736 | **Fixed** | 7.1–8.0 |
+| CVE-2025-6491 | **Fixed** | 7.1–8.0 |
+| CVE-2026-7261 | **Fixed** | 7.1–8.1 |
+| CVE-2026-7568 | **Fixed** | 7.1–8.1 |
+
+<details>
+<summary>Sources, verification and skipped fixes</summary>
+
+Each version's `coverage/provenance.json` records the published commits, native
+maintenance patches, compatibility adjustments and checksums. Builds enforce
+zero-fuzz application and source checksums. Published regressions exercise the
+malformed inputs, with ordinary password, URL, archive, upload and SOAP controls.
+Cookie and multipart payloads run through FPM, since these images do not include CGI.
+The SOAP QName and metaphone regressions exceed 2 GiB and run separately using
+[the documented large-test command](tests/README.md).
+
+- **CVE-2023-3247:** Additional PHP 7.1–7.4 backports are skipped. The
+  [published patch](https://github.com/php/php-src/commit/ac4254ad764c70cb1f05c9270d8d12689fc3aeb6)
+  checks random-generation failure and enlarges the generated nonce. However,
+  current SOAP HTTP Digest code in all eight builds still hashes and sends only
+  eight hexadecimal nonce characters, limiting the effective nonce to at most
+  32 bits. No published follow-up was found in this limited check. Existing
+  upstream/native changes remain in place. Upstream officially lists its releases
+  as patched in [the advisory](https://github.com/php/php-src/security/advisories/GHSA-76gg-c692-v2mw).
+  The nonce-length limitation is this repository's observation, not a separate
+  upstream CVE or a change to upstream's fix classification.
+- **CVE-2024-2408:** No PHP-only fix is applied. Mitigation depends on an OpenSSL
+  build with implicit rejection; that property is not verified for the old image
+  libraries. See [PHP's guidance](https://www.php.net/ChangeLog-8.php#8.1.29) and
+  [the advisory](https://github.com/php/php-src/security/advisories/GHSA-hh26-4ppw-5864).
+- **CVE-2025-1220:** Additional backports are skipped. The
+  [published hostname fix](https://github.com/php/php-src/commit/cac8f7f1cf4939f55f06b68120040f057682d89c)
+  still permits NUL-truncated persistent-socket reuse before hostname validation;
+  a local regression reproduced this on PHP 7.1. Existing PHP 5.6/7.0 maintenance
+  patches remain, but complete coverage is not claimed. The ordinary new-connection
+  tests alone do not verify this reuse path.
+- **CVE-2026-7258:** PHP 7.1–7.3 still need compatible versions of the broad
+  signed-character change. Published native patches are included for
+  [7.4](https://github.com/remicollet/php-src-security/commit/b44c4c80d8a76d7df32985e4bbadb12c985d6a22),
+  [8.0](https://github.com/remicollet/php-src-security/commit/30de2f8492a06ebcf1659307f1f049e2799c7f21) and
+  [8.1](https://github.com/remicollet/php-src-security/commit/07e5a9263314fd9a2a4479661353704e00dd8d0c).
+
+Published sources for the added fixes:
+
+| CVE | Published source |
+| --- | --- |
+| CVE-2019-11045 | [a5a15965](https://github.com/php/php-src/commit/a5a15965da23c8e97657278fc8dfbf1dfb20c016) |
+| CVE-2019-11046 | [eb23c600](https://github.com/php/php-src/commit/eb23c6008753b1cdc5359dead3a096dce46c9018) |
+| CVE-2019-11047 | [d348cfb9](https://github.com/php/php-src/commit/d348cfb96f2543565691010ade5e0346338be5a7) |
+| CVE-2019-11050 | [c14eb8de](https://github.com/php/php-src/commit/c14eb8de974fc8a4d74f3515424c293bc7a40fba) |
+| CVE-2020-7063 | [e5c95234](https://github.com/php/php-src/commit/e5c95234d87fcb8f6b7569a96a89d1e1544749a6) |
+| CVE-2020-7064 | [41f66e2a](https://github.com/php/php-src/commit/41f66e2a2cfd611e35be5ac3bf747f0b56161216), [8577fa58](https://github.com/php/php-src/commit/8577fa5891220dac40d42b2f745fa159dcd871ad), [2c081b7e](https://github.com/php/php-src/commit/2c081b7e269d0f63cd9d60a40997f18b5cf793be), [ad05ad4d](https://github.com/php/php-src/commit/ad05ad4dbafc29dd23828760d4bfa2be12ccbb1c), [b42b6d0f](https://github.com/php/php-src/commit/b42b6d0ff774fdced1155cb0c721d91914d619f5) |
+| CVE-2020-7066 | [0d139c5b](https://github.com/php/php-src/commit/0d139c5b94a5f485a66901919e51faddb0371c43) |
+| CVE-2020-7069 | [0216630e](https://github.com/php/php-src/commit/0216630ea2815a5789a24279a1211ac398d4de79) |
+| CVE-2020-7070 | [6559fe91](https://github.com/php/php-src/commit/6559fe912661ca5ce5f0eeeb591d928451428ed0) |
+| CVE-2020-7071 | [2d3d7241](https://github.com/php/php-src/commit/2d3d72412a6734e19a38ed10f385227a6238e4a6), [4a89e726](https://github.com/php/php-src/commit/4a89e726bd4d0571991dc22a9a1ad4509e8fe347), [9c673083](https://github.com/php/php-src/commit/9c673083cd46ee2a954a62156acbe4b6e657c048), [5174de7c](https://github.com/php/php-src/commit/5174de7cd33c3d4fa591c9c93859ff9989b07e8c) |
+| CVE-2021-21705 | [a5538c62](https://github.com/php/php-src/commit/a5538c62293fa782fcc382d0635cfc0c8b9190e3), [19001378](https://github.com/php/php-src/commit/190013787bbc424c240413d914e3a038f974ccef) |
+| CVE-2021-21707 | [f15f8fc5](https://github.com/php/php-src/commit/f15f8fc573eb38c3c73e23e0930063a6f6409ed4) |
+| CVE-2022-31628 | [404e8bdb](https://github.com/php/php-src/commit/404e8bdb68350931176a5bdc86fc417b34fb583d), [432bf196](https://github.com/php/php-src/commit/432bf196d59bcb661fcf9cb7029cea9b43f490af) |
+| CVE-2022-31629 | [0611be4e](https://github.com/php/php-src/commit/0611be4e82887cee0de6c4cbae320d34eec946ca) |
+| CVE-2022-4900 | [789a37f1](https://github.com/php/php-src/commit/789a37f14405e2d1a05a76c9fb4ed2d49d4580d5) |
+| CVE-2023-0567 | [c840f715](https://github.com/php/php-src/commit/c840f71524067aa474c00c3eacfb83bd860bfc8a), [a92acbad](https://github.com/php/php-src/commit/a92acbad873a05470af1a47cb785a18eadd827b5) |
+| CVE-2024-2756 | [093c08af](https://github.com/php/php-src/commit/093c08af25fb323efa0c8e6154aa9fdeae3d3b53) |
+| CVE-2024-3096 | [0ba5229a](https://github.com/php/php-src/commit/0ba5229a3f7572846e91c8f5382e87785f543826) |
+| CVE-2024-5458 | [4066610b](https://github.com/php/php-src/commit/4066610b47e22c24cbee91be434a94357056a479), [08be64e4](https://github.com/php/php-src/commit/08be64e40197fc12dca5f802d16748d9c3cb4cb4), [76362f95](https://github.com/php/php-src/commit/76362f9526afbd5565003d981f9507aaf62337f2), [87a7b8da](https://github.com/php/php-src/commit/87a7b8dab75e221a1fcd74cf34dc650f7253c12c), [b919ad03](https://github.com/php/php-src/commit/b919ad0323dbc3e1e1ac0f6ba8ec2ad380579918), [7e0e3cc8](https://github.com/php/php-src/commit/7e0e3cc820c493301409a0ce2b6ef95e0ab06b0c) |
+| CVE-2024-8925 | [19b49258](https://github.com/php/php-src/commit/19b49258d0c5a61398d395d8afde1123e8d161e0) |
+| CVE-2025-1219 | [f901bec4](https://github.com/php/php-src/commit/f901bec494ae921f36e1066e4380b92888757f0f), [b6004a04](https://github.com/php/php-src/commit/b6004a043c16b211d462218fbb3f72db68ec2b18) |
+| CVE-2025-1736 | [41d49abb](https://github.com/php/php-src/commit/41d49abbd99dab06cdae4834db664435f8177174) |
+| CVE-2025-6491 | [9cb3d8d2](https://github.com/php/php-src/commit/9cb3d8d200f0c822b17bda35a2a67a97b039d3e1) |
+| CVE-2026-7261 | [b9f81dea](https://github.com/php/php-src/commit/b9f81deadfda4df332fd75e20c03b3812038cd3f) |
+| CVE-2026-7568 | [dd77cfef](https://github.com/php/php-src/commit/dd77cfefa7fb457ddbfa2adab0f2bf2b0d1731c1) |
+
+</details>
+
+## CVEs that do not affect the checked builds
+
+| CVE | Status | PHP builds |
+| --- | --- | --- |
+| CVE-2019-19246 | **Not affected** | 5.6–7.1 |
+| CVE-2020-7065 | **Not affected** | 5.6–7.1 |
+| CVE-2020-7067 | **Not affected** | 7.1; EBCDIC support is disabled |
+| CVE-2022-31630 | **Not affected** | 5.6–7.3 |
+| CVE-2024-2757 | **Not affected** | 5.6–8.0 |
+| CVE-2026-12184 | **Not affected** | All eight builds |
+| CVE-2026-17544 | **Not affected** | All eight builds |
+| CVE-2020-7069 | **Not affected** | 5.6, 7.0; the affected AEAD API is absent |
+| CVE-2025-14177 | **Not affected** | 5.6–8.0; the affected chunked-reader implementation is absent |
+| CVE-2026-6104 | **Not affected** | All eight builds; the affected encoding-name lookup is absent |
+| CVE-2026-7263 | **Not affected** | All eight builds; the affected modern DOM implementation is absent |
+| CVE-2024-9026 | **Not affected** | 5.6–7.3; the affected split flush-marker parser is absent |
+| CVE-2026-7259 | **Not affected** | 5.6–7.4; the affected cached mbfl-encoding pointer is absent |
+
+<details>
+<summary>Published sources and compatibility details</summary>
+
+The new nonapplicability checks compare the actual patched sources with the
+reported paths: [CVE-2020-7069](https://bugs.php.net/bug.php?id=79601),
+[CVE-2025-14177](https://github.com/php/php-src/security/advisories/GHSA-3237-qqm7-mfv7),
+[CVE-2026-6104](https://github.com/php/php-src/security/advisories/GHSA-74r9-qxhc-fx53),
+and [CVE-2026-7263](https://github.com/php/php-src/security/advisories/GHSA-4jhr-8w89-j733).
+
+The PHP 7.3 maintenance archive linked below supplies older native variants.
+PHP 7.4 uses its native `return;` after the array-size error because it lacks
+`RETURN_THROWS()`. The older FPM patches cover HTML/XML escaping and retain their
+JSON behavior. Per-version `coverage/` directories record provenance and hashes.
+
+| CVE | Source or applicability evidence |
+| --- | --- |
+| [CVE-2026-109618](https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w) | EOL changes below |
+| [CVE-2026-109619](https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp) | EOL changes below |
+| [CVE-2026-6722](https://github.com/php/php-src/security/advisories/GHSA-85c2-q967-79q5) | [aee3b3ac](https://github.com/php/php-src/commit/aee3b3ac9b816b0def1c462695b483b49a83148e) |
+| [CVE-2026-91765](https://github.com/php/php-src/security/advisories/GHSA-rgrp-mwpx-f6rm) | [3655b79c](https://github.com/php/php-src/commit/3655b79c7bfa90db004d75a3b282ed0f538f4836) |
+| [CVE-2025-14181](https://github.com/php/php-src/security/advisories/GHSA-cj93-vc83-wgqv) | [b11bd1d9](https://github.com/php/php-src/commit/b11bd1d9390bb203684e3d4aa5e1104ea842de6f) |
+| [CVE-2026-6103](https://github.com/php/php-src/security/advisories/GHSA-j3wh-g957-2m85) | [0994e2e8](https://github.com/php/php-src/commit/0994e2e887cd993866b5e4d7dba2fade5caeefec) |
+| [CVE-2023-3824](https://github.com/php/php-src/security/advisories/GHSA-jqcx-ccgc-xwhv) | [80316123](https://github.com/php/php-src/commit/80316123f3e9dcce8ac419bd9dd43546e2ccb5ef) |
+| [CVE-2026-91766](https://github.com/php/php-src/security/advisories/GHSA-fpwc-w8rq-cr92) | [5af9465c](https://github.com/php/php-src/commit/5af9465ca890be679033d5fb0dc89b6ea071326b) |
+| [CVE-2026-93682](https://github.com/php/php-src/security/advisories/GHSA-7875-c8px-7q5f) | [231f29fd](https://github.com/php/php-src/commit/231f29fdfd94a571b36c5f772367329c3af67ca7), [follow-up](https://github.com/php/php-src/pull/23521) |
+| [CVE-2025-1217](https://github.com/php/php-src/security/advisories/GHSA-v8xr-gpvj-cx9g) | [d20b4c97](https://github.com/php/php-src/commit/d20b4c97a9f883b62b65b82d939c5af9a2028ef1) |
+| [CVE-2025-1734](https://github.com/php/php-src/security/advisories/GHSA-pcmh-g36c-qc44) | [0548c4c1](https://github.com/php/php-src/commit/0548c4c1756724a89ef8310709419b08aadb2b3b) |
+| [CVE-2025-1861](https://github.com/php/php-src/security/advisories/GHSA-52jp-hrpf-2jff) | [ac1a054b](https://github.com/php/php-src/commit/ac1a054bb3eb5994a199e8b18cca28cbabf5943e) |
+| [CVE-2026-91767](https://github.com/php/php-src/security/advisories/GHSA-xr7j-rvgx-xq5p) | [78cc82b3](https://github.com/php/php-src/commit/78cc82b37a340840c6fbff676f513eb4e3d96533) |
+| [CVE-2026-91769](https://github.com/php/php-src/security/advisories/GHSA-vvx9-73fr-5jjx) | [0bb308eb](https://github.com/php/php-src/commit/0bb308eb4cf699e707efbcf97ffb70e46a176be7) |
+| [CVE-2026-92842](https://github.com/php/php-src/security/advisories/GHSA-88hq-2827-7pg6) | [b4e3397e](https://github.com/php/php-src/commit/b4e3397ec8f4f647e6e019dbf79870fc2f14ba78) |
+| [CVE-2026-91768](https://github.com/php/php-src/security/advisories/GHSA-62xp-839h-2637) | [dcdfcf86](https://github.com/php/php-src/commit/dcdfcf86fcf7f42fa98dd3d000f310ebdad41965) |
+| [CVE-2024-8929](https://github.com/php/php-src/security/advisories/GHSA-h35g-vwh6-m678) | [2f5aa9f9](https://github.com/php/php-src/commit/2f5aa9f9d150ca56e356f3ca9acf9d530108cb08), [32f905f1](https://github.com/php/php-src/commit/32f905f1d689aaa8eacd6331a18c0dd45972c3c1) |
+| [CVE-2025-1218](https://github.com/php/php-src/security/advisories/GHSA-r6x9-5r99-36j7) | [114dbb74](https://github.com/php/php-src/commit/114dbb74368e6a6cd6e48ddb4a76dbe8728b84e2) |
+| [CVE-2021-21703](https://www.php.net/ChangeLog-7.php#7.3.31) | [cb2021e5](https://github.com/php/php-src/commit/cb2021e5f69da5e2868130a05bb53db0f9f89e4b) |
+| CVE-2022-31625 | [55f6895f](https://github.com/php/php-src/commit/55f6895f4b4c677272fd4ee1113acdbd99c4b5ab) |
+| [CVE-2025-1735](https://github.com/php/php-src/security/advisories/GHSA-hrwm-9436-5mv3) | [9376aeef](https://github.com/php/php-src/commit/9376aeef9f8ff81f2705b8016237ec3e30bdee44) |
+| [CVE-2026-17543](https://github.com/php/php-src/security/advisories/GHSA-7qpv-r5mr-78m4) | [ab048bd8](https://github.com/php/php-src/commit/ab048bd83b578119cf81b456526d50498421d617) |
+| CVE-2016-10166 | [a918020](https://github.com/php/php-src/commit/a918020c03880e12ac9f38e11a4a3789491a5f85) |
+| CVE-2019-9641 | [5e824a8](https://github.com/php/php-src/commit/5e824a88d073d282c4f358f186cb87ddc284f83d) |
+| CVE-2020-7059 | [0f79b1b](https://github.com/php/php-src/commit/0f79b1bf301f455967676b5129240140c5c45b09), [follow-up](https://github.com/php/php-src/commit/2dc170e25d86a725fefd4c08f2bd8378820b28f5) |
+| CVE-2020-7060 | [2bcbc95](https://github.com/php/php-src/commit/2bcbc95f033c31b00595ed39f79c3a99b4ed0501) |
+| CVE-2022-31631 | [921b681](https://github.com/php/php-src/commit/921b6813da3237a83e908998483f46ae3d8bacba) |
+| CVE-2022-37454 | [248f647](https://github.com/php/php-src/commit/248f647724e385bfb8d83aa5b5a5ca3c4ee2c7fd) |
+| CVE-2026-9672 | [fcd691b3](https://github.com/php/php-src/commit/fcd691b377d02285740744bee17c0f298be227d5) |
+| CVE-2026-14355 | [cbc04891](https://github.com/php/php-src/commit/cbc0489126a7682796aad1e5fb4e51de74af162c) |
+| CVE-2026-7260 | [2e0fa0a4](https://github.com/php/php-src/commit/2e0fa0a44441d74bf8cc4e1ce1c8af9cd4209f52) |
+| CVE-2019-6977 | [567c9f5](https://github.com/php/php-src/commit/567c9f58425c37260864f276b6d3f434eecf4b49) |
+| CVE-2021-21702 | [3c939e3](https://github.com/php/php-src/commit/3c939e3f69955d087e0bb671868f7267dfb2a502) |
+| CVE-2023-0662 | [e45850c](https://github.com/php/php-src/commit/e45850c195dcd5534394cf357a3f776d4916b655), [part limit](https://github.com/php/php-src/commit/716de0cff539f46294ef70fe75d548cd66766370) |
+| CVE-2024-11233 | [a6c84cd](https://github.com/php/php-src/commit/a6c84cd7efd7eaaaefd4463412508df570d35358) |
+| CVE-2024-11234 | [cf6700e](https://github.com/php/php-src/commit/cf6700e86d6357420a7c8386da63d48fec55f633) |
+| CVE-2025-14178 | [8b80115](https://github.com/php/php-src/commit/8b801151bd54b36aae4593ed6cfc096e8122b415) |
+| CVE-2026-6735 | [13e72d1](https://github.com/php/php-src/commit/13e72d1c97f72892421b04e8c5c05bc9bb193457) |
+| CVE-2019-9637 | The existing [rename fix](https://github.com/php/php-src/commit/e3133e4db70476fb7adfdedb738483e2255ce0e1) creates with restrictive permissions and restores ownership before mode. |
+| CVE-2019-9638, CVE-2019-9639 | [Bug77563](https://bugs.php.net/bug.php?id=77563) bounds MakerNote data and resets its length; [bug77659](https://bugs.php.net/bug.php?id=77659) identifies the shared fix. |
+| CVE-2019-9640 | Existing [bug77540](https://bugs.php.net/bug.php?id=77540) bounds the SOF segment before parsing. |
+| CVE-2019-9675 | The existing [TAR link fix](https://github.com/php/php-src/commit/e0f5d62bd6690169998474b62f92a8c5ddf0e699) rejects oversized link names. |
+| CVE-2019-19246 | [Upstream bug78559](https://bugs.php.net/bug.php?id=78559) identifies PHP 7.3 as affected. These builds bundle Oniguruma 5.9.5/5.9.6; no speculative port was added. |
+| CVE-2020-7065 | Vulnerable full case mapping was [introduced in PHP 7.3](https://www.php.net/manual/en/migration73.new-features.php); these trees use the older simple mapping. |
+| CVE-2020-7067 | [Bug79465](https://bugs.php.net/bug.php?id=79465) requires EBCDIC. This Linux build leaves `CHARSET_EBCDIC` undefined. |
+| CVE-2022-31630 | [Bug81739](https://bugs.php.net/bug.php?id=81739) dates introduction to 7.4; earlier trees retain the post-byte-swap font-size guard. |
+| CVE-2024-2757 | These versions use the legacy MIME encoder, not the loop changed by [3394efc](https://github.com/php/php-src/commit/3394efc63e52a017995f92d8da4ef28224247bb3). |
+| CVE-2026-12184 | The [reported peer-name reset path](https://github.com/php/php-src/security/advisories/GHSA-mhmq-mmqj-2v39) is absent. |
+| CVE-2026-17544 | Faulty fractional trimming was [introduced in 8.4.3](https://github.com/php/php-src/commit/063c3c852236ecbe45ab23c0fb271b6292ce82c3); these versions retain count-bounded copying. |
+
+</details>
+
 ## EOL mitigations
 
-The first two rows use the published EOL approach: [PHP 7.4](https://github.com/php/php-src/commit/712e60f9edfd03f0960fc4fc3c2c375f42b90aa2), [PHP 8.0](https://github.com/php/php-src/commit/82f8f31b16a035c1b67cc253e79f7cc288f4cc20) and [PHP 8.1](https://github.com/php/php-src/commit/1d7dec178a094e6e75b229ce22754045f8c6070a). PHP 7.1вЂ“7.3 use local adaptations of the 7.4 change, not official releases for those branches.
+CVE-2026-109618 and CVE-2026-109619 use the published EOL approach: [PHP 7.4](https://github.com/php/php-src/commit/712e60f9edfd03f0960fc4fc3c2c375f42b90aa2), [PHP 8.0](https://github.com/php/php-src/commit/82f8f31b16a035c1b67cc253e79f7cc288f4cc20) and [PHP 8.1](https://github.com/php/php-src/commit/1d7dec178a094e6e75b229ce22754045f8c6070a). PHP 7.1–7.3 use local adaptations of the 7.4 change, not official releases for those branches.
 
 Handled allocation failure exits the process immediately, bypassing ordinary shutdown callbacks and destructors. In FPM, the master replaces the affected worker. Session upload progress is disabled in source. Ordinary sessions and uploads remain available. These changes do not implement the modern deferred out-of-memory recovery model.
 
@@ -123,22 +406,22 @@ Known mysqlnd limit: the inherited statement-metadata EOF error path clears the 
 
 The ordered series, source hashes and provenance are under `patches/5.6.40/` and `patches/7.0.33/`. They also contain older published security and compatibility changes needed by those branches. The table above covers the selected CVEs common to this project's review; it is not a complete advisory inventory for either branch.
 
-## Additional PHP 5.6 and 7.0 CVE inventory
+## Other CVEs fixed in PHP 5.6 and 7.0
 
-The original maintenance series includes **53 additional CVE IDs for PHP 5.6.40** and **59 for PHP 7.0.33**, beyond the 19 CVEs in the main table. The PostgreSQL additions are listed separately above. These counts describe included patch contents in enabled components, not the number of regression tests or complete post-EOL coverage.
+The original maintenance series includes **53 additional CVE IDs for PHP 5.6.40** and **59 for PHP 7.0.33**, beyond the 19 CVEs in the core/SOAP/Phar/HTTP/TLS/FPM table. The PostgreSQL additions are listed separately above. These counts describe included patch contents in enabled components, not the number of regression tests or complete post-EOL coverage.
 
 PHP 5.6 release-note evidence is in the [frozen published NEWS](https://github.com/shivammathur/php-src-backports/blob/989262e3e9dcca7642b644a75d209c5b7740e294/NEWS). Later changes use the [native PHP 5.6 maintenance archive](https://deb.freexian.com/extended-lts/pool/main/p/php5/php5_5.6.40%2Bdfsg-0%2Bdeb8u23.debian.tar.xz) and published ports. PHP 7.0 IDs follow the selected patch filenames and headers from the [PHP 7.0 maintenance archive](https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz). The [PHP 5.6 provenance](patches/5.6.40/provenance.json) and [PHP 7.0 provenance](patches/7.0.33/provenance.json) record the selected sources; patch headers retain upstream links.
 
-| Component | PHP 5.6.40 additional IDs | PHP 7.0.33 additional IDs |
+| Component | Fixed in PHP 5.6.40 | Fixed in PHP 7.0.33 |
 | --- | --- | --- |
 | FPM | CVE-2019-11043, CVE-2026-6735 | CVE-2019-11043, CVE-2026-6735 |
-| SOAP | CVE-2021-21702, CVE-2023-3247, CVE-2026-7261, CVE-2026-7262 | CVE-2021-21702, CVE-2023-3247, CVE-2025-6491, CVE-2026-7261, CVE-2026-7262 |
+| SOAP | CVE-2021-21702, CVE-2026-7261, CVE-2026-7262 | CVE-2021-21702, CVE-2025-6491, CVE-2026-7261, CVE-2026-7262 |
 | mysqlnd | CVE-2022-31626 | CVE-2022-31626 |
 | Phar | CVE-2020-7063, CVE-2020-7068, CVE-2022-31628, CVE-2026-7260 | CVE-2019-9021, CVE-2020-7063, CVE-2020-7068, CVE-2022-31628, CVE-2026-7260 |
 | EXIF | CVE-2019-11034, CVE-2019-11035, CVE-2019-11036, CVE-2019-11040, CVE-2019-11041, CVE-2019-11042, CVE-2019-11047, CVE-2019-11050, CVE-2020-7064 | CVE-2019-11034, CVE-2019-11035, CVE-2019-11036, CVE-2019-11040, CVE-2019-11041, CVE-2019-11042, CVE-2019-11047, CVE-2019-11050, CVE-2020-7064 |
 | GD | CVE-2019-11038, CVE-2026-9672 | CVE-2019-11038, CVE-2026-9672 |
 | mbstring / Oniguruma | CVE-2019-13224, CVE-2020-7060 | CVE-2019-13224, CVE-2019-9023, CVE-2020-7060 |
-| Fileinfo | вЂ” | CVE-2019-18218 |
+| Fileinfo | — | CVE-2019-18218 |
 | Bcmath | CVE-2019-11046 | CVE-2019-11046 |
 | Iconv | CVE-2019-11039 | CVE-2019-11039 |
 | SPL | CVE-2019-11045 | CVE-2019-11045 |
@@ -148,12 +431,12 @@ PHP 5.6 release-note evidence is in the [frozen published NEWS](https://github.c
 | Passwords | CVE-2023-0567, CVE-2024-3096 | CVE-2023-0567, CVE-2024-3096 |
 | Cookies / request input | CVE-2020-7070, CVE-2022-31629, CVE-2024-2756, CVE-2024-8925 | CVE-2020-7070, CVE-2022-31629, CVE-2024-2756, CVE-2024-8925 |
 | Multipart / session | CVE-2019-11048, CVE-2020-7062, CVE-2023-0662 | CVE-2019-11048, CVE-2020-7062, CVE-2023-0662 |
-| Streams / HTTP / DNS | CVE-2020-7066, CVE-2024-11233, CVE-2024-11234, CVE-2025-1220, CVE-2025-1736 | CVE-2019-9022, CVE-2020-7066, CVE-2024-11233, CVE-2024-11234, CVE-2025-1220, CVE-2025-1736 |
+| Streams / HTTP / DNS | CVE-2020-7066, CVE-2024-11233, CVE-2024-11234, CVE-2025-1736 | CVE-2019-9022, CVE-2020-7066, CVE-2024-11233, CVE-2024-11234, CVE-2025-1736 |
 | Standard string routines | CVE-2020-7059, CVE-2020-7067 | CVE-2020-7059, CVE-2020-7067, CVE-2026-7568 |
 | Core / enabled extensions | CVE-2026-7258 | CVE-2026-7258 |
 | OpenSSL | CVE-2026-14355 | CVE-2026-14355 |
 
-PHP 5.6's native HTTP additions include [CVE-2025-1219](https://github.com/php/php-src/commit/b6004a043c16b211d462218fbb3f72db68ec2b18) and [CVE-2025-1736](https://github.com/php/php-src/commit/41d49abbd99dab06cdae4834db664435f8177174). Its additional recent ports are [CVE-2025-1220](https://github.com/php/php-src/commit/cac8f7f1cf4939f55f06b68120040f057682d89c), [CVE-2026-7260](https://github.com/php/php-src/commit/2e0fa0a44441d74bf8cc4e1ce1c8af9cd4209f52), [CVE-2026-9672](https://github.com/php/php-src/commit/fcd691b377d02285740744bee17c0f298be227d5), and [CVE-2026-7258](https://github.com/php/php-src/commit/8bdee7e4c6f4e92f9e89841d53855d9ffbdbfe54).
+PHP 5.6's native HTTP additions include [CVE-2025-1219](https://github.com/php/php-src/commit/b6004a043c16b211d462218fbb3f72db68ec2b18) and [CVE-2025-1736](https://github.com/php/php-src/commit/41d49abbd99dab06cdae4834db664435f8177174). Its additional recent ports are [CVE-2026-7260](https://github.com/php/php-src/commit/2e0fa0a44441d74bf8cc4e1ce1c8af9cd4209f52), [CVE-2026-9672](https://github.com/php/php-src/commit/fcd691b377d02285740744bee17c0f298be227d5), and [CVE-2026-7258](https://github.com/php/php-src/commit/8bdee7e4c6f4e92f9e89841d53855d9ffbdbfe54).
 
 Inventory limits and exclusions:
 
