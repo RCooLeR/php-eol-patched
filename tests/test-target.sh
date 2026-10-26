@@ -8,6 +8,12 @@ if [ "$version" = 7.4.33 ]; then bash /tests/batch2-cli-server.sh; fi
 php -n /tests/published-fpm-acl.php
 php -n /tests/published-fpm-status.php
 case "$version" in
+    7.1.33|7.2.34|7.3.33)
+        php -n /tests/published-highbit-controls.php
+        php "${php_args[@]}" /tests/published-ctype-controls.php
+        ;;
+esac
+case "$version" in
     7.4.33|8.0.30|8.1.34)
         php -n /tests/published-fpm-flush.php
         php -n /tests/published-highbit-controls.php
