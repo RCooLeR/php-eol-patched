@@ -4,8 +4,9 @@ This page states which CVEs are fixed in this repository's PHP images. The same
 status applies to the minimal and Debian variants. Short version numbers refer
 to the pinned releases listed in [README.md](README.md).
 
-**Fixed** includes both repository backports and fixes already in the official
-PHP release. **Not fixed** means the fix is missing from the listed builds.
+**Fixed** includes repository backports, fixes already in the official PHP
+release, and dependency fixes identified by verified package versions.
+**Not fixed** means the fix is missing from the listed builds.
 **Not affected** means the reported issue does not apply to the listed version or build.
 **Mitigated** does not mean fully fixed. Versions not listed for a CVE are not
 assessed by that row. This is selected CVE coverage, not complete EOL support.
@@ -18,10 +19,9 @@ the migration period; passing repository tests cannot guarantee every applicatio
 
 | CVE | Not fixed in | Fixed in |
 | --- | --- | --- |
-| CVE-2023-3247 | **7.1–7.4** | Published fix included in 5.6, 7.0, 8.0, 8.1; residual nonce observation below |
-| CVE-2024-2408 | **5.6–8.0** | No dependency fix verified |
+| CVE-2023-3247 | **7.1–7.4**; candidate backports failed the compressed-request failure test | Published fix included in 5.6, 7.0, 8.0, 8.1; limitations below |
+| CVE-2024-2408 | **5.6–7.1, 8.1** | **7.2–8.0 via OpenSSL**, according to Debian's fixed-package criteria |
 | CVE-2025-1220 | **7.1–8.0; persistent-socket gap (see below)** | No complete fix claimed |
-| CVE-2026-7258 | **7.1–7.3** | 5.6, 7.0, 7.4–8.1 |
 
 These remaining gaps require a compatible backport, a dependency repair or a
 published follow-up that covers the remaining path. The two critical EOL
@@ -182,7 +182,8 @@ checks unsupported encoding rejection and preservation of ordinary regex state.
 PHP 7.4/8.0/8.1 use the complete published branch-native CVE-2026-7258 changes,
 apart from an already-applied unsigned-character check. High-bit URL and string
 controls run on these Linux/glibc images. The reported platform-dependent crash
-is not reproduced here; no NetBSD validation is claimed. PHP 7.1–7.3 remain open.
+is not reproduced here; no NetBSD validation is claimed. PHP 7.1–7.3 use ports of
+the applicable published changes, with older-code limitations described below.
 
 </details>
 
@@ -193,6 +194,7 @@ PHP 5.6/7.0 coverage is listed separately below; missing branches are listed at 
 
 | CVE | Status | PHP builds |
 | --- | --- | --- |
+| CVE-2026-7258 | **Fixed (published repair; see scope below)** | All eight builds |
 | CVE-2019-11045 | **Fixed** | 7.1 |
 | CVE-2019-11046 | **Fixed** | 7.1 |
 | CVE-2019-11047 | **Fixed** | 7.1 |
@@ -230,31 +232,65 @@ Cookie and multipart payloads run through FPM, since these images do not include
 The SOAP QName and metaphone regressions exceed 2 GiB and run separately using
 [the documented large-test command](tests/README.md).
 
-- **CVE-2023-3247:** Additional PHP 7.1–7.4 backports are skipped. The
+- **CVE-2023-3247:** Additional PHP 7.1–7.4 backports are skipped after local
+  testing. The native published backports, with the
+  [hash-header prerequisite](https://github.com/php/php-src/commit/32c7c433ac1983c4497349051681a4f361d3d33e),
+  built and passed ordinary Digest, Basic and no-auth exchanges, blocked
+  authenticated requests when random generation failed, and allowed client reuse
+  after entropy was restored. However, repeated failures with compressed requests
+  retained request buffers until PHP request shutdown. The candidates were removed
+  under this repository's policy of skipping medium-severity backports that
+  introduce a compatibility regression. No published cleanup follow-up was found
+  in this limited check. The
   [published patch](https://github.com/php/php-src/commit/ac4254ad764c70cb1f05c9270d8d12689fc3aeb6)
-  checks random-generation failure and enlarges the generated nonce. However,
+  does repair the randomness-error check; this is separate from the observation that
   current SOAP HTTP Digest code in all eight builds still hashes and sends only
   eight hexadecimal nonce characters, limiting the effective nonce to at most
-  32 bits. No published follow-up was found in this limited check. Existing
-  upstream/native changes remain in place. Upstream officially lists its releases
+  32 bits. Existing upstream/native changes remain in place. Upstream lists its releases
   as patched in [the advisory](https://github.com/php/php-src/security/advisories/GHSA-76gg-c692-v2mw).
   The nonce-length limitation is this repository's observation, not a separate
   upstream CVE or a change to upstream's fix classification.
-- **CVE-2024-2408:** No PHP-only fix is applied. Mitigation depends on an OpenSSL
-  build with implicit rejection; that property is not verified for the old image
-  libraries. See [PHP's guidance](https://www.php.net/ChangeLog-8.php#8.1.29) and
-  [the advisory](https://github.com/php/php-src/security/advisories/GHSA-hh26-4ppw-5864).
+- **CVE-2024-2408:** The fix depends on OpenSSL, not a PHP source patch. Exact
+  library package records and loaded-library hashes were checked in both image
+  variants. PHP 7.2–8.0 meet [Debian's published fixed-package criteria](https://security-tracker.debian.org/tracker/CVE-2024-2408);
+  this classification does not claim an independent timing-attack proof.
+  PHP 5.6–7.1 and 8.1 retain dependency gaps; the PHP 8.1 release number alone
+  does not fix its Bookworm OpenSSL dependency. See the package table below and
+  [PHP's guidance](https://www.php.net/ChangeLog-8.php#8.1.29).
 - **CVE-2025-1220:** Additional backports are skipped. The
   [published hostname fix](https://github.com/php/php-src/commit/cac8f7f1cf4939f55f06b68120040f057682d89c)
   still permits NUL-truncated persistent-socket reuse before hostname validation;
   a local regression reproduced this on PHP 7.1. Existing PHP 5.6/7.0 maintenance
   patches remain, but complete coverage is not claimed. The ordinary new-connection
-  tests alone do not verify this reuse path.
-- **CVE-2026-7258:** PHP 7.1–7.3 still need compatible versions of the broad
-  signed-character change. Published native patches are included for
+  tests alone do not verify this reuse path. The available native
+  [7.4](https://github.com/remicollet/php-src-security/commit/d407d8a8735ebf43bee3e6b49fb013b8aa4b6bfc)
+  and [8.0](https://github.com/remicollet/php-src-security/commit/36150278addd8686a9899559241296094bd57282)
+  patches are also omitted here: they leave the same reuse path unchanged.
+- **CVE-2026-7258:** PHP 7.1–7.3 include ports of the applicable published
+  unsigned-character conversions, including the reported URL-decoding path.
+  Adaptations preserve older formatting parsers, URL user information and FPM
+  path allowlists. The published change is not an exhaustive cleanup of older
+  code: tag parsing still has a signed-character case conversion outside its
+  hunks, including in the PHP 7.4 native patch. This separate observation does
+  not change upstream's classification of the reported URL-decoding fix.
+  Linux/glibc compatibility controls do not reproduce the NetBSD crash or
+  establish behavior on untested platforms and locales.
+  Native published sources include
   [7.4](https://github.com/remicollet/php-src-security/commit/b44c4c80d8a76d7df32985e4bbadb12c985d6a22),
   [8.0](https://github.com/remicollet/php-src-security/commit/30de2f8492a06ebcf1659307f1f049e2799c7f21) and
   [8.1](https://github.com/remicollet/php-src-security/commit/07e5a9263314fd9a2a4479661353704e00dd8d0c).
+
+The OpenSSL package classification applies to RSA PKCS#1 v1.5 private decryption:
+
+| PHP builds | Linked library package in both variants | CVE-2024-2408 status |
+| --- | --- | --- |
+| 5.6–7.1 (Stretch) | `libssl1.1 1.1.0l-1~deb9u6` | **Not fixed** |
+| 7.2–7.4 (Buster) | `libssl1.1 1.1.1n-0+deb10u6` | **Fixed via OpenSSL**; exceeds Debian's `1.1.1n-0+deb10u4` threshold |
+| 8.0 (Bullseye) | `libssl1.1 1.1.1w-0+deb11u8` | **Fixed via OpenSSL**; exceeds Debian's `1.1.1n-0+deb11u4` threshold |
+| 8.1 (Bookworm) | `libssl3 3.0.22-1~deb12u1` | **Not fixed**; Debian reports the required support is absent |
+
+Images record package versions in `/usr/share/php-eol-patched/runtime-packages.tsv`.
+Replacing linked libraries requires reassessing this status.
 
 Published sources for the added fixes:
 
