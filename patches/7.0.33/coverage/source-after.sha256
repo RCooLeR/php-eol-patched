@@ -1,4 +1,6 @@
+c61464031374e292ea171d15214fd1302f0d5e4368bbb49b6262ab7011cf2fe8  ext/gd/libgd/gd_color.c
 a6a0fcb3bd5523275a65f7d01fb7fa46ab915447fca5a84081c05a039ccc3d37  ext/gd/libgd/gd_interpolation.c
 c72884a6166b6c8d82295b56e8822186884a5f454c3bc4bffbeb3396522b5d40  ext/gd/tests/bug77269.phpt
+552830c56d415a1af29ca78f1a7694fbb2fba0aa8aba935cd258159600c7355c  ext/gd/tests/bug77270.phpt
 efea02415fd6808990ee66b01f6af6b76706872f485b88ceec8e921b092b6950  ext/phar/tests/tar/coverage-symlink-controls.phpt
 b5a572a671ceac0a375ffeded14d08a9f708c335b6c1b0353eb0250f86f6d4c3  ext/phar/util.c

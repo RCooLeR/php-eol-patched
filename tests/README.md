@@ -1,5 +1,76 @@
 # Tests
 
+Check ordinary application behavior alongside the published failure cases. If a
+low- or medium-severity backport introduces a compatibility regression, omit it
+and record the remaining gap in [PATCHES.md](../PATCHES.md). Applications still
+need their own tests and staging checks before adopting an image.
+
+The further published-CVE tests cover DirectoryIterator paths, BCMath and EXIF
+parsing, Phar permissions and compressed archives, AES-CCM vectors, password and
+URL validation, XML redirects and session-persistent SOAP
+objects. Native fixture overrides preserve the rejection checks while adapting
+older PHP syntax or diagnostics. XML fixtures retain the full expected document
+and the original published whitespace expectations; PHP 8.0 HTTP fixtures expect its
+native HTTP/1.1 request line. PHP 7.4 also checks immediate rejection of an
+overflowing CLI worker count and ordinary operation with two workers.
+
+Published cookie-prefix and multipart-boundary payloads run through FPM on every
+branch. They retain ordinary cookies and fields as controls.
+
+The QName and metaphone cases need large inputs. After building a matching test
+image, run this separately for each PHP 7.1–8.1 release, one at a time:
+
+```sh
+docker run --rm --network none --memory 8g --memory-swap 8g --cpus 2 \
+  --user 33:33 --entrypoint /bin/bash php-eol-patched:7.1.33-test \
+  /tests/batch2-large.sh 7.1.33
+```
+
+These tests are excluded from the default 2 GiB test container and default CI.
+The command requires successful execution; skips fail. PHP 8.1 runs the newly
+backported metaphone regression; its QName fix is already in the base release.
+
+Additional coverage lists select the published GD color-match, SOAP null-name,
+quoted-printable, proxy CR/LF and array-size regressions where their patches are
+included. Ordinary array merging, recursive merging and filter decoding provide
+compatibility controls. The FPM status probe checks HTML and XML escaping plus
+an ordinary concurrent response on every release. FPM tests send three uploads against a one-upload
+limit and require one warning while preserving an ordinary form field.
+The PHP 8.0 proxy-test override changes only the diagnostic capitalization
+(`Failed to open stream`); the rejection payload and assertions are preserved.
+
+The final-pass tests add Phar ZIP parsing, SOAP Apache maps, mbregex encoding
+rejection/state preservation, and exact FPM worker-log bytes across split flush
+markers. PHP 7.1/7.2 quoted-printable tests include the published flush-path
+prerequisite; their HTTP tests include the published header-parser prerequisites.
+PHP 7.4/8.0/8.1 also check high-bit URL inputs and ordinary string operations.
+Those Linux/glibc checks do not reproduce the platform-dependent NetBSD crash.
+
+PHP 7.1–7.3 compile the actual mysqlnd authentication writer with guarded reusable
+and allocated buffers, checking twelve payload lengths and the packet header.
+PHP 7.1–7.4 check maximum-length working-directory XML parsing and ordinary
+open_basedir restrictions. Published libxml global-state cases use a small
+test-only extension; positive controls verify explicit parser options and global
+state restoration. The helper is compiled only inside the test container.
+Resetting libxml parser defaults also restores whitespace in the HTML redirect
+fixtures on PHP 7.1–7.4; serialized HTML can therefore differ from the earlier
+builds even when the document content is unchanged.
+
+The PHP 7.1 upload regression streams a field larger than 2 GiB after an uploaded
+file and verifies both the response and temporary-file cleanup. Run it separately
+with sufficient memory; it is excluded from the default 2 GiB CI container:
+
+```sh
+docker run --rm --network none --memory 8g --memory-swap 8g --cpus 2 \
+  --user 33:33 --entrypoint /bin/bash php-eol-patched:7.1.33-test \
+  /tests/published-upload-large.sh
+```
+
+The quoted-printable PHPT checks the published input and output. A normal build
+is not a memory-sanitizer proof against every invalid read; source inspection
+confirms the bound check precedes the affected dereference. No broad sanitizer
+or full extension audit is implied by these tests.
+
 The runtime checks use the image's default FPM configuration, verify installed
 extensions and pinned PECL versions, and exercise local extension operations.
 PostgreSQL controls also use a disposable server to exercise real database
@@ -113,5 +184,7 @@ The PHP 5.6/7.0 lists also omit three published cases whose prerequisites are
 absent: AES-WRAP-PAD is unavailable through their OpenSSL call path, SQLite's
 defensive mode requires SQLite 3.26 or newer, and the upstream tar symlink test
 is unconditionally skipped for PHP bug 65332. These omissions are not passing
-tests. The published FPM status payload runs through the shared FastCGI probe
-because the older FPM test helpers have incompatible response APIs.
+tests. On all eight versions, the published FPM status payload runs through the
+shared FastCGI probe, with HTML and XML escaping checks and an ordinary response
+control. It is not duplicated in the PHPT lists because the older FPM test
+helpers have incompatible response APIs.

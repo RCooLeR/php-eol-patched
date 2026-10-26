@@ -90,6 +90,629 @@
         "ext/pdo_sqlite/sqlite_driver.c",
         "ext/pdo_sqlite/tests/bug81740.phpt"
       ]
+    },
+    {
+      "file": "soap-CVE-2021-21702.patch",
+      "sources": [
+        "https://github.com/php/php-src/commit/3c939e3f69955d087e0bb671868f7267dfb2a502"
+      ],
+      "adaptation": null,
+      "sha256": "e2dc2b893708dd3166b9186337eb8d4f34268eb3f6487ce81f2f74a30ba4c781",
+      "paths": [
+        "ext/soap/php_sdl.c",
+        "ext/soap/php_xml.c",
+        "ext/soap/tests/bug80672.phpt",
+        "ext/soap/tests/bug80672.xml"
+      ]
+    },
+    {
+      "file": "multipart-CVE-2023-0662-followup.patch",
+      "sources": [
+        "https://github.com/php/php-src/commit/e45850c195dcd5534394cf357a3f776d4916b655"
+      ],
+      "adaptation": null,
+      "sha256": "9ae3bba763db31c9df8ca419bd46ba175bdd32bc8c0691087e87a043aa81c635",
+      "paths": [
+        "main/rfc1867.c"
+      ]
+    },
+    {
+      "file": "fpm-CVE-2026-6735.patch",
+      "sources": [
+        "https://github.com/php/php-src/commit/13e72d1c97f72892421b04e8c5c05bc9bb193457"
+      ],
+      "adaptation": null,
+      "sha256": "e4c7d1e42491e4ebc19d667a9defae0666c7925b3b0dcfd30e6580a05f0cc4f6",
+      "paths": [
+        "sapi/fpm/fpm/fpm_status.c",
+        "sapi/fpm/tests/ghsa-7qg2-v9fj-4mwv-status-xss.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2019-11045.patch",
+      "sha256": "28b99ed57d7a14b03db9382469018d338c90e0a5c2004954561dba6feb451f1e",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/spl/spl_directory.c",
+        "ext/spl/tests/bug78863.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2019-11046.patch",
+      "sha256": "1f6f9c2e6ba02a8cfd8a032be7cbf96a49a09b4b85c4c01a0527782f7aaff9c7",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/bcmath/libbcmath/src/str2num.c",
+        "ext/bcmath/tests/bug78878.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2019-11047-01.patch",
+      "sha256": "da597e5bea3f116a381e946ffa035aff7e97179a98c894ca681c67ecad7ce39f",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/exif/exif.c",
+        "ext/exif/tests/bug78910.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2019-11047-02.patch",
+      "sha256": "a611968079369ea6e9ffa427a2ae0bbf2513039527e52c85fab936c3ef8a1887",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/exif/tests/bug78910.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2019-11050.patch",
+      "sha256": "cda3b1fcf9af15949ad985b318946aecd2aa47ec635ed083a9371290f3ad1fa3",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/exif/exif.c",
+        "ext/exif/tests/bug78793.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2020-7063.patch",
+      "sha256": "046107b2b3b96d5ecf5ab99a5e49c7841086e00d041faaf12fe63180cc66d9e1",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/phar/phar_object.c",
+        "ext/phar/tests/bug79082.phpt",
+        "ext/phar/tests/test79082/test79082-testfile",
+        "ext/phar/tests/test79082/test79082-testfile2"
+      ]
+    },
+    {
+      "file": "CVE-2020-7064-01.patch",
+      "sha256": "c87c7efd60ce6db9af6173f700f7eac1807c9fbb1f65f6162ac45ece4c2b73e1",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/exif/exif.c",
+        "ext/exif/tests/bug79282.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2020-7064-02.patch",
+      "sha256": "ce6fa9981b2eae82be824a5ae9df2288a4832b824a8b1cee71f7164ae23c7774",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/exif/tests/bug79282.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2020-7064-03.patch",
+      "sha256": "ff1325a3296141f58c0fe4ef747600816b888f4090cb8cd76dd12a84426e00c8",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/exif/tests/bug79282.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2020-7069.patch",
+      "sha256": "2852fde485e10e3d1a29175283c13d3816922220abdb0717336ec45bb3f770ad",
+      "sources": [
+        "https://github.com/php/php-src/commit/0216630ea2815a5789a24279a1211ac398d4de79"
+      ],
+      "adaptation": "Retain the source fix and updated cipher vectors/decryption regression. The encryption PHPT expected-output context differs on PHP 7.1; a native encryption round-trip control is selected separately.",
+      "paths": [
+        "ext/openssl/openssl.c",
+        "ext/openssl/tests/cipher_tests.inc",
+        "ext/openssl/tests/openssl_decrypt_ccm.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2020-7070.patch",
+      "sha256": "daad19244f36ee3a8224d69570d4584ca8257a11bafa248613eed08d5dd93773",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz",
+        "https://github.com/php/php-src/commit/6559fe912661ca5ce5f0eeeb591d928451428ed0"
+      ],
+      "adaptation": null,
+      "paths": [
+        "main/php_variables.c",
+        "tests/basic/022.phpt",
+        "tests/basic/023.phpt",
+        "tests/basic/bug79699.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2020-7071.patch",
+      "sha256": "51bae3360155dff0c2fc4b33e9b81dfab45b0ae13bae1c2191c59dac58aa1b7e",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz",
+        "https://github.com/php/php-src/commit/2d3d72412a6734e19a38ed10f385227a6238e4a6",
+        "https://github.com/php/php-src/commit/4a89e726bd4d0571991dc22a9a1ad4509e8fe347",
+        "https://github.com/php/php-src/commit/9c673083cd46ee2a954a62156acbe4b6e657c048",
+        "https://github.com/php/php-src/commit/5174de7cd33c3d4fa591c9c93859ff9989b07e8c"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/filter/logical_filters.c",
+        "ext/filter/tests/bug77423.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2021-21705.patch",
+      "sha256": "5e7b01887d9069c57a1e80e1728ed65d38fbf86de36b95099bae20dd62e55d95",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz",
+        "https://github.com/php/php-src/commit/a5538c62293fa782fcc382d0635cfc0c8b9190e3",
+        "https://github.com/php/php-src/commit/190013787bbc424c240413d914e3a038f974ccef"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/filter/logical_filters.c",
+        "ext/filter/tests/bug81122.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2021-21707.patch",
+      "sha256": "88b6a9890340d2076139457d817bc5dae9007f4a81da0e9c55c4216ec4d7ae05",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz",
+        "https://github.com/php/php-src/commit/f15f8fc573eb38c3c73e23e0930063a6f6409ed4"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/dom/domimplementation.c",
+        "ext/dom/tests/bug79971_2.phpt",
+        "ext/libxml/libxml.c",
+        "ext/simplexml/tests/bug79971_1.phpt",
+        "ext/simplexml/tests/bug79971_1.xml"
+      ]
+    },
+    {
+      "file": "CVE-2022-31628-01.patch",
+      "sha256": "0ec5683b044d9f1c8bf130fdc5e29febbb5240e2c9e6b46963a363de87e8664b",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz",
+        "https://github.com/php/php-src/commit/404e8bdb68350931176a5bdc86fc417b34fb583d"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/phar/phar.c"
+      ]
+    },
+    {
+      "file": "CVE-2022-31628-02.patch",
+      "sha256": "c7a80ac2e108395fa3d4dfe8fcc91d22f517e529bd19310a32e59ae93fa4fa58",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz",
+        "https://github.com/php/php-src/commit/432bf196d59bcb661fcf9cb7029cea9b43f490af"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/phar/phar.c"
+      ]
+    },
+    {
+      "file": "CVE-2022-31628-03.patch",
+      "sha256": "c8a24e582ade82a724934acf70676721b367298d67eda94f54b5ec26a040c5e7",
+      "sources": [
+        "https://github.com/php/php-src/commit/404e8bdb68350931176a5bdc86fc417b34fb583d"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/phar/tests/bug81726.gz",
+        "ext/phar/tests/bug81726.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2022-31629.patch",
+      "sha256": "e06e2d4a066155f8b4c22a45f872057f9448a3a4daee5c64b8569fe2791573e1",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz",
+        "https://github.com/php/php-src/commit/0611be4e82887cee0de6c4cbae320d34eec946ca"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/standard/tests/bug81727.phpt",
+        "main/php_variables.c"
+      ]
+    },
+    {
+      "file": "CVE-2023-0567-01.patch",
+      "sha256": "a5b2342eb5cf418a0e32bb82fcafe5a04e986bcd834c6868deb6f316e3ebb478",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.3/php7.3_7.3.31-1~deb10u16.debian.tar.xz",
+        "https://github.com/php/php-src/commit/c840f71524067aa474c00c3eacfb83bd860bfc8a"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/standard/crypt_blowfish.c",
+        "ext/standard/tests/crypt/bcrypt_salt_dollar.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2023-0567-02.patch",
+      "sha256": "c8faef5a0fe2d7ee16655683c6f8ae4dcd1294a38a62d6a8205d0ecd33dad310",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.3/php7.3_7.3.31-1~deb10u16.debian.tar.xz",
+        "https://github.com/php/php-src/commit/a92acbad873a05470af1a47cb785a18eadd827b5"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/standard/crypt.c",
+        "ext/standard/tests/password/password_bcrypt_short.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2024-3096.patch",
+      "sha256": "a4a6a8d36bd4072c800b6089f43d995cafbedae9237670c2fa555127e5f851c3",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz",
+        "https://github.com/php/php-src/security/advisories/GHSA-h746-cjrr-wfmr",
+        "https://github.com/php/php-src/commit/0ba5229a3f7572846e91c8f5382e87785f543826"
+      ],
+      "adaptation": "Select the published native source change; NUL and ordinary-password cases are exercised by batch2-controls.phpt.",
+      "paths": [
+        "ext/standard/password.c"
+      ]
+    },
+    {
+      "file": "CVE-2024-8925.patch",
+      "sha256": "c6b46ae1e3bc540fe3bda9f7d81823e4f806b467f02c03fa808b269b9eed1971",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.3/php7.3_7.3.31-1~deb10u16.debian.tar.xz",
+        "https://github.com/php/php-src/commit/19b49258d0c5a61398d395d8afde1123e8d161e0",
+        "https://github.com/php/php-src/security/advisories/GHSA-9pqp-7h25-4f32"
+      ],
+      "adaptation": null,
+      "paths": [
+        "main/rfc1867.c",
+        "tests/basic/GHSA-9pqp-7h25-4f32.inc",
+        "tests/basic/GHSA-9pqp-7h25-4f32.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2024-2756.patch",
+      "sha256": "84c5bd881a39c9540c4997d3d72c07050df86e9bd34c90b88daa2c3702c837f6",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz",
+        "https://github.com/php/php-src/security/advisories/GHSA-wpj3-hf5j-x4v4",
+        "https://github.com/php/php-src/commit/093c08af25fb323efa0c8e6154aa9fdeae3d3b53"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/standard/tests/ghsa-wpj3-hf5j-x4v4.phpt",
+        "main/php_variables.c"
+      ]
+    },
+    {
+      "file": "CVE-2024-5458.patch",
+      "sha256": "163395c9fba5a0957ce13d5e01511f2b5b03d6a048b1829f98c4c640b677e516",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/filter/logical_filters.c",
+        "ext/filter/tests/ghsa-w8qr-v226-r27w.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2020-7066.patch",
+      "sha256": "84302f090f95e4451518a8d1a1c75e410bfee00de6e4592ee3b6b7181bc05b17",
+      "sources": [
+        "https://github.com/php/php-src/commit/0d139c5b94a5f485a66901919e51faddb0371c43"
+      ],
+      "adaptation": "Retain the PHP 7.1 optional stream-context argument while changing the URL parser to the published path validation type.",
+      "paths": [
+        "ext/standard/url.c"
+      ]
+    },
+    {
+      "file": "CVE-2025-1219-01.patch",
+      "sha256": "0cf438dc6f534f151d114e854b0be6d76fdf39f18743159eefc96c1545a78aae",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz",
+        "https://github.com/php/php-src/commit/f901bec494ae921f36e1066e4380b92888757f0f"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/libxml/libxml.c",
+        "ext/libxml/tests/bug51903.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2025-1219-02.patch",
+      "sha256": "55f5df4ff1644e3f3178bf34f6631e545217f7dc421fc70aeea1531817df553c",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz",
+        "https://github.com/php/php-src/commit/b6004a043c16b211d462218fbb3f72db68ec2b18",
+        "https://github.com/php/php-src/security/advisories/GHSA-p3x9-6h7p-cgfc"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/dom/tests/ghsa-p3x9-6h7p-cgfc_001.phpt",
+        "ext/dom/tests/ghsa-p3x9-6h7p-cgfc_002.phpt",
+        "ext/dom/tests/ghsa-p3x9-6h7p-cgfc_003.phpt",
+        "ext/libxml/libxml.c"
+      ]
+    },
+    {
+      "file": "CVE-2025-6491.patch",
+      "sha256": "d7eccfbc9f2c914c017899aa3199e5386e4d06277976de9092467e696baf61f4",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.3/php7.3_7.3.31-1~deb10u16.debian.tar.xz",
+        "https://github.com/php/php-src/commit/9cb3d8d200f0c822b17bda35a2a67a97b039d3e1",
+        "https://github.com/php/php-src/security/advisories/GHSA-453j-q27h-5p8x"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/soap/soap.c",
+        "ext/soap/tests/soap_qname_crash.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2026-7261.patch",
+      "sha256": "d467afecb323d6ce2511d6dbd7de3385bd9dbf52f34d5615afc10cb232f11af6",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.3/php7.3_7.3.31-1~deb10u16.debian.tar.xz",
+        "https://github.com/php/php-src/commit/b9f81deadfda4df332fd75e20c03b3812038cd3f",
+        "https://github.com/php/php-src/security/advisories/GHSA-m33r-qmcv-p97q"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/soap/soap.c",
+        "ext/soap/tests/GHSA-m33r-qmcv-p97q.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2026-7568.patch",
+      "sha256": "c06d0bff6e6a7d53344c0d484c120e954f8b52ff0d78d19aca2a334b5d447eb5",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.3/php7.3_7.3.31-1~deb10u16.debian.tar.xz",
+        "https://github.com/php/php-src/commit/dd77cfefa7fb457ddbfa2adab0f2bf2b0d1731c1",
+        "https://github.com/php/php-src/security/advisories/GHSA-96wq-48vp-hh57"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/standard/metaphone.c",
+        "ext/standard/tests/GHSA-96wq-48vp-hh57.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2022-31626.patch",
+      "sha256": "c779dc02382b3588900c3096c5adb2fdd0ce3664da75ce5149904b34790b3f25",
+      "sources": [
+        "https://github.com/php/php-src/commit/58006537fc5f133ae8549efe5118cde418b3ace9",
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.3/php7.3_7.3.31-1~deb10u16.debian.tar.xz"
+      ],
+      "adaptation": "Only hunk context follows native packet-header fields rather than connection fields. Runtime change is byte-identical to the published PHP 7.3 backport.",
+      "paths": [
+        "ext/mysqlnd/mysqlnd_wireprotocol.c"
+      ]
+    },
+    {
+      "file": "CVE-2023-0568.patch",
+      "sha256": "3cee7f5e6cdc1a9d393c16a4aaca374355ca71d22ef110b67236f5d398d7710c",
+      "sources": [
+        "https://github.com/php/php-src/commit/ec10b28d64decbc54aa1e585dce580f0bd7a5953",
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/dom/document.c",
+        "ext/xmlreader/php_xmlreader.c",
+        "main/fopen_wrappers.c"
+      ]
+    },
+    {
+      "file": "CVE-2023-3823.patch",
+      "sha256": "271bea06e64297507bb5c2f961f21be11ae2ad12fafa80f90784aa9fe9c4c17a",
+      "sources": [
+        "https://github.com/php/php-src/commit/c283c3ab0ba45d21b2b8745c1f9c7cbfe771c975",
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.3/php7.3_7.3.31-1~deb10u16.debian.tar.xz",
+        "https://github.com/php/php-src/commit/62228a2568505d700d9069d187338c8cd270c178"
+      ],
+      "adaptation": "Omit the zend_test build changes; a test-only bridge exposes the unchanged published override helper. XSL hunk context includes the existing std_hnd local.",
+      "paths": [
+        "ext/dom/document.c",
+        "ext/dom/documentfragment.c",
+        "ext/dom/tests/libxml_global_state_entity_loader_bypass.phpt",
+        "ext/libxml/php_libxml.h",
+        "ext/simplexml/simplexml.c",
+        "ext/simplexml/tests/libxml_global_state_entity_loader_bypass.phpt",
+        "ext/soap/php_xml.c",
+        "ext/xml/compat.c",
+        "ext/xmlreader/php_xmlreader.c",
+        "ext/xmlreader/tests/libxml_global_state_entity_loader_bypass.phpt",
+        "ext/xsl/xsltprocessor.c"
+      ]
+    },
+    {
+      "file": "CVE-2024-11233-01.patch",
+      "sha256": "f92eb3674b92bce3a6632aa1f0634f934b3d3b702f3e25575a141006cb68a1a0",
+      "sources": [
+        "https://github.com/php/php-src/commit/12c59f6660706321f9d42c55421ff6864439c8b7",
+        "https://github.com/php/php-src/commit/a6c84cd7efd7eaaaefd4463412508df570d35358",
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz"
+      ],
+      "adaptation": "Published bug74267 prerequisite removes incorrect lb counters from NULL flush guards, fixing exact old-version crash mechanism. NEWS omitted; all source/test changes byte-exact. Full pair applies --fuzz=0 on both images; runtime tests not run.",
+      "paths": [
+        "ext/standard/filters.c",
+        "ext/standard/tests/filters/bug74267.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2024-11233-02.patch",
+      "sha256": "bbad9875a768b0a4c91697dc20ad3a415160dc42a1fb7f81d5793c5e43a7a706",
+      "sources": [
+        "https://github.com/php/php-src/commit/12c59f6660706321f9d42c55421ff6864439c8b7",
+        "https://github.com/php/php-src/commit/a6c84cd7efd7eaaaefd4463412508df570d35358",
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz"
+      ],
+      "adaptation": "Published bug74267 prerequisite removes incorrect lb counters from NULL flush guards, fixing exact old-version crash mechanism. NEWS omitted; all source/test changes byte-exact. Full pair applies --fuzz=0 on both images; runtime tests not run.",
+      "paths": [
+        "ext/standard/filters.c",
+        "ext/standard/tests/filters/ghsa-r977-prxv-hc43.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2024-11234.patch",
+      "sha256": "5caaf402c4a1d249abb02bf172067600ba7dd3f5aa2e811d7e54f12813e64948",
+      "sources": [
+        "https://github.com/php/php-src/commit/cf6700e86d6357420a7c8386da63d48fec55f633",
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz"
+      ],
+      "adaptation": "7.0 native char* URL API matches7.1/7.2. Narrowed unchanged request assembly context from strcpy/smart_str divergence; changed lines unchanged. Applies --fuzz=0. Additional desired controls: HTTP explicit fulluri and FTP proxy implicit fulluri reject CR-only/LF-only; ordinary URL and percent-encoded CR/LF remain allowed.",
+      "paths": [
+        "ext/standard/http_fopen_wrapper.c",
+        "ext/standard/tests/http/ghsa-c5f2-jwm7-mmq2.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2025-1736-01.patch",
+      "sha256": "d371b032f4e04cdea1e65bda218f3d81044fac30cd3c0b4a102783e64aeefc09",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz",
+        "https://github.com/php/php-src/commit/d0d60503b54b528d42546acf1ca34914fb8aea55",
+        "https://github.com/php/php-src/commit/3d9c02364db62a6d8e27947ffe47dbfaad644efe",
+        "https://github.com/php/php-src/commit/56cdbe63c24b86c2f1d60bf2609fde113d12d235",
+        "https://github.com/php/php-src/commit/41d49abbd99dab06cdae4834db664435f8177174"
+      ],
+      "adaptation": "Published four-commit dependency sequence. First two patches narrow unchanged leading context around prior redirect header changes; all changed lines preserved. Tests use native7.0 complete-read fixtures, existing ServerClientTestCase-8.1.inc confirmed in bothimages. Ordered sequence applies --fuzz=0.",
+      "paths": [
+        "ext/standard/http_fopen_wrapper.c",
+        "ext/standard/tests/http/bug79265.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2025-1736-02.patch",
+      "sha256": "efe6728786ab0b490e32614ac0fb8bcda51d2e1dc0a13d212b261c62cd8cef9d",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz",
+        "https://github.com/php/php-src/commit/d0d60503b54b528d42546acf1ca34914fb8aea55",
+        "https://github.com/php/php-src/commit/3d9c02364db62a6d8e27947ffe47dbfaad644efe",
+        "https://github.com/php/php-src/commit/56cdbe63c24b86c2f1d60bf2609fde113d12d235",
+        "https://github.com/php/php-src/commit/41d49abbd99dab06cdae4834db664435f8177174"
+      ],
+      "adaptation": "Published four-commit dependency sequence. First two patches narrow unchanged leading context around prior redirect header changes; all changed lines preserved. Tests use native7.0 complete-read fixtures, existing ServerClientTestCase-8.1.inc confirmed in bothimages. Ordered sequence applies --fuzz=0.",
+      "paths": [
+        "ext/standard/http_fopen_wrapper.c"
+      ]
+    },
+    {
+      "file": "CVE-2025-1736-03.patch",
+      "sha256": "ebee70c73767ec662af4268b712ccb06c29e30eec689d1c674cc5630ee78783f",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz",
+        "https://github.com/php/php-src/commit/d0d60503b54b528d42546acf1ca34914fb8aea55",
+        "https://github.com/php/php-src/commit/3d9c02364db62a6d8e27947ffe47dbfaad644efe",
+        "https://github.com/php/php-src/commit/56cdbe63c24b86c2f1d60bf2609fde113d12d235",
+        "https://github.com/php/php-src/commit/41d49abbd99dab06cdae4834db664435f8177174"
+      ],
+      "adaptation": "Published four-commit dependency sequence. First two patches narrow unchanged leading context around prior redirect header changes; all changed lines preserved. Tests use native7.0 complete-read fixtures, existing ServerClientTestCase-8.1.inc confirmed in bothimages. Ordered sequence applies --fuzz=0.",
+      "paths": [
+        "ext/standard/http_fopen_wrapper.c",
+        "ext/standard/tests/http/bug79265_2.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2025-1736-04.patch",
+      "sha256": "a12cab3e5c8ce252329c0350a7cde926c11d1e7b34ae4b95f3694b5fb8d1d5fb",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz",
+        "https://github.com/php/php-src/commit/d0d60503b54b528d42546acf1ca34914fb8aea55",
+        "https://github.com/php/php-src/commit/3d9c02364db62a6d8e27947ffe47dbfaad644efe",
+        "https://github.com/php/php-src/commit/56cdbe63c24b86c2f1d60bf2609fde113d12d235",
+        "https://github.com/php/php-src/commit/41d49abbd99dab06cdae4834db664435f8177174"
+      ],
+      "adaptation": "Published four-commit dependency sequence. First two patches narrow unchanged leading context around prior redirect header changes; all changed lines preserved. Tests use native7.0 complete-read fixtures, existing ServerClientTestCase-8.1.inc confirmed in bothimages. Ordered sequence applies --fuzz=0.",
+      "paths": [
+        "ext/standard/http_fopen_wrapper.c",
+        "ext/standard/tests/http/ghsa-hgf5-96fm-v528-001.phpt",
+        "ext/standard/tests/http/ghsa-hgf5-96fm-v528-002.phpt",
+        "ext/standard/tests/http/ghsa-hgf5-96fm-v528-003.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2020-7068.patch",
+      "sha256": "5ae0e61a8313417e9ab092d868eab46056482678b98ac482442ea4996326b54a",
+      "sources": [
+        "https://github.com/php/php-src/commit/7355ab81763a3d6a04ac11660e6a16d58838d187"
+      ],
+      "adaptation": "Unchanged upstream patch includes the required 274-byte binary bug79797.phar fixture; git apply --check succeeded on current PHP 7.1 source. Native PHP 7.0 text patch lacks that fixture.",
+      "paths": [
+        "ext/phar/tests/bug79797.phar",
+        "ext/phar/tests/bug79797.phpt",
+        "ext/phar/zip.c"
+      ]
+    },
+    {
+      "file": "CVE-2026-7262.patch",
+      "sha256": "d7acfc3d61f50ec3fd220e5662c3a17be6eabcdd10c0306671df057e775f9923",
+      "sources": [
+        "https://github.com/php/php-src/commit/9992b81bcd0a4b94e8a2249e50cc37646725df93",
+        "https://github.com/php/php-src/security/advisories/GHSA-hmxp-6pc4-f3vv",
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz"
+      ],
+      "adaptation": "Published PHP 7.0 patch applies without fuzz; only line offsets. Runtime rejection payload and ordinary typed-map control verified before patch.",
+      "paths": [
+        "ext/soap/php_encoding.c",
+        "ext/soap/tests/GHSA-hmxp-6pc4-f3vv.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2019-11048.patch",
+      "sha256": "885a3778adbe76dede798800fe717ecf78bc7382f0472c8f82e406f87d1c4a81",
+      "sources": [
+        "https://github.com/php/php-src/commit/3c8582ca4b8e84e5647220b647914876d2c3b124",
+        "https://bugs.php.net/bug.php?id=78876"
+      ],
+      "adaptation": null,
+      "paths": [
+        "main/rfc1867.c"
+      ]
     }
   ],
   "verification_limits": {

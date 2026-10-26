@@ -6,6 +6,13 @@ scratch=$(mktemp -d /tmp/php-critical-native.XXXXXX)
 trap 'rm -rf "$scratch"' EXIT
 php -n /tests/extract-critical-native.php "$scratch" "$version"
 case "$version" in
+    7.1.33|7.2.34|7.3.33)
+        php -n /tests/extract-auth-writer.php "$scratch/auth-writer.c"
+        cc -std=c99 -O1 -Wall -Wextra "$scratch/auth-writer.c" -o "$scratch/auth-writer"
+        "$scratch/auth-writer"
+        ;;
+esac
+case "$version" in
     7.0.33)
         cc -std=c99 -O1 -Wall -Wextra "$scratch/gd-contributions.c" -o "$scratch/gd-contributions"
         for mode in normal later first overflow; do "$scratch/gd-contributions" "$mode"; done
