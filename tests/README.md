@@ -43,8 +43,23 @@ The final-pass tests add Phar ZIP parsing, SOAP Apache maps, mbregex encoding
 rejection/state preservation, and exact FPM worker-log bytes across split flush
 markers. PHP 7.1/7.2 quoted-printable tests include the published flush-path
 prerequisite; their HTTP tests include the published header-parser prerequisites.
-PHP 7.4/8.0/8.1 also check high-bit URL inputs and ordinary string operations.
+PHP 7.1–7.4/8.0/8.1 also check high-bit URL inputs and ordinary string operations.
 Those Linux/glibc checks do not reproduce the platform-dependent NetBSD crash.
+The PHP 7.1–7.3 ctype ports additionally check positional formatting, padding,
+tag allowlists, URL user information, date offsets, day suffixes and interval
+whitespace against ordinary and high-bit inputs. These controls preserve the
+existing Linux behavior; they do not prove other platforms or locales safe.
+
+The PHP 7.1–7.3 ctype ports passed the required local suites for both image
+variants: 446 focused PHPT passes, three permitted AES-WRAP-PAD skips, and 8,538
+explicit compatibility checks. A separate comparison of 1,863 upstream tests
+against the same builds before these ports found no changed results or skip reasons.
+That broader selection has one existing SQLite column-metadata failure per PHP
+version (`ext/pdo_sqlite/tests/bug_42589.phpt`), 229 skips and six expected
+failures in total. These baseline limitations remain; the result is not a claim
+that every upstream test passes. The rejected PHP 7.1–7.4 SOAP candidates
+retained memory when randomness failed during repeated compressed requests
+and are not included.
 
 PHP 7.1–7.3 compile the actual mysqlnd authentication writer with guarded reusable
 and allocated buffers, checking twelve payload lengths and the packet header.
