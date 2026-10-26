@@ -43,6 +43,286 @@
         "ext/phar/tests/tar/ghsa-vc5h-9ppw-p5f3-symlink-circular.phpt",
         "ext/phar/util.c"
       ]
+    },
+    {
+      "file": "filter-CVE-2024-11233.patch",
+      "sources": [
+        "https://github.com/php/php-src/commit/a6c84cd7efd7eaaaefd4463412508df570d35358"
+      ],
+      "adaptation": null,
+      "sha256": "e15accdd7d125f91976cd4711a653fb797dab7b0fb250f46ebd0ddf7db15c61e",
+      "paths": [
+        "ext/standard/filters.c",
+        "ext/standard/tests/filters/ghsa-r977-prxv-hc43.phpt"
+      ]
+    },
+    {
+      "file": "http-CVE-2024-11234.patch",
+      "sources": [
+        "https://github.com/php/php-src/commit/cf6700e86d6357420a7c8386da63d48fec55f633"
+      ],
+      "adaptation": null,
+      "sha256": "a0498453b451184bb768d2e6433c9bc8a7e970966f036c953c8673dc6eb04b2e",
+      "paths": [
+        "ext/standard/http_fopen_wrapper.c",
+        "ext/standard/tests/http/ghsa-c5f2-jwm7-mmq2.phpt"
+      ]
+    },
+    {
+      "file": "array-CVE-2025-14178.patch",
+      "sources": [
+        "https://github.com/php/php-src/commit/8b801151bd54b36aae4593ed6cfc096e8122b415"
+      ],
+      "adaptation": null,
+      "sha256": "0e2ae81852c158f3e4344f63dc388eea738656ca6215f26f6783e9449f27b775",
+      "paths": [
+        "ext/standard/array.c",
+        "ext/standard/tests/array/GHSA-h96m-rvf9-jgm2.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2024-3096.patch",
+      "sha256": "e4cc106218738da5329c79b896a25c8fd9cc843bc36f18916ec32c4a1ce122db",
+      "sources": [
+        "https://github.com/php/php-src/commit/0ba5229a3f7572846e91c8f5382e87785f543826"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/standard/password.c",
+        "ext/standard/tests/password/password_bcrypt_errors.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2024-8925.patch",
+      "sha256": "c6b46ae1e3bc540fe3bda9f7d81823e4f806b467f02c03fa808b269b9eed1971",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.3/php7.3_7.3.31-1~deb10u16.debian.tar.xz",
+        "https://github.com/php/php-src/commit/19b49258d0c5a61398d395d8afde1123e8d161e0",
+        "https://github.com/php/php-src/security/advisories/GHSA-9pqp-7h25-4f32"
+      ],
+      "adaptation": null,
+      "paths": [
+        "main/rfc1867.c",
+        "tests/basic/GHSA-9pqp-7h25-4f32.inc",
+        "tests/basic/GHSA-9pqp-7h25-4f32.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2024-2756.patch",
+      "sha256": "e29cacc7e93f389b4160ab5422fe8e0d169f2bac449b6dac723b8f8c54ff0e5f",
+      "sources": [
+        "https://github.com/php/php-src/commit/093c08af25fb323efa0c8e6154aa9fdeae3d3b53"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/standard/tests/ghsa-wpj3-hf5j-x4v4.phpt",
+        "main/php_variables.c"
+      ]
+    },
+    {
+      "file": "CVE-2024-5458.patch",
+      "sha256": "aed7a9865a27fe55795a822215f08fd35a870f61a03a8f10067b78b29a47f65c",
+      "sources": [
+        "https://github.com/php/php-src/commit/7e0e3cc820c493301409a0ce2b6ef95e0ab06b0c"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/filter/logical_filters.c",
+        "ext/filter/tests/ghsa-w8qr-v226-r27w.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2025-1219.patch",
+      "sha256": "26f8975daaef9ed0d2bb001ba9f0abcbb1b45d41e3440abd18cd216589c25a64",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.3/php7.3_7.3.31-1~deb10u16.debian.tar.xz",
+        "https://github.com/php/php-src/commit/b6004a043c16b211d462218fbb3f72db68ec2b18",
+        "https://github.com/php/php-src/security/advisories/GHSA-p3x9-6h7p-cgfc"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/dom/tests/ghsa-p3x9-6h7p-cgfc_001.phpt",
+        "ext/dom/tests/ghsa-p3x9-6h7p-cgfc_002.phpt",
+        "ext/dom/tests/ghsa-p3x9-6h7p-cgfc_003.phpt",
+        "ext/libxml/libxml.c"
+      ]
+    },
+    {
+      "file": "CVE-2025-1736.patch",
+      "sha256": "e9edb2191879214dedd4c560478848e95884d7b14d5db84ee6716eb59b923f62",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.3/php7.3_7.3.31-1~deb10u16.debian.tar.xz",
+        "https://github.com/php/php-src/commit/41d49abbd99dab06cdae4834db664435f8177174",
+        "https://github.com/php/php-src/security/advisories/GHSA-hgf5-96fm-v528"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/standard/http_fopen_wrapper.c",
+        "ext/standard/tests/http/ghsa-hgf5-96fm-v528-001.phpt",
+        "ext/standard/tests/http/ghsa-hgf5-96fm-v528-002.phpt",
+        "ext/standard/tests/http/ghsa-hgf5-96fm-v528-003.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2025-6491.patch",
+      "sha256": "d7eccfbc9f2c914c017899aa3199e5386e4d06277976de9092467e696baf61f4",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.3/php7.3_7.3.31-1~deb10u16.debian.tar.xz",
+        "https://github.com/php/php-src/commit/9cb3d8d200f0c822b17bda35a2a67a97b039d3e1",
+        "https://github.com/php/php-src/security/advisories/GHSA-453j-q27h-5p8x"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/soap/soap.c",
+        "ext/soap/tests/soap_qname_crash.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2026-7568.patch",
+      "sha256": "e4a5fe2e715ed0b736c3bdb90baa9b0e59f87762502027bf71c25e9de8eec42c",
+      "sources": [
+        "https://github.com/php/php-src/commit/dd77cfefa7fb457ddbfa2adab0f2bf2b0d1731c1"
+      ],
+      "adaptation": null,
+      "paths": [
+        "ext/standard/metaphone.c",
+        "ext/standard/tests/GHSA-96wq-48vp-hh57.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2026-7261.patch",
+      "sha256": "b56074fca7a64bbd7f897cd891695dcd1dc8439f82666ec25385e41876ab040f",
+      "sources": [
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz",
+        "https://github.com/php/php-src/commit/b9f81deadfda4df332fd75e20c03b3812038cd3f",
+        "https://github.com/php/php-src/security/advisories/GHSA-m33r-qmcv-p97q"
+      ],
+      "adaptation": "Only target-version context changes (ZEND_THIS and the existing fn_name release); the published persistence guards are unchanged.",
+      "paths": [
+        "ext/soap/soap.c",
+        "ext/soap/tests/GHSA-m33r-qmcv-p97q.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2026-6735.patch",
+      "sha256": "9043f9ba31b3974ab5173f4aef30488f03d3126ee5f0f5c69ef71da82a9b6ff3",
+      "sources": [
+        "https://github.com/php/php-src/commit/13e72d1c97f72892421b04e8c5c05bc9bb193457",
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.3/php7.3_7.3.31-1~deb10u16.debian.tar.xz"
+      ],
+      "adaptation": "Use PHP 8.0 scoreboard pointer fields, const input and quiet argument for php_escape_html_entities_ex; retain published PHP 7.3 encode flag behavior. JSON behavior remains unchanged.",
+      "paths": [
+        "sapi/fpm/fpm/fpm_status.c",
+        "sapi/fpm/tests/ghsa-7qg2-v9fj-4mwv-status-xss.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2026-7258.patch",
+      "sha256": "8b3acf9bbc42bf8833de04bbefc55051f2dc0cc22382f84bd98fd340a0ed7feb",
+      "sources": [
+        "https://github.com/remicollet/php-src-security/commit/30de2f8492a06ebcf1659307f1f049e2799c7f21",
+        "https://github.com/php/php-src/security/advisories/GHSA-m8rr-4c36-8gq4"
+      ],
+      "adaptation": "Complete published branch-native ctype cast sweep except one already-safe isspace((unsigned char)*value) hunk in main/rfc1867.c; one unchanged context edge narrowed. --fuzz=0 dry-run passes. No added upstream regression. Platform failure described for NetBSD; glibc smoke alone cannot demonstrate mitigation, so check changed source casts and builds as well.",
+      "paths": [
+        "Zend/zend_compile.c",
+        "Zend/zend_operators.c",
+        "Zend/zend_virtual_cwd.c",
+        "Zend/zend_virtual_cwd.h",
+        "ext/com_dotnet/com_extension.c",
+        "ext/date/lib/parse_date.c",
+        "ext/date/lib/parse_date.re",
+        "ext/date/lib/parse_iso_intervals.c",
+        "ext/date/lib/parse_iso_intervals.re",
+        "ext/date/lib/timelib.c",
+        "ext/filter/logical_filters.c",
+        "ext/ftp/ftp.c",
+        "ext/gd/libgd/gd_xbm.c",
+        "ext/imap/php_imap.c",
+        "ext/intl/locale/locale_methods.c",
+        "ext/mbstring/mbstring.c",
+        "ext/mbstring/php_mbregex.c",
+        "ext/pcre/php_pcre.c",
+        "ext/pdo/pdo.c",
+        "ext/pdo/pdo_sql_parser.re",
+        "ext/pdo/pdo_stmt.c",
+        "ext/standard/dl.c",
+        "ext/standard/exec.c",
+        "ext/standard/file.c",
+        "ext/standard/filters.c",
+        "ext/standard/formatted_print.c",
+        "ext/standard/ftp_fopen_wrapper.c",
+        "ext/standard/html.c",
+        "ext/standard/math.c",
+        "ext/standard/metaphone.c",
+        "ext/standard/quot_print.c",
+        "ext/standard/scanf.c",
+        "ext/standard/soundex.c",
+        "ext/standard/string.c",
+        "ext/standard/strnatcmp.c",
+        "ext/standard/type.c",
+        "ext/standard/url.c",
+        "ext/standard/url_scanner_ex.re",
+        "ext/standard/versioning.c",
+        "main/SAPI.c",
+        "main/fopen_wrappers.c",
+        "main/php_ini.c",
+        "main/php_variables.c",
+        "main/rfc1867.c",
+        "main/snprintf.c",
+        "main/spprintf.c",
+        "main/streams/streams.c",
+        "main/streams/transports.c",
+        "sapi/cli/php_cli_server.c",
+        "sapi/fpm/fpm/fpm_conf.c",
+        "sapi/litespeed/lsapi_main.c",
+        "sapi/litespeed/lsapilib.c",
+        "sapi/phpdbg/phpdbg_cmd.c",
+        "sapi/phpdbg/phpdbg_prompt.c",
+        "sapi/phpdbg/phpdbg_utils.c",
+        "win32/sendmail.c"
+      ]
+    },
+    {
+      "file": "CVE-2026-7262.patch",
+      "sha256": "d7acfc3d61f50ec3fd220e5662c3a17be6eabcdd10c0306671df057e775f9923",
+      "sources": [
+        "https://github.com/php/php-src/commit/9992b81bcd0a4b94e8a2249e50cc37646725df93",
+        "https://github.com/php/php-src/security/advisories/GHSA-hmxp-6pc4-f3vv",
+        "https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz"
+      ],
+      "adaptation": "Published PHP 7.0 patch applies without fuzz; only line offsets. Runtime rejection payload and ordinary typed-map control verified before patch.",
+      "paths": [
+        "ext/soap/php_encoding.c",
+        "ext/soap/tests/GHSA-hmxp-6pc4-f3vv.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2024-9026.patch",
+      "sha256": "c12053a4449b99a718f8e5d8104e6fddeca5f909162250f45f9d471a50eb54ee",
+      "sources": [
+        "https://github.com/php/php-src/commit/4580b8b3e1495df45a894ab928b23067159eedb8",
+        "https://github.com/php/php-src/security/advisories/GHSA-865w-9rf3-2wh5"
+      ],
+      "adaptation": "Unchanged source patch applies without fuzz. Upstream sapi/fpm/tests/log-bwp-msg-flush-split-sep-pos-end.phpt and log-bwp-msg-flush-split-sep-pos-start.phpt are included, but use newer tester helpers (and named arguments unsupported by PHP 7.4); do not automatically select those PHPTs. Parent should run custom FPM probe with the identical 1013/1009 a + Quarkslab + NUL fscf NUL + Quarkslab payloads, catch_workers_output=yes and decorate_workers_output=no, requiring exact retained log content plus an ordinary response/log control.",
+      "paths": [
+        "sapi/fpm/fpm/fpm_stdio.c",
+        "sapi/fpm/tests/log-bwp-msg-flush-split-sep-pos-end.phpt",
+        "sapi/fpm/tests/log-bwp-msg-flush-split-sep-pos-start.phpt"
+      ]
+    },
+    {
+      "file": "CVE-2026-7259.patch",
+      "sha256": "9ff0640eef142f560341c5d1dc058b4ffba938deaa13405022af4acc3edbe90d",
+      "sources": [
+        "https://github.com/php/php-src/commit/79a054eae016c56409432e69aebc8ca908a88838",
+        "https://github.com/php/php-src/security/advisories/GHSA-wm6j-2649-pv75"
+      ],
+      "adaptation": "Unchanged upstream patch applies exactly; preserves previous regex state when rejecting an encoding absent from mbfl. Source and runtime show the pointer-cache bug introduced in PHP 8.0.",
+      "paths": [
+        "Zend/tests/GHSA-wm6j-2649-pv75.phpt",
+        "ext/mbstring/php_mbregex.c"
+      ]
     }
   ],
   "verification_limits": {

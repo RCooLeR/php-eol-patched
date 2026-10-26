@@ -12,16 +12,26 @@ source_root=${PHP_SOURCE_ROOT:-/usr/src/php}
 scratch=$(mktemp -d /tmp/php-phpt.XXXXXX)
 cp "$source_root/run-tests.php" "$scratch/"
 mkdir -p "$scratch/ext" "$scratch/sapi/cli" "$scratch/Zend"
-for extension in openssl standard soap phar mysqli pdo_mysql gd mbstring hash; do
+for extension in openssl standard soap phar mysqli pdo_mysql gd mbstring hash spl bcmath exif filter dom simplexml libxml xmlreader; do
     mkdir -p "$scratch/ext/$extension"
     cp -a "$source_root/ext/$extension/tests" "$scratch/ext/$extension/"
 done
 cp -a "$source_root/sapi/cli/tests" "$scratch/sapi/cli/"
 cp -a "$source_root/Zend/tests" "$scratch/Zend/"
-cp /tests/published-filter-controls.phpt /tests/mysql-http-fpm-pdo-control.phpt "$scratch/"
+cp /tests/published-filter-controls.phpt /tests/published-additional-controls.phpt /tests/batch2-controls.phpt /tests/mysql-http-fpm-pdo-control.phpt "$scratch/"
+cp /tests/published-low-controls.phpt /tests/published-mb-rejection-control.phpt "$scratch/"
 cp -a /tests/soap-regressions "$scratch/"
 if [ -d "$test_dir/overrides" ]; then cp -a "$test_dir/overrides/." "$scratch/"; fi
 cd "$scratch"
+case "$version" in
+    7.1.33|7.2.34|7.3.33|7.4.33)
+        cc -shared -fPIC -O2 $(php-config --includes) $(pkg-config --cflags libxml-2.0) \
+            /tests/libxml-state-probe.c -o "$scratch/libxml-state-probe.so" $(pkg-config --libs libxml-2.0)
+        php_args+=(-d "extension=$scratch/libxml-state-probe.so")
+        php "${php_args[@]}" /tests/libxml-ordinary-controls.php
+        php -n /tests/xml-path-controls.php
+        ;;
+esac
 
 run_group() {
     local group=$1

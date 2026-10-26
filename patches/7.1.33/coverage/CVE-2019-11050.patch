@@ -1,0 +1,45 @@
+Published-source: https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz
+Published-patch: 0107-Fix-bug-78793.patch
+Scope: selected PHP runtime components and their tests; packaging and unrelated extensions omitted.
+
+From: Stanislav Malyshev <stas@php.net>
+Date: Mon, 16 Dec 2019 01:14:38 -0800
+Subject: Fix bug #78793
+
+(cherry picked from commit c14eb8de974fc8a4d74f3515424c293bc7a40fba)
+---
+ NEWS                         |  4 ++++
+ ext/exif/exif.c              |  5 +++--
+ ext/exif/tests/bug78793.phpt | 12 ++++++++++++
+ 3 files changed, 19 insertions(+), 2 deletions(-)
+ create mode 100644 ext/exif/tests/bug78793.phpt
+
+--- a/ext/exif/exif.c
++++ b/ext/exif/exif.c
+@@ -2820,8 +2820,9 @@ static int exif_process_IFD_in_MAKERNOTE(image_info_type *ImageInfo, char * valu
+ 	}
+ 
+ 	for (de=0;de<NumDirEntries;de++) {
+-		if (!exif_process_IFD_TAG(ImageInfo, dir_start + 2 + 12 * de,
+-								  offset_base, data_len, displacement, section_index, 0, maker_note->tag_table)) {
++		size_t offset = 2 + 12 * de;
++		if (!exif_process_IFD_TAG(ImageInfo, dir_start + offset,
++								  offset_base, data_len - offset, displacement, section_index, 0, maker_note->tag_table)) {
+ 			return FALSE;
+ 		}
+ 	}
+--- /dev/null
++++ b/ext/exif/tests/bug78793.phpt
+@@ -0,0 +1,12 @@
++--TEST--
++Bug #78793: Use-after-free in exif parsing under memory sanitizer
++--FILE--
++<?php
++$f = "ext/exif/tests/bug77950.tiff";
++for ($i = 0; $i < 10; $i++) {
++    @exif_read_data($f);
++}
++?>
++===DONE===
++--EXPECT--
++===DONE===

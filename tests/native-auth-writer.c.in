@@ -1,0 +1,86 @@
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stddef.h>
+typedef unsigned char zend_uchar;
+typedef int MYSQLND_ERROR_INFO;
+typedef int MYSQLND_VIO;
+typedef int MYSQLND_STATS;
+typedef int MYSQLND_CONNECTION_STATE;
+#define MYSQLND_HEADER_SIZE 4
+#define CONN_QUIT_SENT 1
+#define DBG_ENTER(x) ((void)0)
+#define DBG_RETURN(x) return (x)
+#define SET_CONNECTION_STATE(s,v) (*(s)=(v))
+typedef struct MYSQLND_PFC MYSQLND_PFC;
+typedef struct { struct { size_t (*send)(MYSQLND_PFC *, MYSQLND_VIO *, zend_uchar *, size_t, MYSQLND_STATS *, MYSQLND_ERROR_INFO *); } m; } codec_data;
+struct MYSQLND_PFC { struct { size_t length; zend_uchar *buffer; } cmd_buffer; codec_data *data; };
+typedef struct { MYSQLND_ERROR_INFO *error_info; MYSQLND_PFC *protocol_frame_codec; MYSQLND_VIO *vio; MYSQLND_STATS *stats; MYSQLND_CONNECTION_STATE *connection_state; } packet_header;
+typedef struct { packet_header header; zend_uchar *auth_data; size_t auth_data_len; } MYSQLND_PACKET_CHANGE_AUTH_RESPONSE;
+typedef struct { MYSQLND_ERROR_INFO *error_info; MYSQLND_PFC *protocol_frame_codec; MYSQLND_VIO *vio; MYSQLND_STATS *stats; MYSQLND_CONNECTION_STATE state; } MYSQLND_CONN_DATA;
+static unsigned char *heap_buffer;
+static size_t heap_length;
+static void check_guard(const unsigned char *ptr, size_t length) {
+    size_t i;
+    for (i=0; i<16; ++i) assert(ptr[length+i] == 0xCD);
+}
+static void *guard_alloc(size_t length) {
+    assert(heap_buffer == NULL);
+    heap_buffer = malloc(length + 16);
+    assert(heap_buffer != NULL);
+    heap_length = length;
+    memset(heap_buffer + length, 0xCD, 16);
+    return heap_buffer;
+}
+static void guard_free(void *ptr) {
+    assert(ptr == heap_buffer);
+    check_guard(heap_buffer, heap_length);
+    free(heap_buffer);
+    heap_buffer = NULL;
+}
+#define mnd_emalloc guard_alloc
+#define mnd_efree guard_free
+static size_t wire_send(MYSQLND_PFC *pfc, MYSQLND_VIO *vio, zend_uchar *buffer, size_t count, MYSQLND_STATS *stats, MYSQLND_ERROR_INFO *error_info) {
+    size_t i;
+    (void)vio; (void)stats; (void)error_info;
+    if (buffer == pfc->cmd_buffer.buffer) {
+        assert(count + MYSQLND_HEADER_SIZE <= pfc->cmd_buffer.length);
+        check_guard(buffer, pfc->cmd_buffer.length);
+    } else {
+        assert(buffer == heap_buffer);
+        assert(count + MYSQLND_HEADER_SIZE <= heap_length);
+        check_guard(buffer, heap_length);
+    }
+    /* The real codec owns the reserved four-byte packet header. */
+    buffer[0]=(unsigned char)count; buffer[1]=(unsigned char)(count>>8);
+    buffer[2]=(unsigned char)(count>>16); buffer[3]=3;
+    for (i=0; i<count; ++i) assert(buffer[MYSQLND_HEADER_SIZE+i] == 'p');
+    return count + MYSQLND_HEADER_SIZE;
+}
+@AUTH_WRITER@
+int main(void) {
+    const size_t lengths[] = {0,1,8,32,4092,4093,4094,4095,4096,4097,8191,8192};
+    unsigned char command[4096+16], payload[8192];
+    MYSQLND_ERROR_INFO error=0;
+    MYSQLND_VIO vio=0;
+    MYSQLND_STATS stats=0;
+    codec_data data={{wire_send}};
+    MYSQLND_PFC codec={{4096,command}, &data};
+    MYSQLND_CONN_DATA conn={&error,&codec,&vio,&stats,0};
+    MYSQLND_PACKET_CHANGE_AUTH_RESPONSE packet={{&error,&codec,&vio,&stats,&conn.state},payload,0};
+    size_t i;
+    memset(payload, 'p', sizeof(payload));
+    for(i=0; i<sizeof(lengths)/sizeof(lengths[0]); ++i) {
+        size_t sent;
+        memset(command, 0, 4096);
+        memset(command+4096, 0xCD, 16);
+        packet.auth_data_len=lengths[i];
+        sent=@CALL@;
+        assert(sent == lengths[i]+MYSQLND_HEADER_SIZE);
+        assert(heap_buffer == NULL);
+        check_guard(command, 4096);
+    }
+    puts("PASS native auth-switch writer: 12 payload lengths, packet header, reusable and allocated buffer guards");
+    return 0;
+}

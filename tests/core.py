@@ -114,6 +114,65 @@ def multipart(fields, payload=None):
     return b"".join(chunks), "multipart/form-data; boundary=" + boundary
 
 
+def multipart_upload_limit(report, name):
+    boundary = "published-upload-limit"
+    parts = [f'--{boundary}\r\nContent-Disposition: form-data; name="file{i}"; '
+             f'filename="control.txt"\r\n\r\nordinary\r\n' for i in range(3)]
+    parts.append(f'--{boundary}\r\nContent-Disposition: form-data; name="control"\r\n\r\nok\r\n')
+    parts.append(f'--{boundary}--\r\n')
+    limited_uploads = fastcgi(name, "fields", "".join(parts).encode("ascii"), {
+        "CONTENT_TYPE": "multipart/form-data; boundary=" + boundary,
+        "PHP_VALUE": "max_file_uploads = 1\nmax_multipart_body_parts = 10\ndisplay_errors = 0",
+    })
+    upload_logs = command(["docker", "logs", name])
+    warning_count = (upload_logs["stdout"] + upload_logs["stderr"]).count(
+        "Maximum number of allowable file uploads has been exceeded")
+    record(report, "Excess file uploads produce one warning and preserve ordinary fields",
+           warning_count == 1 and limited_uploads["body"].get("post") == {"control": "ok"},
+           {"warning_count": warning_count, "response": limited_uploads})
+
+
+def published_input_controls(report, name):
+    """Exercise published request-input regressions through the built FPM SAPI."""
+    # CVE-2024-8925: the CGI payload from tests/basic/GHSA-9pqp-7h25-4f32.phpt.
+    # https://github.com/php/php-src/commit/19b49258d0c5a61398d395d8afde1123e8d161e0
+    boundaries = []
+    for length in (5115, 5116, 5117):
+        boundary = "A" * length
+        value = "BBB\r\n--" + boundary[:-1] + "CCC"
+        body = ("--" + boundary + '\r\nContent-Disposition: form-data; name="koko"\r\n\r\n'
+                + value + "\r\n--" + boundary + "--\r\n").encode("ascii")
+        response = fastcgi(name, "fields", body,
+                           {"CONTENT_TYPE": "multipart/form-data; boundary=" + boundary})
+        fields = response["body"].get("post", {})
+        actual = fields.get("koko") if isinstance(fields, dict) else None
+        error = response["body"].get("early_error") or {}
+        valid = actual == value if length < 5117 else (
+            fields in ([], {}) and "Boundary too large" in error.get("message", ""))
+        boundaries.append({"boundary_length": length, "pass": valid, "error": error,
+                           "field_length": len(actual) if isinstance(actual, str) else None})
+    record(report, "Published multipart boundary-buffer cases through FPM",
+           all(case["pass"] for case in boundaries), boundaries)
+
+    # The existing fixtures preserve the published CVE-2022-31629 and
+    # CVE-2024-2756 payloads. Add CVE-2020-7070's encoded-cookie-name case:
+    # https://github.com/php/php-src/commit/6559fe912661ca5ce5f0eeeb591d928451428ed0
+    fixtures = json.loads((TESTS / "legacy" / "cookie-controls.json").read_text(encoding="utf-8"))
+    fixtures.append({
+        "source": "tests/basic/bug79699.phpt",
+        "cookie": "__%48ost-evil=evil; __Host-evil=good; %66oo=baz;foo=bar",
+        "expected": {"__%48ost-evil": "evil", "__Host-evil": "good", "%66oo": "baz", "foo": "bar"},
+    })
+    cookies = []
+    for fixture in fixtures:
+        response = fastcgi(name, "cookies", extra={"HTTP_COOKIE": fixture["cookie"]})
+        cookies.append({"source": fixture["source"],
+                        "pass": response["body"].get("cookies") == fixture["expected"],
+                        "actual": response["body"].get("cookies"), "expected": fixture["expected"]})
+    record(report, "Published cookie-prefix cases through FPM",
+           all(case["pass"] for case in cookies), cookies)
+
+
 def fpm_suite(report, image, expected):
     name = "php-regression-" + uuid.uuid4().hex
     started = False
@@ -212,6 +271,9 @@ def fpm_suite(report, image, expected):
         record(report, "Multipart body-part limit reduces amplification", fields["body"].get("post") == {
             "field" + str(i): str(i) for i in range(count)
         }, {"expected_fields": count, "response": fields})
+        if expected == "patched":
+            published_input_controls(report, name)
+            multipart_upload_limit(report, name)
     except (RuntimeError, ValueError, subprocess.TimeoutExpired) as error:
         record(report, "FPM remaining test execution", False, str(error))
     finally:

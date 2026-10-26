@@ -28,6 +28,18 @@
         "ext/gd/libgd/gd_interpolation.c",
         "ext/gd/tests/bug77269.phpt"
       ]
+    },
+    {
+      "file": "gd-CVE-2019-6977.patch",
+      "sources": [
+        "https://github.com/php/php-src/commit/567c9f58425c37260864f276b6d3f434eecf4b49"
+      ],
+      "adaptation": null,
+      "sha256": "1f8b911ed5adee8e98777bcac7da71645b7ecff9b7544cfe20ddae286e2fd9cf",
+      "paths": [
+        "ext/gd/libgd/gd_color.c",
+        "ext/gd/tests/bug77270.phpt"
+      ]
     }
   ],
   "verification_limits": {

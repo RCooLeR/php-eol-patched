@@ -1,3 +1,14 @@
 ext/phar/tests/tar/coverage-symlink-controls.phpt
 ext/phar/tests/tar/ghsa-vc5h-9ppw-p5f3-symlink-circular.phpt
 ext/gd/tests/gif.phpt
+ext/soap/tests/GHSA-m33r-qmcv-p97q.phpt
+batch2-controls.phpt
+published-low-controls.phpt
+published-mb-rejection-control.phpt
+ext/standard/tests/url/parse_url_basic_001.phpt
+ext/standard/tests/url/parse_url_basic_002.phpt
+ext/standard/tests/strings/strnatcmp_basic.phpt
+ext/standard/tests/strings/strnatcasecmp_basic.phpt
+ext/standard/tests/strings/quoted_printable_decode_basic.phpt
+ext/soap/tests/GHSA-hmxp-6pc4-f3vv.phpt
+Zend/tests/GHSA-wm6j-2649-pv75.phpt
