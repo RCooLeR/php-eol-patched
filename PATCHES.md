@@ -15,13 +15,19 @@ For low- and medium-severity CVEs, a backport that breaks normal application
 behavior is omitted and its gap documented. Compatibility takes priority during
 the migration period; passing repository tests cannot guarantee every application.
 
+Scores are the published CVSS base scores, with the version shown beside each
+number and a link to its source. The assigning CVE Numbering Authority's (CNA)
+newest published CVSS version is preferred. CISA-ADP, NVD or vendor scores fill
+gaps; CNA and NVD ratings can differ. Scores describe the original vulnerability, not the
+remaining risk after this repository's fixes or mitigations. Checked 2026-10-27.
+
 ## CVEs with missing fixes
 
-| CVE | Not fixed in | Fixed in |
-| --- | --- | --- |
-| CVE-2023-3247 | **7.1–7.4**; candidate backports failed the compressed-request failure test | Published fix included in 5.6, 7.0, 8.0, 8.1; limitations below |
-| CVE-2024-2408 | **5.6–7.1, 8.1** | **7.2–8.0 via OpenSSL**, according to Debian's fixed-package criteria |
-| CVE-2025-1220 | **7.1–8.0; persistent-socket gap (see below)** | No complete fix claimed |
+| CVE | CVSS | Short description | Not fixed in | Fixed in |
+| --- | --- | --- | --- | --- |
+| CVE-2023-3247 | [2.6 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2023/3xxx/CVE-2023-3247.json) | SOAP Digest authentication fails to check randomness errors | **7.1–7.4**; candidate backports failed the compressed-request failure test | Published fix included in 5.6, 7.0, 8.0, 8.1; limitations below |
+| CVE-2024-2408 | [5.9 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2024/2xxx/CVE-2024-2408.json) | RSA PKCS#1 decryption exposes the Marvin timing attack | **5.6–7.1, 8.1** | **7.2–8.0 via OpenSSL**, according to Debian's fixed-package criteria |
+| CVE-2025-1220 | [3.7 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2025/1xxx/CVE-2025-1220.json) | Network functions truncate NUL-containing hostnames, potentially bypassing access checks | **7.1–8.0; persistent-socket gap (see below)** | No complete fix claimed |
 
 These remaining gaps require a compatible backport, a dependency repair or a
 published follow-up that covers the remaining path. The two critical EOL
@@ -29,37 +35,40 @@ mitigations are listed separately below and are not complete fixes.
 
 ## Core, SOAP, Phar, HTTP, TLS and FPM
 
-| CVE | Status | PHP builds |
-| --- | --- | --- |
-| [CVE-2026-109618](https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w) | **Mitigated, not fully fixed** | All eight builds |
-| [CVE-2026-109619](https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp) | **Mitigated, not fully fixed** | All eight builds |
-| [CVE-2026-6722](https://github.com/php/php-src/security/advisories/GHSA-85c2-q967-79q5) | **Fixed** | All eight builds |
-| [CVE-2026-91765](https://github.com/php/php-src/security/advisories/GHSA-rgrp-mwpx-f6rm) | **Fixed** | All eight builds |
-| [CVE-2025-14181](https://github.com/php/php-src/security/advisories/GHSA-cj93-vc83-wgqv) | **Fixed** | All eight builds |
-| [CVE-2026-6103](https://github.com/php/php-src/security/advisories/GHSA-j3wh-g957-2m85) | **Fixed** | All eight builds |
-| [CVE-2023-3824](https://github.com/php/php-src/security/advisories/GHSA-jqcx-ccgc-xwhv) | **Fixed** | All eight builds |
-| [CVE-2026-91766](https://github.com/php/php-src/security/advisories/GHSA-fpwc-w8rq-cr92) | **Fixed** | All eight builds |
-| [CVE-2026-93682](https://github.com/php/php-src/security/advisories/GHSA-7875-c8px-7q5f) | **Fixed** | All eight builds |
-| [CVE-2025-1217](https://github.com/php/php-src/security/advisories/GHSA-v8xr-gpvj-cx9g) | **Fixed** | All eight builds |
-| [CVE-2025-1734](https://github.com/php/php-src/security/advisories/GHSA-pcmh-g36c-qc44) | **Fixed** | All eight builds |
-| [CVE-2025-1861](https://github.com/php/php-src/security/advisories/GHSA-52jp-hrpf-2jff) | **Fixed** | All eight builds |
-| [CVE-2026-91767](https://github.com/php/php-src/security/advisories/GHSA-xr7j-rvgx-xq5p) | **Fixed** | All eight builds |
-| [CVE-2026-91769](https://github.com/php/php-src/security/advisories/GHSA-vvx9-73fr-5jjx) | **Fixed** | All eight builds |
-| [CVE-2026-92842](https://github.com/php/php-src/security/advisories/GHSA-88hq-2827-7pg6) | **Fixed** | All eight builds |
-| [CVE-2026-91768](https://github.com/php/php-src/security/advisories/GHSA-62xp-839h-2637) | **Fixed** | All eight builds |
-| [CVE-2024-8929](https://github.com/php/php-src/security/advisories/GHSA-h35g-vwh6-m678) | **Fixed** | All eight builds |
-| [CVE-2025-1218](https://github.com/php/php-src/security/advisories/GHSA-r6x9-5r99-36j7) | **Fixed** | All eight builds |
-| [CVE-2021-21703](https://www.php.net/ChangeLog-7.php#7.3.31) | **Fixed** | All eight builds |
+| CVE | CVSS | Short description | Status | PHP builds |
+| --- | --- | --- | --- | --- |
+| [CVE-2026-109618](https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w) | [9.2 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/109xxx/CVE-2026-109618.json) | PHP out-of-memory cleanup corruption permits remote code execution | **Mitigated, not fully fixed** | All eight builds |
+| [CVE-2026-109619](https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp) | [9.2 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/109xxx/CVE-2026-109619.json) | PHP stale global request state permits remote code execution | **Mitigated, not fully fixed** | All eight builds |
+| [CVE-2026-6722](https://github.com/php/php-src/security/advisories/GHSA-85c2-q967-79q5) | [9.5 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/6xxx/CVE-2026-6722.json) | SOAP duplicate Apache map keys cause exploitable use-after-free | **Fixed** | All eight builds |
+| [CVE-2026-91765](https://github.com/php/php-src/security/advisories/GHSA-rgrp-mwpx-f6rm) | [7.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/91xxx/CVE-2026-91765.json) | SOAP deeply nested XML exhausts the stack through unbounded recursion | **Fixed** | All eight builds |
+| [CVE-2025-14181](https://github.com/php/php-src/security/advisories/GHSA-cj93-vc83-wgqv) | [6.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2025/14xxx/CVE-2025-14181.json) | SOAP HTTP response size overflow causes heap buffer corruption | **Fixed** | All eight builds |
+| [CVE-2026-6103](https://github.com/php/php-src/security/advisories/GHSA-j3wh-g957-2m85) | [4.3 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/6xxx/CVE-2026-6103.json) | Phar TAR size overflow allows forged archive entry injection | **Fixed** | All eight builds |
+| [CVE-2023-3824](https://github.com/php/php-src/security/advisories/GHSA-jqcx-ccgc-xwhv) | [9.4 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2023/3xxx/CVE-2023-3824.json) | Phar directory parsing overflows a stack buffer | **Fixed** | All eight builds |
+| [CVE-2026-91766](https://github.com/php/php-src/security/advisories/GHSA-fpwc-w8rq-cr92) | [5.9 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/91xxx/CVE-2026-91766.json) | HTTP stream redirects forward credentials to different origins | **Fixed** | All eight builds |
+| [CVE-2026-93682](https://github.com/php/php-src/security/advisories/GHSA-7875-c8px-7q5f) | [5.8 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/93xxx/CVE-2026-93682.json) | HTTP redirects with empty Location headers read beyond heap buffers | **Fixed** | All eight builds |
+| [CVE-2025-1217](https://github.com/php/php-src/security/advisories/GHSA-v8xr-gpvj-cx9g) | [6.3 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2025/1xxx/CVE-2025-1217.json) | HTTP stream parser misinterprets folded response headers | **Fixed** | All eight builds |
+| [CVE-2025-1734](https://github.com/php/php-src/security/advisories/GHSA-pcmh-g36c-qc44) | [6.3 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2025/1xxx/CVE-2025-1734.json) | HTTP stream parser accepts malformed headers lacking colons | **Fixed** | All eight builds |
+| [CVE-2025-1861](https://github.com/php/php-src/security/advisories/GHSA-52jp-hrpf-2jff) | [6.3 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2025/1xxx/CVE-2025-1861.json) | HTTP stream redirects truncate long URLs to incorrect destinations | **Fixed** | All eight builds |
+| [CVE-2026-91767](https://github.com/php/php-src/security/advisories/GHSA-xr7j-rvgx-xq5p) | [6.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/91xxx/CVE-2026-91767.json) | OpenSSL wildcard certificate matching underflows lengths, causing heap buffer overreads | **Fixed** | All eight builds |
+| [CVE-2026-91769](https://github.com/php/php-src/security/advisories/GHSA-vvx9-73fr-5jjx) | [4.3 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/91xxx/CVE-2026-91769.json) | OpenSSL hostname verification accepts matching CN despite conflicting SAN entries | **Fixed** | All eight builds |
+| [CVE-2026-92842](https://github.com/php/php-src/security/advisories/GHSA-88hq-2827-7pg6) | [5.9 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/92xxx/CVE-2026-92842.json) | Conversion stream filters expose heap data through NUL-containing line separators | **Fixed** | All eight builds |
+| [CVE-2026-91768](https://github.com/php/php-src/security/advisories/GHSA-62xp-839h-2637) | [6.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/91xxx/CVE-2026-91768.json) | FastCGI IPv6 allowlist checks compare incomplete addresses, permitting unauthorized clients | **Fixed** | All eight builds |
+| [CVE-2024-8929](https://github.com/php/php-src/security/advisories/GHSA-h35g-vwh6-m678) | [5.8 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2024/8xxx/CVE-2024-8929.json) | A hostile MySQL server can disclose client heap data | **Fixed** | All eight builds |
+| [CVE-2025-1218](https://github.com/php/php-src/security/advisories/GHSA-r6x9-5r99-36j7) | [3.4 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2025/1xxx/CVE-2025-1218.json) | mysqlnd reads beyond truncated server packet buffers | **Fixed** | All eight builds |
+| [CVE-2021-21703](https://www.php.net/ChangeLog-7.php#7.3.31) | [7.8 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2021/21xxx/CVE-2021-21703.json) | FPM workers can corrupt root-process memory and escalate privileges | **Fixed** | All eight builds |
 
 ## PostgreSQL
 
 Both pgsql and PDO PostgreSQL are enabled in every image. These fixes cover selected published extension defects; they do not establish complete PostgreSQL-related CVE coverage.
 
-| CVE | Status | PHP builds |
-| --- | --- | --- |
-| CVE-2022-31625 | **Fixed** | All eight builds |
-| [CVE-2025-1735](https://github.com/php/php-src/security/advisories/GHSA-hrwm-9436-5mv3) | **Fixed** | All eight builds |
-| [CVE-2026-17543](https://github.com/php/php-src/security/advisories/GHSA-7qpv-r5mr-78m4) | **Fixed** | All eight builds |
+| CVE | CVSS | Short description | Status | PHP builds |
+| --- | --- | --- | --- | --- |
+| CVE-2022-31625 | [8.1 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2022/31xxx/CVE-2022-31625.json) | PostgreSQL parameter cleanup frees uninitialized pointers | **Fixed** | All eight builds |
+| [CVE-2025-1735](https://github.com/php/php-src/security/advisories/GHSA-hrwm-9436-5mv3) | [5.9 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2025/1xxx/CVE-2025-1735.json) | PostgreSQL escaping ignores quoting errors and can crash | **Fixed** | All eight builds |
+| [CVE-2026-17543](https://github.com/php/php-src/security/advisories/GHSA-7qpv-r5mr-78m4) | [8.1 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/17xxx/CVE-2026-17543.json) | PostgreSQL backslash escaping permits SQL injection through crafted parameters | **Fixed** | All eight builds |
+| CVE-2025-14180 | [8.2 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2025/14xxx/CVE-2025-14180.json) | PDO PostgreSQL quoting errors trigger a NULL pointer dereference | **Fixed / not affected** | 8.1 fixed; 5.6–8.0 use the older unaffected PDO quoter ABI |
+| CVE-2025-1094 | [8.1 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2025/1xxx/CVE-2025-1094.json) | PostgreSQL libpq quoting permits SQL injection through invalid encoded text | **Fixed via libpq** | All eight builds |
+| CVE-2026-6477 | [8.8 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/6xxx/CVE-2026-6477.json) | PostgreSQL libpq large-object responses can overflow client stack buffers | **Fixed via libpq** | All eight builds |
 
 [CVE-2025-14180](https://github.com/php/php-src/security/advisories/GHSA-8xr5-qppj-gvwj) is already fixed in PHP 8.1.34. The older branches retain their integer-returning PDO quoter ABI, which already propagates quote failure; they do not need the newer zend_string-returning fix. The published invalid-byte regression is included for all eight versions.
 
@@ -71,11 +80,11 @@ The extensions use [libpq 16.15](https://www.postgresql.org/docs/16/release-16-1
 
 The following fixes were already included in the PHP 5.6 and 7.0 maintenance series and are also backported to PHP 7.1–8.1:
 
-| CVE | Status | PHP builds |
-| --- | --- | --- |
-| CVE-2026-9672 | **Fixed** | All eight builds |
-| CVE-2026-14355 | **Fixed** | All eight builds |
-| CVE-2026-7260 | **Fixed** | All eight builds |
+| CVE | CVSS | Short description | Status | PHP builds |
+| --- | --- | --- | --- | --- |
+| CVE-2026-9672 | [8.1 (v3.1; Red Hat)](https://access.redhat.com/security/cve/cve-2026-9672) | GD GIF decoding permits buffer overflow and application crashes | **Fixed** | All eight builds |
+| CVE-2026-14355 | [5.6 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/14xxx/CVE-2026-14355.json) | OpenSSL AES-WRAP-PAD encryption underallocates output buffers, corrupting heap memory | **Fixed** | All eight builds |
+| CVE-2026-7260 | [5.4 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/7xxx/CVE-2026-7260.json) | Phar circular symbolic links exhaust the stack through unbounded recursion | **Fixed** | All eight builds |
 
 <details>
 <summary>Test coverage and limitations</summary>
@@ -93,14 +102,14 @@ The Phar backports also retain the filename separator after resolving a nested l
 Per-version `coverage/` directories record the patches, published sources and
 source checksums. Not-affected builds are identified explicitly below.
 
-| CVE | Status | PHP builds |
-| --- | --- | --- |
-| CVE-2016-10166 | **Fixed** | All eight builds |
-| CVE-2019-9641 | **Fixed** | All eight builds |
-| CVE-2020-7059 | **Fixed** | 5.6–7.4; not affected: 8.0, 8.1 |
-| CVE-2020-7060 | **Fixed** | All eight builds |
-| CVE-2022-31631 | **Fixed** | All eight builds |
-| CVE-2022-37454 | **Fixed (see note)** | 7.2–8.1; not affected: 5.6–7.1 |
+| CVE | CVSS | Short description | Status | PHP builds |
+| --- | --- | --- | --- | --- |
+| CVE-2016-10166 | [9.8 (v3.0)](https://nvd.nist.gov/vuln/detail/CVE-2016-10166) | GD interpolation allocation suffers an integer underflow | **Fixed** | All eight builds |
+| CVE-2019-9641 | [9.8 (v3.1)](https://nvd.nist.gov/vuln/detail/CVE-2019-9641) | EXIF TIFF directory parsing reads uninitialized memory | **Fixed** | All eight builds |
+| CVE-2020-7059 | [6.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2020/7xxx/CVE-2020-7059.json) | `fgetss()` reads beyond the tag-stripping buffer | **Fixed** | 5.6–7.4; not affected: 8.0, 8.1 |
+| CVE-2020-7060 | [6.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2020/7xxx/CVE-2020-7060.json) | mbstring BIG5 conversion reads beyond its buffer | **Fixed** | All eight builds |
+| CVE-2022-31631 | [9.1 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2022/31xxx/CVE-2022-31631.json) | Oversized PDO SQLite strings bypass quoting, permitting SQL injection | **Fixed** | All eight builds |
+| CVE-2022-37454 | [9.8 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2022/37xxx/CVE-2022-37454.json) | SHA-3/Keccak integer overflow causes buffer overflow | **Fixed (see note)** | 7.2–8.1; not affected: 5.6–7.1 |
 
 The EXIF fixes were already included in the PHP 5.6 and 7.0 maintenance series.
 The [original report](https://bugs.php.net/bug.php?id=77509) concerns 32-bit
@@ -121,28 +130,28 @@ CVE coverage for the extensions or their linked libraries.
 
 ## Additional fixed CVEs
 
-| CVE | Status | PHP builds |
-| --- | --- | --- |
-| CVE-2019-6977 | **Fixed** | 7.0 |
-| CVE-2019-9637 | **Fixed** | 5.6, 7.0 |
-| CVE-2019-9638 | **Fixed** | 5.6, 7.0 |
-| CVE-2019-9639 | **Fixed** | 5.6, 7.0 |
-| CVE-2019-9640 | **Fixed** | 5.6, 7.0 |
-| CVE-2019-9675 | **Fixed** | 5.6, 7.0 |
-| CVE-2021-21702 | **Fixed** | 5.6–7.2 |
-| CVE-2023-0662 | **Fixed** | All eight builds |
-| CVE-2025-14178 | **Fixed** | 7.2–8.1; not affected: 5.6–7.1 |
-| CVE-2019-11048 | **Fixed** | 5.6, 7.0, 7.1 |
-| CVE-2020-7068 | **Fixed** | 7.1 |
-| CVE-2022-31626 | **Fixed** | 5.6–7.3 |
-| CVE-2023-0568 | **Fixed** | 5.6–7.4 |
-| CVE-2023-3823 | **Fixed** | 5.6–7.4 |
-| CVE-2024-11233 | **Fixed** | All eight builds |
-| CVE-2024-11234 | **Fixed** | All eight builds |
-| CVE-2024-9026 | **Fixed** | 7.4–8.1; not affected: 5.6–7.3 |
-| CVE-2026-6735 | **Fixed** | All eight builds |
-| CVE-2026-7259 | **Fixed** | 8.0, 8.1; not affected: 5.6–7.4 |
-| CVE-2026-7262 | **Fixed** | All eight builds |
+| CVE | CVSS | Short description | Status | PHP builds |
+| --- | --- | --- | --- | --- |
+| CVE-2019-6977 | [8.8 (v3.0)](https://nvd.nist.gov/vuln/detail/CVE-2019-6977) | GD image color matching heap buffer overflow with crafted images | **Fixed** | 7.0 |
+| CVE-2019-9637 | [7.5 (v3.0)](https://nvd.nist.gov/vuln/detail/CVE-2019-9637) | Cross-filesystem rename temporarily exposes files with incorrect permissions | **Fixed** | 5.6, 7.0 |
+| CVE-2019-9638 | [7.5 (v3.1)](https://nvd.nist.gov/vuln/detail/CVE-2019-9638) | EXIF MakerNote offset handling causes uninitialized memory reads | **Fixed** | 5.6, 7.0 |
+| CVE-2019-9639 | [7.5 (v3.1)](https://nvd.nist.gov/vuln/detail/CVE-2019-9639) | EXIF MakerNote length handling causes uninitialized memory reads | **Fixed** | 5.6, 7.0 |
+| CVE-2019-9640 | [7.5 (v3.1)](https://nvd.nist.gov/vuln/detail/CVE-2019-9640) | EXIF SOF marker processing performs invalid memory reads | **Fixed** | 5.6, 7.0 |
+| CVE-2019-9675 | [8.1 (v3.0)](https://nvd.nist.gov/vuln/detail/CVE-2019-9675) | PHAR tar long-link buffer overflow; vendor considers practical attacks usually impossible | **Fixed** | 5.6, 7.0 |
+| CVE-2021-21702 | [5.3 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2021/21xxx/CVE-2021-21702.json) | Malformed SOAP responses cause a NULL-pointer crash | **Fixed** | 5.6–7.2 |
+| CVE-2023-0662 | [7.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2023/0xxx/CVE-2023-0662.json) | Excessive multipart fields exhaust CPU or log storage | **Fixed** | All eight builds |
+| CVE-2025-14178 | [6.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2025/14xxx/CVE-2025-14178.json) | `array_merge()` element-count overflow causes heap buffer corruption | **Fixed** | 7.2–8.1; not affected: 5.6–7.1 |
+| CVE-2019-11048 | [5.3 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2019/11xxx/CVE-2019-11048.json) | Upload memory exhaustion leaves temporary files, potentially exhausting disk space | **Fixed** | 5.6, 7.0, 7.1 |
+| CVE-2020-7068 | [4.8 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2020/7xxx/CVE-2020-7068.json) | Phar ZIP parsing accesses freed memory | **Fixed** | 7.1 |
+| CVE-2022-31626 | [7.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2022/31xxx/CVE-2022-31626.json) | Oversized MySQL passwords overflow the mysqlnd/PDO buffer | **Fixed** | 5.6–7.3 |
+| CVE-2023-0568 | [7.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2023/0xxx/CVE-2023-0568.json) | Path resolution writes one byte beyond its buffer | **Fixed** | 5.6–7.4 |
+| CVE-2023-3823 | [8.6 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2023/3xxx/CVE-2023-3823.json) | Shared libxml state unexpectedly enables external entity loading | **Fixed** | 5.6–7.4 |
+| CVE-2024-11233 | [4.8 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2024/11xxx/CVE-2024-11233.json) | Quoted-printable stream decoding reads beyond its buffer | **Fixed** | All eight builds |
+| CVE-2024-11234 | [4.8 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2024/11xxx/CVE-2024-11234.json) | HTTP proxy streams permit CRLF injection and request smuggling | **Fixed** | All eight builds |
+| CVE-2024-9026 | [3.3 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2024/9xxx/CVE-2024-9026.json) | FPM worker output can alter or remove log content | **Fixed** | 7.4–8.1; not affected: 5.6–7.3 |
+| CVE-2026-6735 | [7.3 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/6xxx/CVE-2026-6735.json) | PHP-FPM status page renders attacker-controlled data as executable JavaScript | **Fixed** | All eight builds |
+| CVE-2026-7259 | [2.1 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/7xxx/CVE-2026-7259.json) | mbstring regex encoding mismatches trigger NULL pointer dereferences | **Fixed** | 8.0, 8.1; not affected: 5.6–7.4 |
+| CVE-2026-7262 | [2.9 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/7xxx/CVE-2026-7262.json) | SOAP Apache map decoding dereferences NULL when values are missing | **Fixed** | All eight builds |
 
 <details>
 <summary>Final-pass sources and verification</summary>
@@ -192,34 +201,34 @@ the applicable published changes, with older-code limitations described below.
 These are the additional branches covered by the published backports. Existing
 PHP 5.6/7.0 coverage is listed separately below; missing branches are listed at the top.
 
-| CVE | Status | PHP builds |
-| --- | --- | --- |
-| CVE-2026-7258 | **Fixed (published repair; see scope below)** | All eight builds |
-| CVE-2019-11045 | **Fixed** | 7.1 |
-| CVE-2019-11046 | **Fixed** | 7.1 |
-| CVE-2019-11047 | **Fixed** | 7.1 |
-| CVE-2019-11050 | **Fixed** | 7.1 |
-| CVE-2020-7063 | **Fixed** | 7.1 |
-| CVE-2020-7064 | **Fixed** | 7.1 |
-| CVE-2020-7066 | **Fixed** | 7.1 |
-| CVE-2020-7069 | **Fixed** | 7.1 |
-| CVE-2020-7070 | **Fixed** | 7.1 |
-| CVE-2020-7071 | **Fixed** | 7.1, 7.2 |
-| CVE-2021-21705 | **Fixed** | 7.1, 7.2 |
-| CVE-2021-21707 | **Fixed** | 7.1, 7.2 |
-| CVE-2022-31628 | **Fixed** | 7.1–7.3 |
-| CVE-2022-31629 | **Fixed** | 7.1–7.3 |
-| CVE-2022-4900 | **Fixed** | 7.4 |
-| CVE-2023-0567 | **Fixed** | 7.1–7.4 |
-| CVE-2024-2756 | **Fixed** | 7.1–8.0 |
-| CVE-2024-3096 | **Fixed** | 7.1–8.0 |
-| CVE-2024-5458 | **Fixed** | 7.1–8.0 |
-| CVE-2024-8925 | **Fixed** | 7.1–8.0 |
-| CVE-2025-1219 | **Fixed** | 7.1–8.0 |
-| CVE-2025-1736 | **Fixed** | 7.1–8.0 |
-| CVE-2025-6491 | **Fixed** | 7.1–8.0 |
-| CVE-2026-7261 | **Fixed** | 7.1–8.1 |
-| CVE-2026-7568 | **Fixed** | 7.1–8.1 |
+| CVE | CVSS | Short description | Status | PHP builds |
+| --- | --- | --- | --- | --- |
+| CVE-2026-7258 | [6.3 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/7xxx/CVE-2026-7258.json) | URL decoding passes signed characters to ctype, causing NetBSD buffer overreads | **Fixed (published repair; see scope below)** | All eight builds |
+| CVE-2019-11045 | [3.7 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2019/11xxx/CVE-2019-11045.json) | DirectoryIterator truncates paths at embedded NUL bytes | **Fixed** | 7.1 |
+| CVE-2019-11046 | [3.7 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2019/11xxx/CVE-2019-11046.json) | BCMath non-ASCII numeric input triggers out-of-bounds reads | **Fixed** | 7.1 |
+| CVE-2019-11047 | [4.8 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2019/11xxx/CVE-2019-11047.json) | EXIF image parsing heap over-read exposes memory or crashes | **Fixed** | 7.1 |
+| CVE-2019-11050 | [4.8 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2019/11xxx/CVE-2019-11050.json) | EXIF parsing use-after-free allows invalid memory reads | **Fixed** | 7.1 |
+| CVE-2020-7063 | [5.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2020/7xxx/CVE-2020-7063.json) | Phar archives discard restrictive file permissions | **Fixed** | 7.1 |
+| CVE-2020-7064 | [6.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2020/7xxx/CVE-2020-7064.json) | EXIF parsing reads uninitialized memory | **Fixed** | 7.1 |
+| CVE-2020-7066 | [5.3 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2020/7xxx/CVE-2020-7066.json) | `get_headers()` truncates URLs at NUL bytes | **Fixed** | 7.1 |
+| CVE-2020-7069 | [5.4 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2020/7xxx/CVE-2020-7069.json) | OpenSSL AES-CCM incorrectly shortens the initialization vector | **Fixed** | 7.1 |
+| CVE-2020-7070 | [4.3 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2020/7xxx/CVE-2020-7070.json) | Cookie-name decoding bypasses secure cookie prefixes | **Fixed** | 7.1 |
+| CVE-2020-7071 | [5.3 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2020/7xxx/CVE-2020-7071.json) | URL validation accepts invalid password components | **Fixed** | 7.1, 7.2 |
+| CVE-2021-21705 | [4.3 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2021/21xxx/CVE-2021-21705.json) | Malformed URL password fields bypass validation | **Fixed** | 7.1, 7.2 |
+| CVE-2021-21707 | [5.3 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2021/21xxx/CVE-2021-21707.json) | XML filenames permit encoded-NUL path truncation | **Fixed** | 7.1, 7.2 |
+| CVE-2022-31628 | [2.3 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2022/31xxx/CVE-2022-31628.json) | Phar repeatedly decompresses self-reproducing gzip archives | **Fixed** | 7.1–7.3 |
+| CVE-2022-31629 | [6.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2022/31xxx/CVE-2022-31629.json) | Cookie-name normalization permits forged secure-prefix cookies | **Fixed** | 7.1–7.3 |
+| CVE-2022-4900 | [6.2 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2022/4xxx/CVE-2022-4900.json) | Excessive CLI-server worker counts overflow a heap buffer | **Fixed** | 7.4 |
+| CVE-2023-0567 | [7.7 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2023/0xxx/CVE-2023-0567.json) | Malformed bcrypt hashes can accept an incorrect password | **Fixed** | 7.1–7.4 |
+| CVE-2024-2756 | [6.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2024/2xxx/CVE-2024-2756.json) | Incomplete cookie-prefix repair still permits forged secure cookies | **Fixed** | 7.1–8.0 |
+| CVE-2024-3096 | [6.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2024/3xxx/CVE-2024-3096.json) | `password_verify()` accepts an empty password in a NUL case | **Fixed** | 7.1–8.0 |
+| CVE-2024-5458 | [5.3 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2024/5xxx/CVE-2024-5458.json) | URL filtering accepts invalid user information | **Fixed** | 7.1–8.0 |
+| CVE-2024-8925 | [3.1 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2024/8xxx/CVE-2024-8925.json) | Malformed multipart data suppresses legitimate request fields | **Fixed** | 7.1–8.0 |
+| CVE-2025-1219 | [6.3 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2025/1xxx/CVE-2025-1219.json) | libxml redirects use incorrect Content-Type headers for charset detection | **Fixed** | 7.1–8.0 |
+| CVE-2025-1736 | [6.3 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2025/1xxx/CVE-2025-1736.json) | HTTP stream header validation mishandles line endings and omits headers | **Fixed** | 7.1–8.0 |
+| CVE-2025-6491 | [5.9 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2025/6xxx/CVE-2025-6491.json) | SOAP parsing dereferences NULL for oversized XML namespace prefixes | **Fixed** | 7.1–8.0 |
+| CVE-2026-7261 | [6.3 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/7xxx/CVE-2026-7261.json) | SoapServer session persistence mishandles faults, leaving freed object references | **Fixed** | 7.1–8.1 |
+| CVE-2026-7568 | [6.3 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/7xxx/CVE-2026-7568.json) | `metaphone()` input position overflow causes out-of-bounds memory reads | **Fixed** | 7.1–8.1 |
 
 <details>
 <summary>Sources, verification and skipped fixes</summary>
@@ -326,21 +335,21 @@ Published sources for the added fixes:
 
 ## CVEs that do not affect the checked builds
 
-| CVE | Status | PHP builds |
-| --- | --- | --- |
-| CVE-2019-19246 | **Not affected** | 5.6–7.1 |
-| CVE-2020-7065 | **Not affected** | 5.6–7.1 |
-| CVE-2020-7067 | **Not affected** | 7.1; EBCDIC support is disabled |
-| CVE-2022-31630 | **Not affected** | 5.6–7.3 |
-| CVE-2024-2757 | **Not affected** | 5.6–8.0 |
-| CVE-2026-12184 | **Not affected** | All eight builds |
-| CVE-2026-17544 | **Not affected** | All eight builds |
-| CVE-2020-7069 | **Not affected** | 5.6, 7.0; the affected AEAD API is absent |
-| CVE-2025-14177 | **Not affected** | 5.6–8.0; the affected chunked-reader implementation is absent |
-| CVE-2026-6104 | **Not affected** | All eight builds; the affected encoding-name lookup is absent |
-| CVE-2026-7263 | **Not affected** | All eight builds; the affected modern DOM implementation is absent |
-| CVE-2024-9026 | **Not affected** | 5.6–7.3; the affected split flush-marker parser is absent |
-| CVE-2026-7259 | **Not affected** | 5.6–7.4; the affected cached mbfl-encoding pointer is absent |
+| CVE | CVSS | Short description | Status | PHP builds |
+| --- | --- | --- | --- | --- |
+| CVE-2019-19246 | [7.5 (v3.1)](https://nvd.nist.gov/vuln/detail/CVE-2019-19246) | Oniguruma case-insensitive matching reads beyond heap buffers | **Not affected** | 5.6–7.1 |
+| CVE-2020-7065 | [7.4 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2020/7xxx/CVE-2020-7065.json) | UTF-32LE lowercasing overwrites a stack buffer | **Not affected** | 5.6–7.1 |
+| CVE-2020-7067 | [7.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2020/7xxx/CVE-2020-7067.json) | EBCDIC `urldecode()` uses invalid signed array indexes | **Not affected** | 7.1; EBCDIC support is disabled |
+| CVE-2022-31630 | [6.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2022/31xxx/CVE-2022-31630.json) | GD font loading permits out-of-bounds reads | **Not affected** | 5.6–7.3 |
+| CVE-2024-2757 | [7.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2024/2xxx/CVE-2024-2757.json) | `mb_encode_mimeheader()` loops indefinitely on crafted input | **Not affected** | 5.6–8.0 |
+| CVE-2026-12184 | [8.2 (v4.0)](https://github.com/php/php-src/security/advisories/GHSA-mhmq-mmqj-2v39) | HTTP stream TLS setup failure crashes PHP-FPM and its workers | **Not affected** | All eight builds |
+| CVE-2026-17544 | [8.1 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/17xxx/CVE-2026-17544.json) | BCMath `bccomp()` writes beyond bounds with crafted operands and scale | **Not affected** | All eight builds |
+| CVE-2020-7069 | [5.4 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2020/7xxx/CVE-2020-7069.json) | OpenSSL AES-CCM incorrectly shortens the initialization vector | **Not affected** | 5.6, 7.0; the affected AEAD API is absent |
+| CVE-2025-14177 | [6.3 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2025/14xxx/CVE-2025-14177.json) | `getimagesize()` exposes uninitialized heap data when reading image chunks | **Not affected** | 5.6–8.0; the affected chunked-reader implementation is absent |
+| CVE-2026-6104 | [6.3 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/6xxx/CVE-2026-6104.json) | mbstring encoding names containing NUL trigger global buffer overreads | **Not affected** | All eight builds; the affected encoding-name lookup is absent |
+| CVE-2026-7263 | [6.3 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/7xxx/CVE-2026-7263.json) | DOM XML canonicalization creates circular lists, causing infinite loops | **Not affected** | All eight builds; the affected modern DOM implementation is absent |
+| CVE-2024-9026 | [3.3 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2024/9xxx/CVE-2024-9026.json) | FPM worker output can alter or remove log content | **Not affected** | 5.6–7.3; the affected split flush-marker parser is absent |
+| CVE-2026-7259 | [2.1 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/7xxx/CVE-2026-7259.json) | mbstring regex encoding mismatches trigger NULL pointer dereferences | **Not affected** | 5.6–7.4; the affected cached mbfl-encoding pointer is absent |
 
 <details>
 <summary>Published sources and compatibility details</summary>
@@ -448,33 +457,80 @@ The original maintenance series includes **53 additional CVE IDs for PHP 5.6.40*
 
 PHP 5.6 release-note evidence is in the [frozen published NEWS](https://github.com/shivammathur/php-src-backports/blob/989262e3e9dcca7642b644a75d209c5b7740e294/NEWS). Later changes use the [native PHP 5.6 maintenance archive](https://deb.freexian.com/extended-lts/pool/main/p/php5/php5_5.6.40%2Bdfsg-0%2Bdeb8u23.debian.tar.xz) and published ports. PHP 7.0 IDs follow the selected patch filenames and headers from the [PHP 7.0 maintenance archive](https://deb.freexian.com/extended-lts/pool/main/p/php7.0/php7.0_7.0.33-0+deb9u26.debian.tar.xz). The [PHP 5.6 provenance](patches/5.6.40/provenance.json) and [PHP 7.0 provenance](patches/7.0.33/provenance.json) record the selected sources; patch headers retain upstream links.
 
-| Component | Fixed in PHP 5.6.40 | Fixed in PHP 7.0.33 |
-| --- | --- | --- |
-| FPM | CVE-2019-11043, CVE-2026-6735 | CVE-2019-11043, CVE-2026-6735 |
-| SOAP | CVE-2021-21702, CVE-2026-7261, CVE-2026-7262 | CVE-2021-21702, CVE-2025-6491, CVE-2026-7261, CVE-2026-7262 |
-| mysqlnd | CVE-2022-31626 | CVE-2022-31626 |
-| Phar | CVE-2020-7063, CVE-2020-7068, CVE-2022-31628, CVE-2026-7260 | CVE-2019-9021, CVE-2020-7063, CVE-2020-7068, CVE-2022-31628, CVE-2026-7260 |
-| EXIF | CVE-2019-11034, CVE-2019-11035, CVE-2019-11036, CVE-2019-11040, CVE-2019-11041, CVE-2019-11042, CVE-2019-11047, CVE-2019-11050, CVE-2020-7064 | CVE-2019-11034, CVE-2019-11035, CVE-2019-11036, CVE-2019-11040, CVE-2019-11041, CVE-2019-11042, CVE-2019-11047, CVE-2019-11050, CVE-2020-7064 |
-| GD | CVE-2019-11038, CVE-2026-9672 | CVE-2019-11038, CVE-2026-9672 |
-| mbstring / Oniguruma | CVE-2019-13224, CVE-2020-7060 | CVE-2019-13224, CVE-2019-9023, CVE-2020-7060 |
-| Fileinfo | — | CVE-2019-18218 |
-| Bcmath | CVE-2019-11046 | CVE-2019-11046 |
-| Iconv | CVE-2019-11039 | CVE-2019-11039 |
-| SPL | CVE-2019-11045 | CVE-2019-11045 |
-| PDO SQLite | CVE-2022-31631 | CVE-2022-31631 |
-| XML / Libxml | CVE-2021-21707, CVE-2023-0568, CVE-2023-3823, CVE-2025-1219 | CVE-2021-21707, CVE-2023-0568, CVE-2023-3823, CVE-2025-1219 |
-| URL validation | CVE-2020-7071, CVE-2021-21705, CVE-2024-5458 | CVE-2020-7071, CVE-2021-21705, CVE-2024-5458 |
-| Passwords | CVE-2023-0567, CVE-2024-3096 | CVE-2023-0567, CVE-2024-3096 |
-| Cookies / request input | CVE-2020-7070, CVE-2022-31629, CVE-2024-2756, CVE-2024-8925 | CVE-2020-7070, CVE-2022-31629, CVE-2024-2756, CVE-2024-8925 |
-| Multipart / session | CVE-2019-11048, CVE-2020-7062, CVE-2023-0662 | CVE-2019-11048, CVE-2020-7062, CVE-2023-0662 |
-| Streams / HTTP / DNS | CVE-2020-7066, CVE-2024-11233, CVE-2024-11234, CVE-2025-1736 | CVE-2019-9022, CVE-2020-7066, CVE-2024-11233, CVE-2024-11234, CVE-2025-1736 |
-| Standard string routines | CVE-2020-7059, CVE-2020-7067 | CVE-2020-7059, CVE-2020-7067, CVE-2026-7568 |
-| Core / enabled extensions | CVE-2026-7258 | CVE-2026-7258 |
-| OpenSSL | CVE-2026-14355 | CVE-2026-14355 |
+| CVE | CVSS | Short description | PHP 5.6.40 | PHP 7.0.33 |
+| --- | --- | --- | --- | --- |
+| CVE-2019-11043 | [8.7 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2019/11xxx/CVE-2019-11043.json) | PHP-FPM buffer underflow permits remote code execution in certain configurations | **Fixed** | **Fixed** |
+| CVE-2026-6735 | [7.3 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/6xxx/CVE-2026-6735.json) | PHP-FPM status page renders attacker-controlled data as executable JavaScript | **Fixed** | **Fixed** |
+| CVE-2021-21702 | [5.3 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2021/21xxx/CVE-2021-21702.json) | Malformed SOAP responses cause a NULL-pointer crash | **Fixed** | **Fixed** |
+| CVE-2025-6491 | [5.9 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2025/6xxx/CVE-2025-6491.json) | SOAP parsing dereferences NULL for oversized XML namespace prefixes | — | **Fixed** |
+| CVE-2026-7261 | [6.3 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/7xxx/CVE-2026-7261.json) | SoapServer session persistence mishandles faults, leaving freed object references | **Fixed** | **Fixed** |
+| CVE-2026-7262 | [2.9 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/7xxx/CVE-2026-7262.json) | SOAP Apache map decoding dereferences NULL when values are missing | **Fixed** | **Fixed** |
+| CVE-2022-31626 | [7.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2022/31xxx/CVE-2022-31626.json) | Oversized MySQL passwords overflow the mysqlnd/PDO buffer | **Fixed** | **Fixed** |
+| CVE-2019-9021 | [9.8 (v3.0)](https://nvd.nist.gov/vuln/detail/CVE-2019-9021) | PHAR filename parsing reads beyond heap buffers | — | **Fixed** |
+| CVE-2020-7063 | [5.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2020/7xxx/CVE-2020-7063.json) | Phar archives discard restrictive file permissions | **Fixed** | **Fixed** |
+| CVE-2020-7068 | [4.8 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2020/7xxx/CVE-2020-7068.json) | Phar ZIP parsing accesses freed memory | **Fixed** | **Fixed** |
+| CVE-2022-31628 | [2.3 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2022/31xxx/CVE-2022-31628.json) | Phar repeatedly decompresses self-reproducing gzip archives | **Fixed** | **Fixed** |
+| CVE-2026-7260 | [5.4 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/7xxx/CVE-2026-7260.json) | Phar circular symbolic links exhaust the stack through unbounded recursion | **Fixed** | **Fixed** |
+| CVE-2019-11034 | [4.8 (v3.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2019/11xxx/CVE-2019-11034.json) | EXIF tag parsing heap over-read exposes memory or crashes | **Fixed** | **Fixed** |
+| CVE-2019-11035 | [4.8 (v3.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2019/11xxx/CVE-2019-11035.json) | EXIF value parsing heap over-read exposes memory or crashes | **Fixed** | **Fixed** |
+| CVE-2019-11036 | [4.8 (v3.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2019/11xxx/CVE-2019-11036.json) | EXIF tag parsing heap over-read exposes memory or crashes | **Fixed** | **Fixed** |
+| CVE-2019-11040 | [4.8 (v3.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2019/11xxx/CVE-2019-11040.json) | EXIF image metadata parsing reads beyond heap buffers | **Fixed** | **Fixed** |
+| CVE-2019-11041 | [4.8 (v3.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2019/11xxx/CVE-2019-11041.json) | EXIF thumbnail scanning reads beyond allocated buffers | **Fixed** | **Fixed** |
+| CVE-2019-11042 | [4.8 (v3.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2019/11xxx/CVE-2019-11042.json) | EXIF user-comment parsing reads beyond allocated buffers | **Fixed** | **Fixed** |
+| CVE-2019-11047 | [4.8 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2019/11xxx/CVE-2019-11047.json) | EXIF image parsing heap over-read exposes memory or crashes | **Fixed** | **Fixed** |
+| CVE-2019-11050 | [4.8 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2019/11xxx/CVE-2019-11050.json) | EXIF parsing use-after-free allows invalid memory reads | **Fixed** | **Fixed** |
+| CVE-2020-7064 | [6.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2020/7xxx/CVE-2020-7064.json) | EXIF parsing reads uninitialized memory | **Fixed** | **Fixed** |
+| CVE-2019-11038 | [3.1 (v3.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2019/11xxx/CVE-2019-11038.json) | GD XBM decoding uses uninitialized values, exposing stack data | **Fixed** | **Fixed** |
+| CVE-2026-9672 | [8.1 (v3.1; Red Hat)](https://access.redhat.com/security/cve/cve-2026-9672) | GD GIF decoding permits buffer overflow and application crashes | **Fixed** | **Fixed** |
+| CVE-2019-13224 | [9.8 (v3.1)](https://nvd.nist.gov/vuln/detail/CVE-2019-13224) | Oniguruma `onig_new_deluxe()` use-after-free with crafted multibyte regular expressions | **Fixed** | **Fixed** |
+| CVE-2019-9023 | [9.8 (v3.0)](https://nvd.nist.gov/vuln/detail/CVE-2019-9023) | Mbstring regular expressions over-read heap buffers on invalid multibyte data | — | **Fixed** |
+| CVE-2020-7060 | [6.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2020/7xxx/CVE-2020-7060.json) | mbstring BIG5 conversion reads beyond its buffer | **Fixed** | **Fixed** |
+| CVE-2019-18218 | [7.8 (v3.1)](https://nvd.nist.gov/vuln/detail/CVE-2019-18218) | Libmagic CDF vector parsing causes a heap buffer overflow | — | **Fixed** |
+| CVE-2019-11046 | [3.7 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2019/11xxx/CVE-2019-11046.json) | BCMath non-ASCII numeric input triggers out-of-bounds reads | **Fixed** | **Fixed** |
+| CVE-2019-11039 | [4.2 (v3.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2019/11xxx/CVE-2019-11039.json) | Iconv MIME header integer overflow causes out-of-bounds reads | **Fixed** | **Fixed** |
+| CVE-2019-11045 | [3.7 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2019/11xxx/CVE-2019-11045.json) | DirectoryIterator truncates paths at embedded NUL bytes | **Fixed** | **Fixed** |
+| CVE-2022-31631 | [9.1 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2022/31xxx/CVE-2022-31631.json) | Oversized PDO SQLite strings bypass quoting, permitting SQL injection | **Fixed** | **Fixed** |
+| CVE-2021-21707 | [5.3 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2021/21xxx/CVE-2021-21707.json) | XML filenames permit encoded-NUL path truncation | **Fixed** | **Fixed** |
+| CVE-2023-0568 | [7.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2023/0xxx/CVE-2023-0568.json) | Path resolution writes one byte beyond its buffer | **Fixed** | **Fixed** |
+| CVE-2023-3823 | [8.6 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2023/3xxx/CVE-2023-3823.json) | Shared libxml state unexpectedly enables external entity loading | **Fixed** | **Fixed** |
+| CVE-2025-1219 | [6.3 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2025/1xxx/CVE-2025-1219.json) | libxml redirects use incorrect Content-Type headers for charset detection | **Fixed** | **Fixed** |
+| CVE-2020-7071 | [5.3 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2020/7xxx/CVE-2020-7071.json) | URL validation accepts invalid password components | **Fixed** | **Fixed** |
+| CVE-2021-21705 | [4.3 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2021/21xxx/CVE-2021-21705.json) | Malformed URL password fields bypass validation | **Fixed** | **Fixed** |
+| CVE-2024-5458 | [5.3 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2024/5xxx/CVE-2024-5458.json) | URL filtering accepts invalid user information | **Fixed** | **Fixed** |
+| CVE-2023-0567 | [7.7 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2023/0xxx/CVE-2023-0567.json) | Malformed bcrypt hashes can accept an incorrect password | **Fixed** | **Fixed** |
+| CVE-2024-3096 | [6.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2024/3xxx/CVE-2024-3096.json) | `password_verify()` accepts an empty password in a NUL case | **Fixed** | **Fixed** |
+| CVE-2020-7070 | [4.3 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2020/7xxx/CVE-2020-7070.json) | Cookie-name decoding bypasses secure cookie prefixes | **Fixed** | **Fixed** |
+| CVE-2022-31629 | [6.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2022/31xxx/CVE-2022-31629.json) | Cookie-name normalization permits forged secure-prefix cookies | **Fixed** | **Fixed** |
+| CVE-2024-2756 | [6.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2024/2xxx/CVE-2024-2756.json) | Incomplete cookie-prefix repair still permits forged secure cookies | **Fixed** | **Fixed** |
+| CVE-2024-8925 | [3.1 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2024/8xxx/CVE-2024-8925.json) | Malformed multipart data suppresses legitimate request fields | **Fixed** | **Fixed** |
+| CVE-2019-11048 | [5.3 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2019/11xxx/CVE-2019-11048.json) | Upload memory exhaustion leaves temporary files, potentially exhausting disk space | **Fixed** | **Fixed** |
+| CVE-2020-7062 | [7.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2020/7xxx/CVE-2020-7062.json) | Failed uploads crash session progress cleanup | **Fixed** | **Fixed** |
+| CVE-2023-0662 | [7.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2023/0xxx/CVE-2023-0662.json) | Excessive multipart fields exhaust CPU or log storage | **Fixed** | **Fixed** |
+| CVE-2019-9022 | [7.5 (v3.0)](https://nvd.nist.gov/vuln/detail/CVE-2019-9022) | DNS CAA/ANY response parsing reads beyond allocated buffers | — | **Fixed** |
+| CVE-2020-7066 | [5.3 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2020/7xxx/CVE-2020-7066.json) | `get_headers()` truncates URLs at NUL bytes | **Fixed** | **Fixed** |
+| CVE-2024-11233 | [4.8 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2024/11xxx/CVE-2024-11233.json) | Quoted-printable stream decoding reads beyond its buffer | **Fixed** | **Fixed** |
+| CVE-2024-11234 | [4.8 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2024/11xxx/CVE-2024-11234.json) | HTTP proxy streams permit CRLF injection and request smuggling | **Fixed** | **Fixed** |
+| CVE-2025-1736 | [6.3 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2025/1xxx/CVE-2025-1736.json) | HTTP stream header validation mishandles line endings and omits headers | **Fixed** | **Fixed** |
+| CVE-2020-7059 | [6.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2020/7xxx/CVE-2020-7059.json) | `fgetss()` reads beyond the tag-stripping buffer | **Fixed** | **Fixed** |
+| CVE-2020-7067 | [7.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2020/7xxx/CVE-2020-7067.json) | EBCDIC `urldecode()` uses invalid signed array indexes | **Fixed** | **Fixed** |
+| CVE-2026-7568 | [6.3 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/7xxx/CVE-2026-7568.json) | `metaphone()` input position overflow causes out-of-bounds memory reads | — | **Fixed** |
+| CVE-2026-7258 | [6.3 (v4.0)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/7xxx/CVE-2026-7258.json) | URL decoding passes signed characters to ctype, causing NetBSD buffer overreads | **Fixed** | **Fixed** |
+| CVE-2026-14355 | [5.6 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2026/14xxx/CVE-2026-14355.json) | OpenSSL AES-WRAP-PAD encryption underallocates output buffers, corrupting heap memory | **Fixed** | **Fixed** |
 
 PHP 5.6's native HTTP additions include [CVE-2025-1219](https://github.com/php/php-src/commit/b6004a043c16b211d462218fbb3f72db68ec2b18) and [CVE-2025-1736](https://github.com/php/php-src/commit/41d49abbd99dab06cdae4834db664435f8177174). Its additional recent ports are [CVE-2026-7260](https://github.com/php/php-src/commit/2e0fa0a44441d74bf8cc4e1ce1c8af9cd4209f52), [CVE-2026-9672](https://github.com/php/php-src/commit/fcd691b377d02285740744bee17c0f298be227d5), and [CVE-2026-7258](https://github.com/php/php-src/commit/8bdee7e4c6f4e92f9e89841d53855d9ffbdbfe54).
 
-Inventory limits and exclusions:
+### Inventory limits and exclusions
+
+| CVE | CVSS | Short description | Inventory treatment |
+| --- | --- | --- | --- |
+| CVE-2012-1823 | [9.8 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2012/1xxx/CVE-2012-1823.json) | PHP-CGI query-string argument injection enables remote code execution | Contextual prerequisite reference; not counted as an additional fix |
+| CVE-2019-11044 | [3.7 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2019/11xxx/CVE-2019-11044.json) | Windows `link()` truncates paths at embedded NUL bytes | Windows issue; excluded from Linux runtime counts |
+| CVE-2021-21706 | [5.3 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2021/21xxx/CVE-2021-21706.json) | Windows ZIP extraction writes outside the destination directory | Windows issue; excluded from Linux runtime counts |
+| CVE-2021-21704 | [5.0 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2021/21xxx/CVE-2021-21704.json) | Malformed Firebird responses cause crashes or memory corruption | PDO Firebird is disabled |
+| CVE-2024-8932 | [9.8 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2024/8xxx/CVE-2024-8932.json) | Oversized `ldap_escape()` input causes an out-of-bounds write on 32-bit systems | LDAP is disabled |
+| CVE-2024-4577 | [9.8 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2024/4xxx/CVE-2024-4577.json) | Windows PHP-CGI permits command-line argument injection | CGI is disabled |
+| CVE-2024-8926 | [8.1 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2024/8xxx/CVE-2024-8926.json) | Windows code pages bypass the CGI argument-injection repair | CGI is disabled |
+| CVE-2024-8927 | [7.5 (v3.1)](https://raw.githubusercontent.com/CVEProject/cvelistV5/main/cves/2024/8xxx/CVE-2024-8927.json) | Environment-variable collision bypasses CGI redirect protection | CGI is disabled |
 
 - Windows-oriented CVE-2019-11044 and CVE-2021-21706 are excluded from Linux runtime counts. PHP 5.6 retains the ZIP source change for the latter, but it is not counted here.
 - Disabled components are excluded: LDAP CVE-2024-8932; CGI CVE-2024-4577, CVE-2024-8926 and CVE-2024-8927; PDO Firebird CVE-2021-21704.
