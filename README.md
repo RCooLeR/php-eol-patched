@@ -6,7 +6,7 @@
 
 PHP CLI/FPM images with selected published security backports for PHP 5.6–8.1.
 
-The badge tracks the `main` push workflow: build and test all eight PHP releases, then publish the passing images to GHCR.
+The badge tracks the `main` push workflow: build and test all eight PHP releases on native amd64 and arm64 runners, then publish each passing release to GHCR.
 
 > [!CAUTION]
 > **Temporary migration aid**
@@ -50,7 +50,7 @@ Use `--branch minimal` and target `php71` for the no-shell image. Use `main` whe
 | `php80` / `php-eol-patched:8.0.30` | `php80-debian` / `php-eol-patched:8.0.30-debian` |
 | `php81` / `php-eol-patched:8.1.34` | `php81-debian` / `php-eol-patched:8.1.34-debian` |
 
-Only Linux amd64 is supported. Builds start from pinned official PHP images, apply the patches once, and compile the selected modules. After a release's tests pass on a push to `main`, CI publishes its images to `ghcr.io/rcooler/php-eol-patched`. Release tags match the local tags above. Each build also gets `<tag>-<full-commit>-<run-id>-<attempt>` tags, so reruns have separate references. Tags can be reassigned; pin a digest for an exact image:
+The build recipes support Linux amd64 and arm64. Builds start from pinned multi-platform official PHP images, apply the patches once per architecture, and compile the selected modules. After a release's tests pass on both architectures on a push to `main`, CI publishes multi-platform images to `ghcr.io/rcooler/php-eol-patched`. Docker selects the native architecture from the same release tag, including on Apple Silicon and Linux ARM64 hosts. Release tags match the local tags above. Each build also gets `<tag>-<full-commit>-<run-id>-<attempt>` tags, so reruns have separate references. Tags can be reassigned; pin the multi-platform manifest digest to retain architecture selection:
 
 ```sh
 docker pull ghcr.io/rcooler/php-eol-patched:7.1.33-debian
@@ -58,6 +58,8 @@ docker image inspect --format '{{index .RepoDigests 0}}' ghcr.io/rcooler/php-eol
 ```
 
 The matching source export is published first as `<release>-source-<full-commit>-<run-id>-<attempt>`. Use the same build suffix as the runtime when obtaining its source. `<release>-source` follows the current release. Only a run for the current `main` commit updates release tags; an older rerun publishes only its run-specific tags. Versions publish independently after their own checks, so a failed version does not prevent another version from publishing.
+
+CI uses `ubuntu-24.04` for amd64 and `ubuntu-24.04-arm` for arm64. Each runs the minimal and Debian profiles, the shared regression target and the applicable application example. Architecture-specific staging tags end in `-amd64` or `-arm64`; release manifests are created only after both jobs pass. For a publication retry, rerun all jobs so both architecture tags belong to the same run attempt.
 
 For maintainers: [GHCR creates new packages as private](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#pushing-container-images), even for a public repository. After the first publication, set the package visibility to **Public** in its GitHub package settings and verify an anonymous pull. Until then, pulls require package access. Pull requests, other branches and manual test runs do not publish images.
 
@@ -71,7 +73,7 @@ Composer, Node.js, mail tools and database servers are not included. The minimal
 
 ## Build and run
 
-Use Docker with Buildx from the repository root:
+Use Docker with Buildx from the repository root. Local builds use the builder's native architecture by default:
 
 ```sh
 docker buildx bake --load php71
@@ -83,6 +85,14 @@ Replace `php71` with another target, or omit the target to build all eight. `BUI
 ```sh
 docker buildx bake --load --set php71.args.BUILD_JOBS=4 php71
 ```
+
+Select an architecture explicitly when needed:
+
+```sh
+docker buildx bake --load --set '*.platform=linux/arm64' php71-debian
+```
+
+Building or running that image on an amd64 host requires emulation. On an ARM64 host, use the normal commands without an amd64 override. To build both architectures, use `--set '*.platform=linux/amd64' --set '*.platform+=linux/arm64'` with a multi-platform exporter such as `--push` and your own registry tags; a classic Docker image store cannot `--load` both architectures at once. The CI workflow builds and tests them separately before combining their manifests.
 
 Build an extensible Debian image or either group explicitly:
 

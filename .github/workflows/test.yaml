@@ -15,8 +15,6 @@ concurrency:
 
 jobs:
   php:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 90
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -41,77 +39,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-    env:
-      TARGET: ${{ matrix.target }}
-      PHP_RELEASE: ${{ matrix.version }}
-    steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-        with:
-          persist-credentials: false
-      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
-      - name: Check Dockerfile and Compose
-        run: |
-          docker buildx bake --check "$TARGET" "$TARGET-debian"
-          docker compose -f compose.example.yaml config --quiet
-      - name: Build runtime and test images
-        run: |
-          docker buildx bake --load "$TARGET" "$TARGET-debian"
-          docker buildx bake --load "$TARGET" \
-            --set "$TARGET.target=test" \
-            --set "$TARGET.tags=php-eol-patched:$PHP_RELEASE-test"
-      - name: Test PHP and FPM
-        run: |
-          docker pull "$(python3 -B -c "import sys; sys.path.insert(0, 'tests'); import postgresql; print(postgresql.DEFAULT_IMAGE)")"
-          python3 tests/run.py \
-            --image "php-eol-patched:$PHP_RELEASE" \
-            --test-image "php-eol-patched:$PHP_RELEASE-test" \
-            --version "$PHP_RELEASE" \
-            --output "$RUNNER_TEMP/php-tests.json"
-          python3 tests/run.py \
-            --variant debian \
-            --image "php-eol-patched:$PHP_RELEASE-debian" \
-            --version "$PHP_RELEASE" \
-            --output "$RUNNER_TEMP/php-debian-tests.json"
-      - name: Test PHP 7.1 application example
-        if: matrix.target == 'php71'
-        run: |
-          docker build --pull=false -t php71-app:local examples/php71-app
-          docker run --rm php71-app:local php --ri gmp
-          docker run --rm php71-app:local php --ri ftp
-          docker run --rm php71-app:local php --ri posix
-          docker run --rm php71-app:local php-fpm -t
-      - name: Test PHP 8.1 sodium example
-        if: matrix.target == 'php81'
-        run: |
-          docker build --pull=false -t php81-sodium:local examples/php81-sodium
-          docker run --rm php81-sodium:local php --ri sodium
-      # Publish the matching source before making the tested runtimes available.
-      - name: Publish to GitHub Container Registry
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        shell: bash
-        env:
-          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          image="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/php-eol-patched"
-          build_id="$GITHUB_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
-          docker buildx bake --load "$TARGET" \
-            --set "$TARGET.target=source" \
-            --set "$TARGET.tags=php-eol-patched:$PHP_RELEASE-source"
-          trap 'docker logout ghcr.io >/dev/null 2>&1 || true' EXIT
-          printf '%s\n' "$REGISTRY_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
-          for variant in -source "" -debian; do
-            tag="$PHP_RELEASE$variant-$build_id"
-            docker tag "php-eol-patched:$PHP_RELEASE$variant" "$image:$tag"
-            docker push "$image:$tag"
-          done
-          # Rerunning an older commit must not replace the current release tags.
-          current_main=$(git ls-remote origin refs/heads/main | cut -f1)
-          if [ "$current_main" = "$GITHUB_SHA" ]; then
-            for variant in -source "" -debian; do
-              tag="$PHP_RELEASE$variant"
-              docker tag "php-eol-patched:$PHP_RELEASE$variant" "$image:$tag"
-              docker push "$image:$tag"
-            done
-          else
-            printf '%s\n' 'Published run-specific tags; main has advanced, so release tags were left unchanged.'
-          fi
+    uses: ./.github/workflows/php-release.yaml
+    with:
+      target: ${{ matrix.target }}
+      version: ${{ matrix.version }}
