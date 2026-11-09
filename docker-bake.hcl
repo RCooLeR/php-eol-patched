@@ -14,7 +14,6 @@ target "php56" {
   context = "."
   dockerfile = "Dockerfile"
   target = "runtime"
-  platforms = ["linux/amd64"]
   tags = ["php-eol-patched:5.6.40"]
   args = {
     PHP_RELEASE = "5.6.40"
@@ -26,7 +25,6 @@ target "php70" {
   context = "."
   dockerfile = "Dockerfile"
   target = "runtime"
-  platforms = ["linux/amd64"]
   tags = ["php-eol-patched:7.0.33"]
   args = {
     PHP_RELEASE = "7.0.33"
@@ -38,11 +36,10 @@ target "php71" {
   context = "."
   dockerfile = "Dockerfile"
   target = "runtime"
-  platforms = ["linux/amd64"]
   tags = ["php-eol-patched:7.1.33"]
   args = {
     PHP_RELEASE = "7.1.33"
-    BASE_IMAGE = "php:7.1.33-fpm-stretch@sha256:b3ab332d16643ea8d6967c8b2d7e8678026224c8b283e8e667465efbf5123b73"
+    BASE_IMAGE = "php:7.1.33-fpm-stretch@sha256:aa24ec376855697d8b84960f4e0e616faae4afdf7ee43c957dc35e5992244d51"
   }
 }
 
@@ -50,11 +47,10 @@ target "php72" {
   context = "."
   dockerfile = "Dockerfile"
   target = "runtime"
-  platforms = ["linux/amd64"]
   tags = ["php-eol-patched:7.2.34"]
   args = {
     PHP_RELEASE = "7.2.34"
-    BASE_IMAGE = "php:7.2.34-fpm-buster@sha256:cde8c998f1d61d48b56a5f68b9af07737ace947a79a29febaac9b2e26d3d2490"
+    BASE_IMAGE = "php:7.2.34-fpm-buster@sha256:9c84ae47fddb97b94d1d2e289635b7306142a5336bc4ece0a393458c5e0d2cef"
   }
 }
 
@@ -62,7 +58,6 @@ target "php73" {
   context = "."
   dockerfile = "Dockerfile"
   target = "runtime"
-  platforms = ["linux/amd64"]
   tags = ["php-eol-patched:7.3.33"]
   args = {
     PHP_RELEASE = "7.3.33"
@@ -74,7 +69,6 @@ target "php74" {
   context = "."
   dockerfile = "Dockerfile"
   target = "runtime"
-  platforms = ["linux/amd64"]
   tags = ["php-eol-patched:7.4.33"]
   args = {
     PHP_RELEASE = "7.4.33"
@@ -86,11 +80,10 @@ target "php80" {
   context = "."
   dockerfile = "Dockerfile"
   target = "runtime"
-  platforms = ["linux/amd64"]
   tags = ["php-eol-patched:8.0.30"]
   args = {
     PHP_RELEASE = "8.0.30"
-    BASE_IMAGE = "php:8.0.30-fpm-bullseye@sha256:f4874097fc37a9d270e21523f40f621fe574183372d5133de6eb88ed2f663d54"
+    BASE_IMAGE = "php:8.0.30-fpm-bullseye@sha256:b07b8df17506cdb370945d942c5f12356af2d078005ded8b195f7e17129de9d1"
   }
 }
 
@@ -98,7 +91,6 @@ target "php81" {
   context = "."
   dockerfile = "Dockerfile"
   target = "runtime"
-  platforms = ["linux/amd64"]
   tags = ["php-eol-patched:8.1.34"]
   args = {
     PHP_RELEASE = "8.1.34"

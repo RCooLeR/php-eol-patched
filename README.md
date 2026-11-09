@@ -6,7 +6,7 @@
 
 PHP CLI/FPM images with selected published security backports for PHP 5.6–8.1.
 
-The badge tracks builds and tests for all eight PHP releases on pushes to `minimal`. Images are published by the `main` workflow after each release's checks pass.
+The badge tracks builds and tests for all eight PHP releases on native amd64 and arm64 runners on pushes to `minimal`. Images are published by the `main` workflow after each release's checks pass.
 
 > [!CAUTION]
 > **Temporary migration aid**
@@ -38,7 +38,7 @@ docker buildx bake --load php71
 | `php80` | `php-eol-patched:8.0.30` |
 | `php81` | `php-eol-patched:8.1.34` |
 
-The `default`, `minimal` and `all` Bake groups each build these eight images. A plain `docker build` also produces a minimal runtime. Only Linux amd64 is supported. Builds start from pinned official PHP images, apply the patches once, and compile the selected modules. After a release's tests pass on a push to `main`, CI publishes its images to `ghcr.io/rcooler/php-eol-patched`. Release tags match the local tags above. Each build also gets `<tag>-<full-commit>-<run-id>-<attempt>` tags, so reruns have separate references. Tags can be reassigned; pin a digest for an exact image:
+The `default`, `minimal` and `all` Bake groups each build these eight images. A plain `docker build` also produces a minimal runtime. Linux amd64 and arm64 are supported. Builds start from pinned multi-platform official PHP images, apply the patches once per architecture, and compile the selected modules. After a release's tests pass on both architectures on a push to `main`, CI publishes its multi-platform images to `ghcr.io/rcooler/php-eol-patched`. Release tags match the local tags above. Each build also gets `<tag>-<full-commit>-<run-id>-<attempt>` tags, so reruns have separate references. Tags can be reassigned; pin the multi-platform manifest digest to retain architecture selection:
 
 ```sh
 docker pull ghcr.io/rcooler/php-eol-patched:7.1.33
@@ -73,6 +73,14 @@ Replace `php71` with another target, or omit the target to build all eight. `BUI
 ```sh
 docker buildx bake --load --set php71.args.BUILD_JOBS=4 php71
 ```
+
+Select an architecture explicitly when needed:
+
+```sh
+docker buildx bake --load --set '*.platform=linux/arm64' php71
+```
+
+Building or running that image on an amd64 host requires emulation. On an ARM64 host, use the normal commands without an amd64 override. To build both architectures, use `--set '*.platform=linux/amd64' --set '*.platform+=linux/arm64'` with a multi-platform exporter such as `--push` and your own registry tags; a classic Docker image store cannot `--load` both architectures at once. CI builds and tests them separately. Only the `main` workflow publishes images.
 
 Build all eight minimal images with any of these equivalent commands:
 

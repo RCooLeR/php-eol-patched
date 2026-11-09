@@ -5,6 +5,15 @@ low- or medium-severity backport introduces a compatibility regression, omit it
 and record the remaining gap in [PATCHES.md](../PATCHES.md). Applications still
 need their own tests and staging checks before adopting an image.
 
+CI runs the same required suites on native Linux amd64 and arm64 runners for
+every PHP release, including the minimal runtime and shared test image.
+It verifies image architecture before executing the tests. The `main` workflow
+publishes a release manifest only after both architectures pass. Local Bake commands use
+the builder's native architecture; add `--set '*.platform=linux/arm64'` to
+each build when testing ARM64 through emulation on an amd64 host. Use distinct
+local tags for the runtime and test images to keep them separate from
+existing amd64 builds. Emulated local results do not replace the native CI run.
+
 The further published-CVE tests cover DirectoryIterator paths, BCMath and EXIF
 parsing, Phar permissions and compressed archives, AES-CCM vectors, password and
 URL validation, XML redirects and session-persistent SOAP
@@ -50,7 +59,7 @@ tag allowlists, URL user information, date offsets, day suffixes and interval
 whitespace against ordinary and high-bit inputs. These controls preserve the
 existing Linux behavior; they do not prove other platforms or locales safe.
 
-The PHP 7.1–7.3 ctype ports passed the required local suites for both image
+The PHP 7.1–7.3 ctype ports passed the required local amd64 suites for both image
 variants: 446 focused PHPT passes, three permitted AES-WRAP-PAD skips, and 8,538
 explicit compatibility checks. A separate comparison of 1,863 upstream tests
 against the same builds before these ports found no changed results or skip reasons.
@@ -171,7 +180,7 @@ overflow. The tag-stripping harness places the input immediately after an
 inaccessible page, so a preceding-byte read fails even when PHP output would
 otherwise look correct. The SQLite harness checks its signed-int argument limit
 without allocating a large string. Both Keccak implementations compile and run
-a known-answer digest vector on the supported amd64 platform.
+a known-answer digest vector on each architecture tested by CI.
 
 Run the resource-heavy regressions separately after building the matching test
 image. Use this command for PHP 7.1.33, 7.2.34, 7.3.33 and 7.4.33, one at a time:

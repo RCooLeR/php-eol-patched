@@ -2,6 +2,8 @@
 
 These images contain PHP CLI/FPM and their runtime dependencies, with no shell, apt, PECL or compiler. A downstream Dockerfile cannot run shell commands or compile extensions inside the final image. For conventional application Dockerfiles, Composer, development tools and Debian package installation, use the [`debian` branch's customization guide](https://github.com/RCooLeR/php-eol-patched/blob/debian/CUSTOMIZING.md). [`main`](https://github.com/RCooLeR/php-eol-patched/tree/main) contains both variants.
 
+Linux amd64 and arm64 are supported. Local builds use the builder's native architecture; avoid forcing amd64 on ARM64 hosts.
+
 ## Application configuration and ownership
 
 Copy or mount INI overrides under `/usr/local/etc/php/conf.d/`, and replace the pool at `/usr/local/etc/php-fpm.d/www.conf` when needed. Match the application's path to the web server's `SCRIPT_FILENAME` and keep the FPM listener on port 9000.
