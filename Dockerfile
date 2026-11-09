@@ -9,7 +9,7 @@ ARG PHP_RELEASE=8.1.34
 COPY --from=archive-keyring /usr/share/keyrings/debian-archive-keyring.gpg /etc/apt/trusted.gpg.d/debian-archive.gpg
 COPY --from=archive-keyring /usr/share/keyrings/debian-archive-removed-keys.gpg /etc/apt/trusted.gpg.d/debian-archive-removed.gpg
 COPY scripts/install-build-deps.sh /build/scripts/install-build-deps.sh
-RUN test "$(dpkg --print-architecture)" = amd64 \
+RUN case "$(dpkg --print-architecture)" in amd64|arm64) ;; *) exit 1 ;; esac \
     && /bin/bash /build/scripts/install-build-deps.sh "${PHP_RELEASE}"
 
 FROM dependencies AS patched-source

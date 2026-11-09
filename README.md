@@ -6,7 +6,7 @@
 
 PHP CLI/FPM images with selected published security backports for PHP 5.6–8.1.
 
-The badge tracks builds and tests for all eight PHP releases on pushes to `debian`. Images are published by the `main` workflow after each release's checks pass.
+The badge tracks builds and tests for all eight PHP releases on native amd64 and arm64 runners on pushes to `debian`. Images are published by the `main` workflow after each release's checks pass.
 
 > [!CAUTION]
 > **Temporary migration aid**
@@ -50,7 +50,7 @@ Use `--branch minimal` and target `php71` for the no-shell image. Use `main` whe
 | `php80-debian` | `php-eol-patched:8.0.30-debian` |
 | `php81-debian` | `php-eol-patched:8.1.34-debian` |
 
-Only Linux amd64 is supported. Builds start from pinned official PHP images, apply the patches once, and compile the selected modules. After a release's tests pass on a push to `main`, CI publishes its images to `ghcr.io/rcooler/php-eol-patched`. Release tags match the local tags above. Each build also gets `<tag>-<full-commit>-<run-id>-<attempt>` tags, so reruns have separate references. Tags can be reassigned; pin a digest for an exact image:
+Linux amd64 and arm64 are supported. Builds start from pinned multi-platform official PHP images, apply the patches once per architecture, and compile the selected modules. After a release's tests pass on both architectures on a push to `main`, CI publishes its multi-platform images to `ghcr.io/rcooler/php-eol-patched`. Release tags match the local tags above. Each build also gets `<tag>-<full-commit>-<run-id>-<attempt>` tags, so reruns have separate references. Tags can be reassigned; pin the multi-platform manifest digest to retain architecture selection:
 
 ```sh
 docker pull ghcr.io/rcooler/php-eol-patched:7.1.33-debian
@@ -71,7 +71,7 @@ Composer, Node.js, mail tools and database servers are not included. Test-only m
 
 ## Build and run
 
-Use Docker with Buildx from the repository root:
+Use Docker with Buildx from the repository root. Local builds use the builder's native architecture:
 
 ```sh
 docker buildx bake --load php71-debian
@@ -85,6 +85,14 @@ Replace `php71-debian` with another target. The `default`, `debian` and `all` gr
 docker buildx bake --load --set php71-debian.args.BUILD_JOBS=4 php71-debian
 docker buildx bake --load  # All eight Debian images
 ```
+
+Select an architecture explicitly when needed:
+
+```sh
+docker buildx bake --load --set '*.platform=linux/arm64' php71-debian
+```
+
+Building or running that image on an amd64 host requires emulation. On ARM64 hosts, use the normal commands without an amd64 override. To build both architectures, set `*.platform=linux/amd64` and `*.platform+=linux/arm64` with a multi-platform exporter such as `--push` and your own registry tags; a classic Docker image store cannot load both at once. The `debian` branch tests each architecture independently and does not publish images. The `main` workflow combines tested architectures into release manifests.
 
 The Debian image starts a root FPM master with `www-data` workers (`33:33`) on port 9000. Its pool uses `clear_env = no`, making container environment variables available to PHP. Mount application files at paths matching the web server's `SCRIPT_FILENAME`. Writable cache, log and upload directories must permit the worker UID. See [CUSTOMIZING.md](CUSTOMIZING.md) for an unprivileged UID 1000 example.
 

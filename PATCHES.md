@@ -123,7 +123,7 @@ source checksums. Not-affected builds are identified explicitly below.
 
 The EXIF fixes were already included in the PHP 5.6 and 7.0 maintenance series.
 The [original report](https://bugs.php.net/bug.php?id=77509) concerns 32-bit
-integer overflow; these images support amd64 only. No duplicate patch is added.
+integer overflow; these images target 64-bit amd64 and arm64. No duplicate patch is added.
 
 <a name="notes-sha3"></a>
 
