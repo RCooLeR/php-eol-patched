@@ -175,6 +175,128 @@
         "Zend/tests/GHSA-wm6j-2649-pv75.phpt",
         "ext/mbstring/php_mbregex.c"
       ]
+    },
+    {
+      "file": "CVE-2026-15353.patch",
+      "sha256": "46ead1de089ac65e00656ec99ddf41bccfb9ce57e4275c008927269342739ebf",
+      "sources": [
+        "https://github.com/remicollet/php-src-security/commit/34911d08770ae9f9659d5a0b8c8b61ae7b6ced3b",
+        "https://github.com/php/php-src/security/advisories/GHSA-q23r-hr55-xmpg"
+      ],
+      "adaptation": "Branch maintenance patch, production source changes only.",
+      "paths": [
+        "ext/soap/php_encoding.c"
+      ]
+    },
+    {
+      "file": "CVE-2026-128090.patch",
+      "sha256": "3970ff30b28effd33c2e36ef663be507665dd3efe546e08adab138496e8d8e43",
+      "sources": [
+        "https://github.com/remicollet/php-src-security/commit/88287560c4a3945ad189e6bbf2436165fb73a767",
+        "https://github.com/php/php-src/security/advisories/GHSA-68fq-fh7h-f8gr"
+      ],
+      "adaptation": "Branch maintenance patch, production source changes only.",
+      "paths": [
+        "ext/phar/util.c"
+      ]
+    },
+    {
+      "file": "CVE-2026-129292.patch",
+      "sha256": "b1ce2343fa2d9c0c50b1e34d484a153cc625849698e05591dff2a7a50bdbfa19",
+      "sources": [
+        "https://github.com/remicollet/php-src-security/commit/02629c6960c31adea93aa6a9e8acc69e835f3681",
+        "https://github.com/php/php-src/security/advisories/GHSA-3mg3-cr28-46gc"
+      ],
+      "adaptation": "Branch maintenance patch, production source changes only.",
+      "paths": [
+        "sapi/fpm/fpm/fpm_status.c"
+      ]
+    },
+    {
+      "file": "CVE-2026-129289.patch",
+      "sha256": "30738282fb7591ea14b6029666c22e450af09dab3183708bad786d5d6196b258",
+      "sources": [
+        "https://github.com/remicollet/php-src-security/commit/130836964c5c26b2421891a706ebad5f0b14f713",
+        "https://github.com/php/php-src/security/advisories/GHSA-qc49-hpvq-g2w6"
+      ],
+      "adaptation": "Branch maintenance patch, production source changes only.",
+      "paths": [
+        "main/SAPI.c",
+        "main/fastcgi.c"
+      ]
+    },
+    {
+      "file": "CVE-2026-129506.patch",
+      "sha256": "2a2559e28cd8c41f6b4f9ff2b44b440dcf28b7e73a02474fa74e559dc801f188",
+      "sources": [
+        "https://github.com/remicollet/php-src-security/commit/47f8976103f6022dc10d12eed151b2bc2980ac72",
+        "https://github.com/php/php-src/security/advisories/GHSA-4646-p932-gw34"
+      ],
+      "adaptation": "Branch maintenance patch, production source changes only.",
+      "paths": [
+        "ext/soap/php_xml.c"
+      ]
+    },
+    {
+      "file": "CVE-2026-129496.patch",
+      "sha256": "1af206988b53342f59b42b5229fd023a223c2f0441c5da83e0f7b38394193a6e",
+      "sources": [
+        "https://github.com/remicollet/php-src-security/commit/b3a6786b50a3df7df665b201d45aa8dbb45b9e0e",
+        "https://github.com/php/php-src/security/advisories/GHSA-gr4f-wgx5-jpfv"
+      ],
+      "adaptation": "Branch maintenance patch, production source changes only.",
+      "paths": [
+        "main/main.c"
+      ]
+    },
+    {
+      "file": "CVE-2026-126714.patch",
+      "sha256": "205e37453e2937873b444b15aa3af88c7629e9b01554cde6dcea03e2d6b690fe",
+      "sources": [
+        "https://github.com/remicollet/php-src-security/commit/9c5d97f5bf9548b139f94dadf9d5471b01ecfd3f",
+        "https://github.com/php/php-src/security/advisories/GHSA-fm2m-fjf5-v3cp"
+      ],
+      "adaptation": "Branch maintenance patch, production source changes only.",
+      "paths": [
+        "ext/session/mod_files.c"
+      ]
+    },
+    {
+      "file": "CVE-2026-128064.patch",
+      "sha256": "407d56116efe6f75ded0d551be9ea773bd71bd0b3cbde739f2a36c01aed7f18b",
+      "sources": [
+        "https://github.com/remicollet/php-src-security/commit/061a2967440b9fab45946765f387546d3055b41f",
+        "https://github.com/php/php-src/security/advisories/GHSA-f6gg-rchx-xw8j"
+      ],
+      "adaptation": "Branch maintenance patch, production source changes only.",
+      "paths": [
+        "ext/standard/ftp_fopen_wrapper.c",
+        "ext/standard/http_fopen_wrapper.c"
+      ]
+    },
+    {
+      "file": "CVE-2026-127960.patch",
+      "sha256": "2465b4c49359c195aec04801619530f713a9b9b191806d510f6d351fff21f24f",
+      "sources": [
+        "https://github.com/remicollet/php-src-security/commit/e371eee5ce835619e52fb9acbed9f79f1235d853",
+        "https://github.com/php/php-src/security/advisories/GHSA-mmf9-xm3v-hg2x"
+      ],
+      "adaptation": "Branch maintenance patch, production source changes only.",
+      "paths": [
+        "ext/standard/http_fopen_wrapper.c"
+      ]
+    },
+    {
+      "file": "CVE-2026-129291.patch",
+      "sha256": "968e82691bf7e3e8ce0ecf7e38ef894bf9d6f6d5380168655e25b004c7d0c5dc",
+      "sources": [
+        "https://github.com/remicollet/php-src-security/commit/11400f4539ae94dea40824d2110a3917c474c649",
+        "https://github.com/php/php-src/security/advisories/GHSA-jm4m-qfqx-967m"
+      ],
+      "adaptation": "Branch maintenance patch, production source changes only.",
+      "paths": [
+        "sapi/fpm/fpm/fpm_children.c"
+      ]
     }
   ],
   "verification_limits": {
