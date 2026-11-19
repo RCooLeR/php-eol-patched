@@ -2,6 +2,8 @@
 set -euo pipefail
 version=${1:-$(php -n -r 'echo PHP_VERSION;')}
 source /tests/extensions.sh
+php "${php_args[@]}" -d phar.readonly=0 /tests/ordinary-compatibility.php
+php "${php_args[@]}" /tests/ordinary-https.php
 bash /tests/phpt.sh "$version"
 bash /tests/critical-native.sh "$version"
 if [ "$version" = 7.4.33 ]; then bash /tests/batch2-cli-server.sh; fi

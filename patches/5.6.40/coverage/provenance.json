@@ -16,6 +16,117 @@
         "ext/phar/tests/tar/coverage-symlink-controls.phpt",
         "ext/phar/util.c"
       ]
+    },
+    {
+      "file": "CVE-2026-15353.patch",
+      "sha256": "d259b3d692c324f9587e1c71c08ef40c4363c4155331a2802b4d737591a07a4c",
+      "sources": [
+        "https://packages.sury.org/php/pool/main/p/php5.6/php5.6_5.6.40-109%2Bdebsuryorg12.1%2Bphp%2B1.debian.tar.xz",
+        "https://github.com/php/php-src/security/advisories/GHSA-q23r-hr55-xmpg"
+      ],
+      "adaptation": "Production source from debian/patches/0390-Fix-GHSA-q23r-hr55-xmpg-out-of-bounds-read-on-empty-.patch.",
+      "paths": [
+        "ext/soap/php_encoding.c"
+      ]
+    },
+    {
+      "file": "CVE-2026-128090.patch",
+      "sha256": "63c78ec4108e16a3b6a0380644a47898462b3c263fbe9c1c5b3cc49f2d0a24f6",
+      "sources": [
+        "https://packages.sury.org/php/pool/main/p/php5.6/php5.6_5.6.40-109%2Bdebsuryorg12.1%2Bphp%2B1.debian.tar.xz",
+        "https://github.com/php/php-src/security/advisories/GHSA-68fq-fh7h-f8gr"
+      ],
+      "adaptation": "Production source from debian/patches/0391-Fix-GHSA-68fq-fh7h-f8gr-refuse-keyless-phar-signatur.patch.",
+      "paths": [
+        "ext/phar/util.c"
+      ]
+    },
+    {
+      "file": "CVE-2026-129292.patch",
+      "sha256": "49b003284f473d4534227f66c7f0d15e42f48dc012333bb93915f966369e7820",
+      "sources": [
+        "https://packages.sury.org/php/pool/main/p/php5.6/php5.6_5.6.40-109%2Bdebsuryorg12.1%2Bphp%2B1.debian.tar.xz",
+        "https://github.com/php/php-src/security/advisories/GHSA-3mg3-cr28-46gc"
+      ],
+      "adaptation": "Production source from debian/patches/0393-Fix-GHSA-3mg3-cr28-46gc-FPM-XSS-within-status-endpoi.patch.",
+      "paths": [
+        "sapi/fpm/fpm/fpm_status.c"
+      ]
+    },
+    {
+      "file": "CVE-2026-129289.patch",
+      "sha256": "a3959256c3553b7ae5df7cf5835f5a86fc53642d7fd8e77f69de882b568ac5f2",
+      "sources": [
+        "https://packages.sury.org/php/pool/main/p/php5.6/php5.6_5.6.40-109%2Bdebsuryorg12.1%2Bphp%2B1.debian.tar.xz",
+        "https://github.com/php/php-src/security/advisories/GHSA-qc49-hpvq-g2w6"
+      ],
+      "adaptation": "Production source from debian/patches/0394-Fix-GHSA-qc49-hpvq-g2w6-Drain-unread-request-bodies.patch.",
+      "paths": [
+        "main/SAPI.c",
+        "sapi/cgi/fastcgi.c",
+        "sapi/fpm/fpm/fastcgi.c"
+      ]
+    },
+    {
+      "file": "CVE-2026-129506.patch",
+      "sha256": "730705e40ffa8210d664ff4d386ab911855e1c907fe8e87a41b28826e7396e3e",
+      "sources": [
+        "https://packages.sury.org/php/pool/main/p/php5.6/php5.6_5.6.40-109%2Bdebsuryorg12.1%2Bphp%2B1.debian.tar.xz",
+        "https://github.com/php/php-src/security/advisories/GHSA-4646-p932-gw34"
+      ],
+      "adaptation": "Production source from debian/patches/0395-Fix-GHSA-4646-p932-gw34-keep-SOAP-DTD-alive-during-c.patch.",
+      "paths": [
+        "ext/soap/php_xml.c"
+      ]
+    },
+    {
+      "file": "CVE-2026-129496.patch",
+      "sha256": "5fc8fe9e11d3ffeaceb795ff49fada9996c23b01d3baa0fbe6104a5ed8856c3f",
+      "sources": [
+        "https://packages.sury.org/php/pool/main/p/php5.6/php5.6_5.6.40-109%2Bdebsuryorg12.1%2Bphp%2B1.debian.tar.xz",
+        "https://github.com/php/php-src/security/advisories/GHSA-gr4f-wgx5-jpfv"
+      ],
+      "adaptation": "Production source from debian/patches/0396-Fix-GHSA-gr4f-wgx5-jpfv-DATEG-tzcache-use-after-free.patch.",
+      "paths": [
+        "main/main.c"
+      ]
+    },
+    {
+      "file": "CVE-2026-126714.patch",
+      "sha256": "c78cd0c5e2ea29c30339eb1f40c1762286c20b2176bf8775b4203872fd8f8208",
+      "sources": [
+        "https://packages.sury.org/php/pool/main/p/php5.6/php5.6_5.6.40-109%2Bdebsuryorg12.1%2Bphp%2B1.debian.tar.xz",
+        "https://github.com/php/php-src/security/advisories/GHSA-fm2m-fjf5-v3cp"
+      ],
+      "adaptation": "Production source from debian/patches/0397-Fix-GHSA-fm2m-fjf5-v3cp-RCE-via-corrupted-session-fi.patch.",
+      "paths": [
+        "ext/session/mod_files.c"
+      ]
+    },
+    {
+      "file": "CVE-2026-128064.patch",
+      "sha256": "19d2b53b5d00fad8c1cc616a2d2a0aadd4084417d7be4f63522e12ddac2539e8",
+      "sources": [
+        "https://packages.sury.org/php/pool/main/p/php5.6/php5.6_5.6.40-109%2Bdebsuryorg12.1%2Bphp%2B1.debian.tar.xz",
+        "https://github.com/php/php-src/security/advisories/GHSA-f6gg-rchx-xw8j"
+      ],
+      "adaptation": "Production source from debian/patches/0399-Fix-GHSA-f6gg-rchx-xw8j-mixed-case-HTTPS-and-FTPS.patch.",
+      "paths": [
+        "ext/standard/ftp_fopen_wrapper.c",
+        "ext/standard/http_fopen_wrapper.c"
+      ]
+    },
+    {
+      "file": "CVE-2026-127960.patch",
+      "sha256": "2a29d9cf84067b49619eccaf7442a1fe10947a43405b8a0cde40218eccb3e74b",
+      "sources": [
+        "https://github.com/remicollet/php-src-security/commit/5826df3705019343905d3bb6107f5aa95588e460",
+        "https://github.com/php/php-src/security/advisories/GHSA-mmf9-xm3v-hg2x"
+      ],
+      "adaptation": "Adapt the PHP 7.0 fix to PHP 5.6 string ownership. Grow the header buffer geometrically and validate lengths against the signed PHP 5 string limit before appending.",
+      "paths": [
+        "ext/standard/http_fopen_wrapper.c"
+      ]
     }
   ],
   "verification_limits": {
