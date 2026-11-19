@@ -19,7 +19,8 @@ Scores are the published CVSS base scores, with the version shown beside each
 number and a link to its source. The assigning CVE Numbering Authority's (CNA)
 newest published CVSS version is preferred. CISA-ADP, NVD or vendor scores fill
 gaps; CNA and NVD ratings can differ. Scores describe the original vulnerability, not the
-remaining risk after this repository's fixes or mitigations. Checked 2026-10-27.
+remaining risk after this repository's fixes or mitigations. Scores for the
+November releases were checked on 2026-11-19 and earlier entries on 2026-10-27.
 
 ## CVEs with missing fixes
 
@@ -32,6 +33,52 @@ remaining risk after this repository's fixes or mitigations. Checked 2026-10-27.
 These remaining gaps require a compatible backport, a dependency repair or a
 published follow-up that covers the remaining path. The two critical EOL
 mitigations are listed separately below and are not complete fixes.
+
+## November 2026 PHP security releases
+
+The November 19 releases list 17 PHP advisories and one bundled-library CVE.
+Nine fixes have backports for all eight EOL targets. One additional fix applies
+to PHP 8.1. The table describes the source used to build both image variants.
+The linked PHP advisories supply the CVSS v4.0 scores.
+[PHP 8.2.36, 8.3.37, 8.4.28, 8.5.13 and 8.6.0 changelogs](https://www.php.net/ChangeLog-8.php#8.2.36).
+
+| CVE | CVSS v4.0 | What changed | Repository coverage |
+| --- | ---: | --- | --- |
+| [CVE-2026-129289](https://github.com/php/php-src/security/advisories/GHSA-qc49-hpvq-g2w6) | 9.2 | Drain unread request bodies before reusing an FPM connection | Backported, all eight |
+| [CVE-2026-126714](https://github.com/php/php-src/security/advisories/GHSA-fm2m-fjf5-v3cp) | 9.2 | Truncate file-backed sessions before replacement writes and handle truncation failure | Backported, all eight |
+| [CVE-2026-129496](https://github.com/php/php-src/security/advisories/GHSA-gr4f-wgx5-jpfv) | 9.2 | Keep startup and early-request diagnostics from using a freed timezone cache | Backported, all eight |
+| [CVE-2026-129291](https://github.com/php/php-src/security/advisories/GHSA-jm4m-qfqx-967m) | 8.8 | Unregister FPM worker output events before closing their descriptors | Backported, **8.1**. PHP 5.6–8.0 lack the delayed cleanup introduced in 8.1.20. |
+| [CVE-2026-127960](https://github.com/php/php-src/security/advisories/GHSA-mmf9-xm3v-hg2x) | 8.7 | Accumulate folded HTTP response headers without copying the whole header for every continuation | Backported, all eight |
+| [CVE-2026-128064](https://github.com/php/php-src/security/advisories/GHSA-f6gg-rchx-xw8j) | 8.2 | Recognize HTTPS and FTPS schemes regardless of letter case so transport encryption stays enabled | Backported, all eight |
+| [CVE-2026-128090](https://github.com/php/php-src/security/advisories/GHSA-68fq-fh7h-f8gr) | 7.7 | Require an OpenSSL Phar signature when the archive has an adjacent public key | Backported, all eight |
+| [CVE-2026-15353](https://github.com/php/php-src/security/advisories/GHSA-q23r-hr55-xmpg) | 6.3 | Handle empty SOAP array dimensions without reading outside the array | Backported, all eight |
+| [CVE-2026-129506](https://github.com/php/php-src/security/advisories/GHSA-4646-p932-gw34) | 6.3 | Keep the SOAP document type definition alive while XML nodes still reference it | Backported, all eight |
+| [CVE-2026-129292](https://github.com/php/php-src/security/advisories/GHSA-3mg3-cr28-46gc) | 5.3 | Escape additional request fields in the FPM status response | Backported, all eight |
+
+PHP 5.6 uses native patches from the [Surý PHP 5.6.40-109 source package](https://packages.sury.org/php/pool/main/p/php5.6/php5.6_5.6.40-109%2Bdebsuryorg12.1%2Bphp%2B1.debian.tar.xz).
+Its earlier HTTP backports include the folded-header parser, so it also needs
+the folded-header repair. The PHP 5.6 adaptation grows the buffer geometrically
+and checks the length against its signed string limit. PHP 7.0–8.1 use the
+corresponding [Remi maintenance branches](https://github.com/remicollet/php-src-security).
+Each release's `coverage/provenance.json` identifies the source of each patch
+and its adaptations. [PHP 5.6 provenance](patches/5.6.40/coverage/provenance.json) · [PHP 8.1 provenance](patches/8.1.34/coverage/provenance.json).
+
+The [compatibility test](tests/ordinary-compatibility.php) reads both hash-signed
+and OpenSSL-signed Phar archives, reopens a shortened session, converts dates
+across timezones and reads a small HTTP response with folded headers. The
+[HTTPS test](tests/ordinary-https.php) uses a mixed-case URL to fetch a response
+from a TLS-only endpoint with certificate and hostname verification enabled.
+
+| Advisory | CVSS | Coverage in all eight EOL builds |
+| --- | ---: | --- |
+| [CVE-2026-115560](https://github.com/php/php-src/security/advisories/GHSA-658j-r8rw-q6mx) | 9.2 (v4.0) | **Mitigated.** The existing source patch disables session upload progress even if an INI setting enables it. This blocks the reported serializer-mismatch path. The separate file-write issue is covered by CVE-2026-126714 above. |
+| [CVE-2026-129538](https://github.com/php/php-src/security/advisories/GHSA-5j3f-64r7-f564) | 6.9 (v4.0) | **Not affected.** The path-handling defect is specific to the standalone CGI binary. These images build CLI and FPM with `--disable-cgi`. |
+| [CVE-2026-129481](https://github.com/php/php-src/security/advisories/GHSA-g3vh-838c-65v7) | 9.2 (v4.0) | **Not affected.** The session filename field involved in interrupted shutdown first appears in PHP 8.3. |
+| [CVE-2026-129501](https://github.com/php/php-src/security/advisories/GHSA-x8r7-mg3g-74hg) | 6.3 (v4.0) | **Not affected.** The modern DOM XML serializer was introduced in PHP 8.4. These builds use the legacy DOM implementation. |
+| [CVE-2026-129182](https://github.com/php/php-src/security/advisories/GHSA-2fjv-p558-g82m) | 9.2 (v4.0) | **Not affected.** The PHP 8.5 fatal-error backtrace global is absent. |
+| [CVE-2026-129474](https://github.com/php/php-src/security/advisories/GHSA-8mjj-2r7p-4hg2) | 9.2 (v4.0) | **Not affected by the reported remote path.** It requires PHP 8.5 fatal-error backtraces. Upstream distinguishes the underlying backtrace handling on older branches. |
+| [CVE-2026-129438](https://github.com/php/php-src/security/advisories/GHSA-mg3p-mxj9-g2mm) | 6.3 (v4.0) | **Not affected.** These builds predate the PHP 8.5 URI extension and its RFC 3986 serializer. |
+| [CVE-2026-48841](https://github.com/uriparser/uriparser/pull/313) | [9.8 (v3.0, Tenable)](https://www.tenable.com/plugins/nessus/374818) | **Not affected through PHP.** The affected uriparser query composer comes with the newer URI extension. |
 
 ## Core, SOAP, Phar, HTTP, TLS and FPM
 
