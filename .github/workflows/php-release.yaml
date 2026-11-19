@@ -96,7 +96,11 @@ jobs:
           for variant in -source "" -debian; do
             tag="$PHP_RELEASE$variant-$build_id-$ARCH"
             docker tag "php-eol-patched:$PHP_RELEASE$variant" "$image:$tag"
-            docker push "$image:$tag"
+            if ! docker push "$image:$tag"; then
+              echo "Retrying the push of $image:$tag in 15 seconds"
+              sleep 15
+              docker push "$image:$tag"
+            fi
           done
 
   publish:
